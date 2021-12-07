@@ -2,6 +2,7 @@ package ai.wapl.noteapi.domain;
 
 import org.springframework.data.annotation.Id;
 
+import ai.wapl.noteapi.dto.PageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.sql.Clob;
 import java.time.LocalDateTime;
@@ -79,4 +82,5 @@ public class Page {
 
     @OneToMany(mappedBy = "tag")
     private List<PageTag> tagPageList;
+
 }

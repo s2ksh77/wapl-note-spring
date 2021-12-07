@@ -2,11 +2,14 @@ package ai.wapl.noteapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Tag {
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-    @JsonProperty("TAG_ID")
+@Getter
+@Setter
+@Builder
+public class TagDTO {
     private String id;
-
-    @JsonProperty("TEXT")
     private String name;
 }
