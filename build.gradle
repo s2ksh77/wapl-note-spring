@@ -14,8 +14,61 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.hibernate:hibernate-core:5.2.13.Final'
+
+    // json binding
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    //jpa query binding parameter show
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8'
+
+    //tibero
+    implementation fileTree( dir : 'libs', include : ['*.jar'])
+
+    //query dsl
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation 'org.jetbrains:annotations:20.1.0'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.slf4j:jcl-over-slf4j'
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'com.google.code.gson:gson'
+
+    // firebase sdk
+    implementation 'com.google.firebase:firebase-admin:6.8.1'
+
+    // for webclient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation 'io.projectreactor:reactor-test'
+
+    // for webclient test
+    testImplementation 'com.squareup.okhttp3:mockwebserver'
+    testRuntimeOnly 'com.squareup.okhttp3:okhttp:4.9.1'
+
+    implementation 'javax.xml.bind:jaxb-api'
+
+    testImplementation 'org.mockito:mockito-core:3.11.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.11.2'
+	runtimeOnly 'com.h2database:h2'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+
 }
 
 test {

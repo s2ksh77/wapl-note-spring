@@ -1,4 +1,4 @@
-package wapl.noteapi.noteapi;
+package ai.wapl.noteapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
