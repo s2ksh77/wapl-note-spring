@@ -1,11 +1,14 @@
 package ai.wapl.noteapi.domain;
 
-import org.springframework.data.annotation.Id;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+
 import javax.persistence.*;
 
 @Data
@@ -23,5 +26,9 @@ public class Tag {
 
     @Column(name = "TEXT")
     private String name;
+
+    @OneToMany
+    @JoinColumn(name = "NOTE_ID")
+    private List<Page> pageTagList;
 
 }

@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Lob;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.*;
 
 @Getter

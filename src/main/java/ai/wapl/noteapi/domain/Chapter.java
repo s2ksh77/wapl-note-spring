@@ -1,6 +1,6 @@
 package ai.wapl.noteapi.domain;
 
-import org.springframework.data.annotation.Id;
+import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
