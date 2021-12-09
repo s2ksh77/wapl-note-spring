@@ -82,4 +82,8 @@ public class Page {
     @JoinTable(name = "TB_NOTEAPP_TAG_MST", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "TAG_ID"))
     private final List<Tag> tagList = new ArrayList<Tag>();
 
+    @ManyToMany
+    @JoinTable(name = "TB_NOTEAPP_NOTE_FILE_MAP", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "FILE_ID"))
+    private final List<File> fileList = new ArrayList<File>();
+
 }
