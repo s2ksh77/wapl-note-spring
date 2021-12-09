@@ -2,6 +2,7 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 
 import java.sql.Clob;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -76,8 +78,8 @@ public class Page {
     @Lob
     private String textContent;
 
-    @OneToMany
-    @JoinColumn(name = "TAG_ID")
-    private List<Tag> tagPageList;
+    @ManyToMany
+    @JoinTable(name = "TB_NOTEAPP_TAG_MST", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "TAG_ID"))
+    private final List<Tag> tagList = new ArrayList<Tag>();
 
 }

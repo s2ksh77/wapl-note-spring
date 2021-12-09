@@ -27,8 +27,4 @@ public class Tag {
     @Column(name = "TEXT")
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "NOTE_ID")
-    private List<Page> pageTagList;
-
 }

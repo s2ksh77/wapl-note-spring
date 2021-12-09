@@ -1,11 +1,6 @@
 package ai.wapl.noteapi.dto;
 
-import java.sql.Clob;
-import java.time.LocalDateTime;
-
-import javax.persistence.FetchType;
 import javax.persistence.Lob;
-import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
