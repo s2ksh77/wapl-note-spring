@@ -1,6 +1,7 @@
 package ai.wapl.noteapi.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -15,16 +16,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.service.PageService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(path = "/note-api/note")
+@RequiredArgsConstructor
+@RequestMapping(path = "/note-api/page")
 public class PageController {
-    // private final Page pageService;
+
+    private final PageService pageService;
 
     // @Autowired
-    // public PageController(Page pageService) {
+    // public PageController(PageService pageService) {
     // this.pageService = pageService;
     // }
+    @GetMapping(path = "/{pageId}")
+    public ResponseEntity getPageInfoList(@PathVariable("pageId") String pageId) {
+        System.out.println("Request Method : GET");
+        Page pageInfo = pageService.getPageInfo(pageId);
+        return ResponseEntity.ok().body(pageInfo);
+    }
 
     @GetMapping
     public List<Page> getAll() {

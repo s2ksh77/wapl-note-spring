@@ -27,6 +27,15 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
     testImplementation 'io.projectreactor:reactor-test'
+
+    // Tibero
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+
+    //query dsl
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation 'org.jetbrains:annotations:20.1.0'
+
 }
 
 test {

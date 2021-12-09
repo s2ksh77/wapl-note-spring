@@ -2,6 +2,8 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,10 +36,10 @@ public class Page {
     private String name;
 
     @Column(name = "CREATED_DATE")
-    private LocalDateTime createdDate;
+    private String createdDate;
 
     @Column(name = "MODIFIED_DATE")
-    private LocalDateTime modifiedDate;
+    private String modifiedDate;
 
     @Column(name = "USER_NAME")
     private String userName;
@@ -50,7 +52,7 @@ public class Page {
 
     @Column(name = "NOTE_CONTENT")
     @Lob
-    private Clob content;
+    private String content;
 
     @Column(name = "USER_ID")
     private String userId;
@@ -68,11 +70,11 @@ public class Page {
     private String createdUserId;
 
     @Column(name = "NOTE_DELETED_AT")
-    private LocalDateTime deletedDate;
+    private String deletedDate;
 
-    @Column(name = "TEXT_CONTEXT")
+    @Column(name = "TEXT_CONTENT")
     @Lob
-    private Clob textContent;
+    private String textContent;
 
     @OneToMany
     @JoinColumn(name = "TAG_ID")

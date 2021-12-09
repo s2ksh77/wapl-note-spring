@@ -5,6 +5,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.repository.PageRepository;
 
 @Service
