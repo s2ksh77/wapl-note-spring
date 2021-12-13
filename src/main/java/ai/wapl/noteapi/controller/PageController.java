@@ -1,12 +1,7 @@
 package ai.wapl.noteapi.controller;
 
-import java.io.Console;
 import java.util.List;
-import java.util.Map;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,7 +29,7 @@ public class PageController {
     // this.pageService = pageService;
     // }
     @GetMapping(path = "/{pageId}")
-    public ResponseEntity getPageInfoList(@PathVariable("pageId") String pageId) {
+    public ResponseEntity<Page> getPageInfoList(@PathVariable("pageId") String pageId) {
         System.out.println("Request Method : GET");
         Page pageInfo = pageService.getPageInfo(pageId);
         return ResponseEntity.ok().body(pageInfo);

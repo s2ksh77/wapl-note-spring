@@ -1,9 +1,6 @@
 package ai.wapl.noteapi.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -11,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.PageDTO;
-import ai.wapl.noteapi.dto.PageListDTO;
 import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 
