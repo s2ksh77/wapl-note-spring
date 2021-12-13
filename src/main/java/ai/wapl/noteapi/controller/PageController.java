@@ -1,11 +1,13 @@
 package ai.wapl.noteapi.controller;
 
+import java.io.Console;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,16 +45,21 @@ public class PageController {
         return null;
     }
 
-    // @PostMapping
-    // public ResponseEntity<Page> createPage(@RequestBody @Valid Page page){
-    // Page result = pageService.createPage(page);
-    // // return new ResponseEntity<>(result, HttpStatus.CREATED);
-    // }
+    @PostMapping
+    public ResponseEntity<Page> createPage(@RequestBody Page inputDTO) {
+        System.out.println(inputDTO);
+        // return ResponseEntity.ok().body(inputDTO);
+        Page result = pageService.createPage(inputDTO);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
 
-    // @DeleteMapping(path = "/{note_id}")
-    // public ResponseEntity deletePage(@PathVariable long pageId) {
-    // pageService.deletePage(pageId);
-    // return new ResponseEntity(HttpStatus.OK);
-    // }
+    @DeleteMapping(path = "/Delete")
+    public ResponseEntity<Page> deletePage(@RequestBody List<PageDTO> pageList) {
+        System.out.println(pageList);
+        Page result = pageService.deletePage(pageList);
+        // return ResponseEntity.ok().body(result);
+        System.out.println(result);
+        return ResponseEntity.ok().body(result);
+    }
 
 }

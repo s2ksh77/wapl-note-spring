@@ -2,8 +2,13 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +19,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import java.sql.Clob;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +34,8 @@ import java.util.List;
 public class Page {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "NOTE_ID")
     private String id;
 
@@ -38,9 +46,15 @@ public class Page {
     private String name;
 
     @Column(name = "CREATED_DATE")
+    // @CreationTimestamp
+    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY.MM.DD
+    // HH24:MI:SS", timezone = "Asia/Seoul")
     private String createdDate;
 
     @Column(name = "MODIFIED_DATE")
+    // @UpdateTimestamp
+    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY.MM.DD
+    // HH24:MI:SS", timezone = "Asia/Seoul")
     private String modifiedDate;
 
     @Column(name = "USER_NAME")
@@ -85,5 +99,8 @@ public class Page {
     @ManyToMany
     @JoinTable(name = "TB_NOTEAPP_NOTE_FILE_MAP", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "FILE_ID"))
     private final List<File> fileList = new ArrayList<File>();
+
+    @Transient
+    private String resultMsg;
 
 }
