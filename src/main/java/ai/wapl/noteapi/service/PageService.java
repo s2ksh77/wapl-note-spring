@@ -1,6 +1,8 @@
 package ai.wapl.noteapi.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -59,7 +61,7 @@ public class PageService {
     public Page deletePage(List<PageDTO> inputList) {
         Page output = new Page();
 
-        // TODO: 페이지 별 파일 조회해서 삭제 후 페이지 삭제하도록
+        // TODO 페이지 별 파일 조회해서 삭제 후 페이지 삭제하도록
         try {
             for (PageDTO page : inputList) {
                 pageRepository.deleteById(page.getId());
@@ -72,4 +74,81 @@ public class PageService {
 
         return output;
     }
+
+    public Page updatePage(Page inputPage) {
+        Page pageInfo = pageRepository.findById(inputPage.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
+        Page output = new Page();
+
+        if (inputPage.getType().equals("NONEDIT") && !pageInfo.getEditingUserId().isEmpty()
+                && inputPage.getUserId().equals(pageInfo.getEditingUserId())) {
+            pageRepository.save(inputPage);
+            output.setResultMsg("Success");
+            return output;
+        }
+
+        if (inputPage.getType().equals("EDIT_START") && !pageInfo.getEditingUserId().isEmpty()
+                && !inputPage.getUserId().equals(pageInfo.getEditingUserId())) {
+            output.setResultMsg("Fail");
+            return output;
+        }
+        if (inputPage.getType().equals("MOVE")
+                || inputPage.getType().equals("RENAME") && pageInfo.getEditingUserId().isEmpty()
+                || inputPage.getType().equals("EDIT_DONE")) {
+            inputPage.setModifiedDate(NoteUtil.generateDate());
+        } else {
+            output.setResultMsg("Fail");
+            return output;
+        }
+        output.setResultMsg("Success");
+        pageRepository.save(inputPage);
+        return output;
+    }
+
+    // public Page updatePage(Page inputPage) {
+    // long count = 0;
+    // String type = inputPage.getType();
+    // if (type.equals("EDIT_START")) {
+    // count = pageRepository.editStartPage(inputPage.getId(), inputPage.getName(),
+    // inputPage.getChapterId(),
+    // inputPage.getEditingUserId(), inputPage.getUserId());
+    // if (count < 0)
+    // throw new RuntimeException("Edit Start Failed");
+    // } else if (type.equals("NONEIDT")) {
+    // count = pageRepository.nonEditPage(inputPage.getId(),
+    // inputPage.getChapterId(),
+    // inputPage.getEditingUserId());
+    // } else if (type.equals("MOVE") || type.equals("RENAME")) {
+    // count = pageRepository.moveRenamePage(inputPage.getId(), inputPage.getName(),
+    // inputPage.getChapterId(),
+    // inputPage.getEditingUserId(), inputPage.getUserId(),
+    // inputPage.getUserName());
+    // } else if (type.equals("EDIT_DONE")) {
+    // count = pageRepository.editDonePage(inputPage.getId(), inputPage.getName(),
+    // inputPage.getContent(),
+    // inputPage.getTextContent(), inputPage.getUserName(),
+    // inputPage.getFavorite(), inputPage.getChapterId(),
+    // inputPage.getEditingUserId(),
+    // inputPage.getUserId());
+    // }
+
+    // Page result = new Page();
+    // return result;
+    // }
+
+    // public Object getUpdateQuery(String type) {
+    // if (type.equals("EDIT_START")) {
+    // return pageRepository.editStartPage(id, name, chapterId, editingUserId,
+    // userId);
+    // } else if (type.equals("NONEIDT")) {
+    // return pageRepository.nonEditPage(id, chapterId, editingUserId);
+    // } else if (type.equals("MOVE") || type.equals("RENAME")) {
+    // return pageRepository.moveRenamePage(id, name, chapterId, editingUserId,
+    // userId, userName);
+    // } else if (type.equals("EDIT_DONE")) {
+    // return pageRepository.editDonePage(id, name, content, textContent, userName,
+    // favorite, chapterId, editingUserId, userId);
+    // }
+
+    // }
 }

@@ -57,4 +57,11 @@ public class PageController {
         return ResponseEntity.ok().body(result);
     }
 
+    @PostMapping(path = "/Update")
+    public ResponseEntity<Page> updatePage(@RequestBody Page inputDTO) {
+        System.out.println(inputDTO);
+        Page result = pageService.updatePage(inputDTO);
+        return ResponseEntity.ok().body(result);
+        // return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
 }
