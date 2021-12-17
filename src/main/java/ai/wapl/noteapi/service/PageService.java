@@ -1,8 +1,6 @@
 package ai.wapl.noteapi.service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -82,7 +80,8 @@ public class PageService {
 
         if (inputPage.getType().equals("NONEDIT") && !pageInfo.getEditingUserId().isEmpty()
                 && inputPage.getUserId().equals(pageInfo.getEditingUserId())) {
-            pageRepository.save(inputPage);
+            pageInfo.setEditingUserId("");
+            pageRepository.save(pageInfo);
             output.setResultMsg("Success");
             return output;
         }
@@ -92,63 +91,26 @@ public class PageService {
             output.setResultMsg("Fail");
             return output;
         }
-        if (inputPage.getType().equals("MOVE")
-                || inputPage.getType().equals("RENAME") && pageInfo.getEditingUserId().isEmpty()
-                || inputPage.getType().equals("EDIT_DONE")) {
-            inputPage.setModifiedDate(NoteUtil.generateDate());
+        if (inputPage.getType().equals("MOVE")) {
+            pageInfo.setChapterId(inputPage.getChapterId());
+            pageInfo.setModifiedDate(NoteUtil.generateDate());
+        } else if (inputPage.getType().equals("RENAME") && pageInfo.getEditingUserId().isEmpty()) {
+            pageInfo.setName(inputPage.getName());
+            pageInfo.setModifiedDate(NoteUtil.generateDate());
+        } else if (inputPage.getType().equals("EDIT_DONE")) {
+            pageInfo.setName(inputPage.getName() != null ? inputPage.getName() : pageInfo.getName());
+            pageInfo.setContent(inputPage.getContent() != null ? inputPage.getContent() : pageInfo.getContent());
+            pageInfo.setTextContent(
+                    inputPage.getTextContent() != null ? inputPage.getTextContent() : pageInfo.getTextContent());
+            pageInfo.setModifiedDate(NoteUtil.generateDate());
+            pageInfo.setUserName(inputPage.getUserName() != null ? inputPage.getUserName() : pageInfo.getUserName());
+            pageInfo.setUserId(inputPage.getUserId() != null ? inputPage.getUserId() : pageInfo.getUserId());
         } else {
             output.setResultMsg("Fail");
             return output;
         }
         output.setResultMsg("Success");
-        pageRepository.save(inputPage);
+        pageRepository.save(pageInfo);
         return output;
     }
-
-    // public Page updatePage(Page inputPage) {
-    // long count = 0;
-    // String type = inputPage.getType();
-    // if (type.equals("EDIT_START")) {
-    // count = pageRepository.editStartPage(inputPage.getId(), inputPage.getName(),
-    // inputPage.getChapterId(),
-    // inputPage.getEditingUserId(), inputPage.getUserId());
-    // if (count < 0)
-    // throw new RuntimeException("Edit Start Failed");
-    // } else if (type.equals("NONEIDT")) {
-    // count = pageRepository.nonEditPage(inputPage.getId(),
-    // inputPage.getChapterId(),
-    // inputPage.getEditingUserId());
-    // } else if (type.equals("MOVE") || type.equals("RENAME")) {
-    // count = pageRepository.moveRenamePage(inputPage.getId(), inputPage.getName(),
-    // inputPage.getChapterId(),
-    // inputPage.getEditingUserId(), inputPage.getUserId(),
-    // inputPage.getUserName());
-    // } else if (type.equals("EDIT_DONE")) {
-    // count = pageRepository.editDonePage(inputPage.getId(), inputPage.getName(),
-    // inputPage.getContent(),
-    // inputPage.getTextContent(), inputPage.getUserName(),
-    // inputPage.getFavorite(), inputPage.getChapterId(),
-    // inputPage.getEditingUserId(),
-    // inputPage.getUserId());
-    // }
-
-    // Page result = new Page();
-    // return result;
-    // }
-
-    // public Object getUpdateQuery(String type) {
-    // if (type.equals("EDIT_START")) {
-    // return pageRepository.editStartPage(id, name, chapterId, editingUserId,
-    // userId);
-    // } else if (type.equals("NONEIDT")) {
-    // return pageRepository.nonEditPage(id, chapterId, editingUserId);
-    // } else if (type.equals("MOVE") || type.equals("RENAME")) {
-    // return pageRepository.moveRenamePage(id, name, chapterId, editingUserId,
-    // userId, userName);
-    // } else if (type.equals("EDIT_DONE")) {
-    // return pageRepository.editDonePage(id, name, content, textContent, userName,
-    // favorite, chapterId, editingUserId, userId);
-    // }
-
-    // }
 }
