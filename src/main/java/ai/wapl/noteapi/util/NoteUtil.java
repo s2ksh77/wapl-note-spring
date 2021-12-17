@@ -12,6 +12,6 @@ public class NoteUtil {
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
 
-        return sdf.format(time);
+        return sdf.format(time) + " Asia/Seoul";
     }
 }

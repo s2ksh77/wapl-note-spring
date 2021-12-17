@@ -42,8 +42,8 @@ public class PageService {
      */
     public Page createPage(Page inputPage) {
 
-        inputPage.setCreatedDate(NoteUtil.generateDate() + " Asia/Seoul");
-        inputPage.setModifiedDate(NoteUtil.generateDate() + " Asia/Seoul");
+        inputPage.setCreatedDate(NoteUtil.generateDate());
+        inputPage.setModifiedDate(NoteUtil.generateDate());
 
         Page result = pageRepository.save(inputPage);
 
