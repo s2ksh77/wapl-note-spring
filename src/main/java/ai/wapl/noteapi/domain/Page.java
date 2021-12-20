@@ -2,6 +2,7 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -30,8 +32,11 @@ public class Page {
     @Column(name = "NOTE_ID")
     private String id;
 
-    @Column(name = "PARENT_NOTEBOOK")
-    private String chapterId;
+    @JsonIgnore
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PARENT_NOTEBOOK")
+    private Chapter chapter;
 
     @Column(name = "NOTE_TITLE")
     private String name;

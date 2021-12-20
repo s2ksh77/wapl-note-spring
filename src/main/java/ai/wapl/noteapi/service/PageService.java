@@ -92,7 +92,7 @@ public class PageService {
             return output;
         }
         if (inputPage.getType().equals("MOVE")) {
-            pageInfo.setChapterId(inputPage.getChapterId());
+            pageInfo.setChapter(inputPage.getChapter());
             pageInfo.setModifiedDate(NoteUtil.generateDate());
         } else if (inputPage.getType().equals("RENAME") && pageInfo.getEditingUserId().isEmpty()) {
             pageInfo.setName(inputPage.getName());
