@@ -2,6 +2,8 @@ package ai.wapl.noteapi.controller;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +28,15 @@ public class ChapterController {
     public ResponseEntity<List<Chapter>> getChapterList(@PathVariable("channelId") String channelId) {
         System.out.println("Request Method : GET " + channelId);
         List<Chapter> chapterList = chapterService.getChapterList(channelId);
+
         return ResponseEntity.ok().body(chapterList);
+    }
+
+    @GetMapping(path = "Info/{chapterId}")
+    public ResponseEntity<Chapter> getChapterInfoList(@PathVariable("chapterId") String chapterId) {
+        Chapter chapterInfo = chapterService.getChapterInfoList(chapterId);
+
+        return ResponseEntity.ok().body(chapterInfo);
     }
 
 }
