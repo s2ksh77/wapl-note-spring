@@ -2,8 +2,6 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,7 +48,7 @@ public class Chapter {
     @Column(name = "SHARED_ROOM_NAME")
     private String sharedRoomId;
 
-    @JsonIgnoreProperties({ "content", "textContent" })
     @OneToMany(mappedBy = "chapter")
     private List<Page> pageList = new ArrayList<Page>();
+
 }

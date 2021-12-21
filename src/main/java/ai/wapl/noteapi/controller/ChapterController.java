@@ -2,8 +2,6 @@ package ai.wapl.noteapi.controller;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,23 +14,23 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/note-api/chapter")
+@RequestMapping(path = "/note-api")
 public class ChapterController {
     private final ChapterService chapterService;
 
-    // @Autowired
-    // public PageController(PageService pageService) {
-    // this.pageService = pageService;
-    // }
-    @GetMapping(path = "/{channelId}")
+    @GetMapping(path = "app/{channelId}")
     public ResponseEntity<List<Chapter>> getChapterList(@PathVariable("channelId") String channelId) {
-        System.out.println("Request Method : GET " + channelId);
         List<Chapter> chapterList = chapterService.getChapterList(channelId);
+
+        chapterList.forEach(chapter -> chapter.getPageList().forEach(page -> {
+            page.setContent(null);
+            page.setTextContent(null);
+        }));
 
         return ResponseEntity.ok().body(chapterList);
     }
 
-    @GetMapping(path = "Info/{chapterId}")
+    @GetMapping(path = "chapter/{chapterId}")
     public ResponseEntity<Chapter> getChapterInfoList(@PathVariable("chapterId") String chapterId) {
         Chapter chapterInfo = chapterService.getChapterInfoList(chapterId);
 
