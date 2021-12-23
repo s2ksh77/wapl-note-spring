@@ -2,6 +2,8 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +23,8 @@ import java.util.List;
 public class Chapter {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "ID")
     private String id;
 
@@ -50,5 +54,11 @@ public class Chapter {
 
     @OneToMany(mappedBy = "chapter")
     private List<Page> pageList = new ArrayList<Page>();
+
+    @Transient
+    private String userId;
+
+    @Transient
+    private String userName;
 
 }
