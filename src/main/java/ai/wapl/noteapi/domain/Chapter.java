@@ -52,7 +52,7 @@ public class Chapter {
     @Column(name = "SHARED_ROOM_NAME")
     private String sharedRoomId;
 
-    @OneToMany(mappedBy = "chapter")
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
     private List<Page> pageList = new ArrayList<Page>();
 
     @Transient
@@ -60,5 +60,8 @@ public class Chapter {
 
     @Transient
     private String userName;
+
+    @Transient
+    private String resultMsg;
 
 }

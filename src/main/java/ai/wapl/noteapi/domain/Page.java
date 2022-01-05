@@ -88,6 +88,9 @@ public class Page {
     @Lob
     private String textContent;
 
+    @Column(name = "RESTORECHAPTERID")
+    private String restoreChapterId;
+
     @ManyToMany
     @JoinTable(name = "TB_NOTEAPP_TAG_MST", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "TAG_ID"))
     private final List<Tag> tagList = new ArrayList<Tag>();

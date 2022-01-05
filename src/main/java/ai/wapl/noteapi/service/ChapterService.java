@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ai.wapl.noteapi.controller.PageController;
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.ChapterDTO;
+import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
@@ -81,4 +83,35 @@ public class ChapterService {
         return result;
     }
 
+    /**
+     * 챕터 삭제 서비스
+     * 하위 페이지는 휴지통으로 이동 되고 챕터는 삭제 된다.
+     */
+    public Chapter deleteChapter(List<ChapterDTO> chapterList) {
+        Chapter result = new Chapter();
+        try {
+            for (ChapterDTO chapter : chapterList) {
+                int output = chapterRepository.updateRecycleBin(chapter.getId(), chapter.getChannelId(),
+                        NoteUtil.generateDate());
+                if (output > 0) {
+                    chapterRepository.deleteById(chapter.getId());
+                }
+            }
+            result.setResultMsg("Success");
+        } catch (Exception e) {
+            System.out.println("Execption occur with Delete Page ::" + e);
+            result.setResultMsg("Fail");
+        }
+        return result;
+    }
+
+    /**
+     * @param channelId
+     * @return RecycleBinId
+     */
+
+    public Chapter getRecycleBinId(String channelId) {
+        Chapter result = chapterRepository.findByChannelIdAndType(channelId, "recycle_bin");
+        return result;
+    }
 }

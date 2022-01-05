@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.wapl.noteapi.domain.Chapter;
+import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.service.ChapterService;
 import lombok.RequiredArgsConstructor;
 
@@ -43,9 +43,15 @@ public class ChapterController {
 
     @PostMapping(path = "/chapter/{language}")
     public ResponseEntity<Chapter> createChapter(@RequestBody Chapter inputDTO, @PathVariable String language) {
-
         Chapter result = chapterService.createChapter(inputDTO, language);
+
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @PostMapping(path = "chapterDelete")
+    public ResponseEntity<Chapter> deleteChapter(@RequestBody List<ChapterDTO> chapterList) {
+        Chapter result = chapterService.deleteChapter(chapterList);
+
+        return ResponseEntity.ok().body(result);
+    }
 }

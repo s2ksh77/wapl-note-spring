@@ -105,6 +105,11 @@ public class PageService {
             pageInfo.setModifiedDate(NoteUtil.generateDate());
             pageInfo.setUserName(inputPage.getUserName() != null ? inputPage.getUserName() : pageInfo.getUserName());
             pageInfo.setUserId(inputPage.getUserId() != null ? inputPage.getUserId() : pageInfo.getUserId());
+        } else if (inputPage.getType().equals("THROW")) {
+            pageInfo.setChapter(inputPage.getChapter());
+            pageInfo.setType("");
+            pageInfo.setRestoreChapterId(inputPage.getRestoreChapterId());
+            pageInfo.setDeletedDate(NoteUtil.generateDate());
         } else {
             output.setResultMsg("Fail");
             return output;
