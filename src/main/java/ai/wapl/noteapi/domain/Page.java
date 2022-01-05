@@ -102,4 +102,7 @@ public class Page {
     @Transient
     private String resultMsg;
 
+    @Transient
+    private String channelId;
+
 }

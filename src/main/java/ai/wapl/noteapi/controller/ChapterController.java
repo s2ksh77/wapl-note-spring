@@ -2,6 +2,7 @@ package ai.wapl.noteapi.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping(path = "/note-api")
 public class ChapterController {
+    @Autowired
     private final ChapterService chapterService;
 
     @GetMapping(path = "app/{channelId}")

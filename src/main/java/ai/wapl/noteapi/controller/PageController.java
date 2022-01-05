@@ -64,4 +64,12 @@ public class PageController {
         return ResponseEntity.ok().body(result);
         // return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
+
+    @PostMapping(path = "/RecycleUpdate")
+    public ResponseEntity<Page> updateRecyclePage(@RequestBody List<PageDTO> inputDTO) {
+        System.out.println(inputDTO);
+        Page result = pageService.updateRecyclePage(inputDTO);
+        return ResponseEntity.ok().body(result);
+        // return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
 }

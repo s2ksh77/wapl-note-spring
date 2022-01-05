@@ -14,6 +14,8 @@ import lombok.*;
 public class PageDTO {
     private String id;
     private String chapterId;
+    private String channelId;
+    private String restoreChapterId;
     private String name;
     private String createdDate;
     private String modifiedDate;

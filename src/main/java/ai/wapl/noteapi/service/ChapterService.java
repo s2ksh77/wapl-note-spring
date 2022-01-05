@@ -7,13 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import ai.wapl.noteapi.controller.PageController;
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.ChapterDTO;
-import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.repository.ChapterRepository;
-import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 
 @Service
@@ -21,9 +18,10 @@ public class ChapterService {
 
     @Autowired
     private final ChapterRepository chapterRepository;
-
+    @Autowired
     private final PageService pageService;
 
+    @Autowired
     public ChapterService(ChapterRepository chapterRepository, PageService pageService) {
         this.chapterRepository = chapterRepository;
         this.pageService = pageService;
