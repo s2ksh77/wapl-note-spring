@@ -97,7 +97,34 @@ public class ChapterService {
             }
             result.setResultMsg("Success");
         } catch (Exception e) {
-            System.out.println("Execption occur with Delete Page ::" + e);
+            System.out.println("Execption occur with Delete Chapter ::" + e);
+            result.setResultMsg("Fail");
+        }
+        return result;
+    }
+
+    /**
+     * 챕터 수정 서비스
+     * 챕터 이름, 챕터 색상(기획엔 없음)
+     */
+    public Chapter updateChapter(Chapter inputDTO) {
+        Chapter chapterInfo = chapterRepository.findById(inputDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter."));
+        Chapter result = new Chapter();
+
+        try {
+            if (inputDTO.getName() != null && inputDTO.getColor() == null) {
+                chapterInfo.setName(inputDTO.getName());
+                chapterInfo.setModifiedDate(NoteUtil.generateDate());
+            } else if (inputDTO.getName() == null && inputDTO.getColor() != null) {
+                chapterInfo.setColor(inputDTO.getColor());
+                chapterInfo.setModifiedDate(NoteUtil.generateDate());
+            }
+            chapterRepository.save(chapterInfo);
+            result = chapterInfo;
+            result.setResultMsg("Success");
+        } catch (Exception e) {
+            System.out.println("Execption occur with Update Chapter ::" + e);
             result.setResultMsg("Fail");
         }
         return result;

@@ -56,4 +56,12 @@ public class ChapterController {
 
         return ResponseEntity.ok().body(result);
     }
+
+    @PostMapping(path = "chapterUpdate")
+    public ResponseEntity<Chapter> updateChapter(@RequestBody Chapter inputDTO) {
+        Chapter result = chapterService.updateChapter(inputDTO);
+
+        return ResponseEntity.ok().body(result);
+    }
+
 }
