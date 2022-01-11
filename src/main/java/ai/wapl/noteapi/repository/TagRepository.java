@@ -18,6 +18,17 @@ public interface TagRepository extends JpaRepository<Tag, String> {
             + "ON T.TAG_ID = TM.TAG_ID \n"
             + "LEFT JOIN TB_NOTEAPP_NOTE_MST as P \n"
             + "ON P.NOTE_ID = TM.NOTE_ID \n"
+            + "LEFT JOIN TB_NOTEAPP_NOTEBOOK_MST as B \n"
+            + "ON P.PARENT_NOTEBOOK = B.ID \n"
+            + "WHERE NOTE_CHANNEL_ID = :NOTE_CHANNEL_ID", nativeQuery = true)
+    List<Tag> findByChannelId(@Param("NOTE_CHANNEL_ID") String channelId);
+
+    @Query(value = "SELECT DISTINCT T.TAG_ID, T.TEXT \n"
+            + "FROM TB_NOTEAPP_TAG as T \n"
+            + "LEFT JOIN TB_NOTEAPP_TAG_MST as TM \n"
+            + "ON T.TAG_ID = TM.TAG_ID \n"
+            + "LEFT JOIN TB_NOTEAPP_NOTE_MST as P \n"
+            + "ON P.NOTE_ID = TM.NOTE_ID \n"
             + "WHERE P.NOTE_ID = :NOTE_ID", nativeQuery = true)
     public List<Tag> pageforTagList(@Param("NOTE_ID") String pageId);
 }
