@@ -2,7 +2,10 @@ package ai.wapl.noteapi.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,6 +14,8 @@ import ai.wapl.noteapi.domain.Tag;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, String> {
+
+    public Tag findByName(String name);
 
     @Query(value = "SELECT DISTINCT T.TAG_ID, T.TEXT \n"
             + "FROM TB_NOTEAPP_TAG as T \n"
@@ -31,4 +36,9 @@ public interface TagRepository extends JpaRepository<Tag, String> {
             + "ON P.NOTE_ID = TM.NOTE_ID \n"
             + "WHERE P.NOTE_ID = :NOTE_ID", nativeQuery = true)
     public List<Tag> pageforTagList(@Param("NOTE_ID") String pageId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO TB_NOTEAPP_TAG_MST (TAG_ID, NOTE_ID) VALUES (:TAG_ID, :NOTE_ID)", nativeQuery = true)
+    public int createMapping(@Param("TAG_ID") String tagId, @Param("NOTE_ID") String pageId);
 }

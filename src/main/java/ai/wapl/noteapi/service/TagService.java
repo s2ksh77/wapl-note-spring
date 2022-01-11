@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
+import ai.wapl.noteapi.dto.TagDTO;
 import ai.wapl.noteapi.repository.TagRepository;
 
 @Service
@@ -63,6 +64,39 @@ public class TagService {
         result.setId(pageId);
         result.addTagList(tagList);
         result.setTagCount(tagList.size());
+        return result;
+    }
+
+    public String getTagId(String text) {
+        Tag result = tagRepository.findByName(text);
+        System.out.println("result" + result);
+        String tagId = null;
+        if (result != null) {
+            tagId = result.getId();
+        }
+        return tagId;
+    }
+
+    public Tag createTag(List<TagDTO> inputList) {
+        Tag result = new Tag();
+        try {
+            for (TagDTO tag : inputList) {
+                if (getTagId(tag.getName()) == null) {
+                    Tag input = new Tag();
+                    input.setName(tag.getName());
+                    Tag createTag = tagRepository.save(input);
+                    tagRepository.createMapping(createTag.getId(), tag.getPageId());
+                } else {
+                    String tagId = getTagId(tag.getName());
+                    tagRepository.createMapping(tagId, tag.getPageId());
+                }
+            }
+            result.setResultMsg("Success");
+        } catch (Exception e) {
+            System.out.println("Execption occur with Delete Page ::" + e);
+            result.setResultMsg("Fail");
+        }
+
         return result;
     }
 
