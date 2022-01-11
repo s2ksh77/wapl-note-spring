@@ -41,4 +41,9 @@ public interface TagRepository extends JpaRepository<Tag, String> {
     @Transactional
     @Query(value = "INSERT INTO TB_NOTEAPP_TAG_MST (TAG_ID, NOTE_ID) VALUES (:TAG_ID, :NOTE_ID)", nativeQuery = true)
     public int createMapping(@Param("TAG_ID") String tagId, @Param("NOTE_ID") String pageId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM TB_NOTEAPP_TAG_MST WHERE TAG_ID = :TAG_ID and NOTE_ID = :NOTE_ID", nativeQuery = true)
+    public int deleteMapping(@Param("TAG_ID") String tagId, @Param("NOTE_ID") String pageId);
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,13 @@ public class TagController {
     @PostMapping(path = "tag")
     public ResponseEntity<Tag> createTag(@RequestBody List<TagDTO> inputDTO) {
         Tag result = tagService.createTag(inputDTO);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "tag/Delete")
+    public ResponseEntity<Tag> deleteTag(@RequestBody List<TagDTO> inputDTO) {
+        Tag result = tagService.deleteTag(inputDTO);
 
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }

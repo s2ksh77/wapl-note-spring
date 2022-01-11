@@ -69,7 +69,6 @@ public class TagService {
 
     public String getTagId(String text) {
         Tag result = tagRepository.findByName(text);
-        System.out.println("result" + result);
         String tagId = null;
         if (result != null) {
             tagId = result.getId();
@@ -97,6 +96,20 @@ public class TagService {
             result.setResultMsg("Fail");
         }
 
+        return result;
+    }
+
+    public Tag deleteTag(List<TagDTO> inputList) {
+        Tag result = new Tag();
+        try {
+            for (TagDTO tag : inputList) {
+                tagRepository.deleteMapping(tag.getId(), tag.getPageId());
+            }
+            result.setResultMsg("Success");
+        } catch (Exception e) {
+            System.out.println("Execption occur with Delete Page ::" + e);
+            result.setResultMsg("Fail");
+        }
         return result;
     }
 
