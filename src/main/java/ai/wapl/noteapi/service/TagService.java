@@ -113,6 +113,28 @@ public class TagService {
         return result;
     }
 
+    public Tag updateTag(List<TagDTO> inputList) {
+        Tag result = new Tag();
+        try {
+            for (TagDTO tag : inputList) {
+                if (getTagId(tag.getName()) == null) { // 기존에 있는지 확인
+                    Tag input = new Tag();
+                    input.setName(tag.getName());
+                    Tag createTag = tagRepository.save(input); // 없으면 만듬
+                    tagRepository.updateMapping(createTag.getId(), tag.getId(), tag.getPageId());
+                } else {
+                    String tagId = getTagId(tag.getName());
+                    tagRepository.updateMapping(tagId, tag.getId(), tag.getPageId());
+                }
+            }
+            result.setResultMsg("Success");
+        } catch (Exception e) {
+            System.out.println("Execption occur with Delete Page ::" + e);
+            result.setResultMsg("Fail");
+        }
+        return result;
+    }
+
     public String getInitialSound(String text) {
         String[] chs = {
                 "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ",

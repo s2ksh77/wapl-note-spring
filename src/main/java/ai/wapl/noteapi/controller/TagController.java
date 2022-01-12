@@ -53,4 +53,11 @@ public class TagController {
 
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
+
+    @PostMapping(path = "tag/Update")
+    public ResponseEntity<Tag> updateTag(@RequestBody List<TagDTO> inputDTO) {
+        Tag result = tagService.updateTag(inputDTO);
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
 }
