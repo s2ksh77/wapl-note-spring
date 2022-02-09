@@ -38,6 +38,9 @@ dependencies {
     implementation 'org.jetbrains:annotations:20.1.0'
 	compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    //swagger
+    implementation 'io.springfox:springfox-swagger2:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 }
 
 test {

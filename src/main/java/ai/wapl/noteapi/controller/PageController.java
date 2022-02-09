@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.service.PageService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,6 +29,7 @@ public class PageController {
     // public PageController(PageService pageService) {
     // this.pageService = pageService;
     // }
+    @ApiOperation(value = "단일 페이지 정보 조회 서비스", notes = "단일 페이지 정보 조회 서비스")
     @GetMapping(path = "/{pageId}")
     public ResponseEntity<Page> getPageInfoList(@PathVariable("pageId") String pageId) {
         System.out.println("Request Method : GET");
@@ -35,11 +37,7 @@ public class PageController {
         return ResponseEntity.ok().body(pageInfo);
     }
 
-    @GetMapping
-    public List<Page> getAll() {
-        return null;
-    }
-
+    @ApiOperation(value = "페이지 생성 서비스", notes = "페이지 생성 서비스")
     @PostMapping
     public ResponseEntity<Page> createPage(@RequestBody Page inputDTO) {
         System.out.println(inputDTO);
@@ -48,6 +46,7 @@ public class PageController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value = "페이지 삭제 서비스", notes = "페이지 삭제 서비스")
     @DeleteMapping(path = "/Delete")
     public ResponseEntity<Page> deletePage(@RequestBody List<PageDTO> pageList) {
         System.out.println(pageList);
@@ -57,6 +56,7 @@ public class PageController {
         return ResponseEntity.ok().body(result);
     }
 
+    @ApiOperation(value = "페이지 업데이트 서비스", notes = "페이지 업데이트 서비스")
     @PostMapping(path = "/Update")
     public ResponseEntity<Page> updatePage(@RequestBody Page inputDTO) {
         System.out.println(inputDTO);
@@ -65,6 +65,7 @@ public class PageController {
         // return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value = "휴지통 서비스", notes = "휴지통 서비스")
     @PostMapping(path = "/RecycleUpdate")
     public ResponseEntity<Page> updateRecyclePage(@RequestBody List<PageDTO> inputDTO) {
         System.out.println(inputDTO);
