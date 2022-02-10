@@ -33,10 +33,17 @@ public class PageService {
      * @return
      */
     public Page getPageInfo(String pageId) {
-        Page result = pageRepository.findById(pageId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found Page"));
+        Page result = pageRepository.findByInterfaceId(pageId, "6f30ca06-bff9-4534-aa13-727efb0a1f22");
+        // result.setFavorite(isBookMark(pageId));
         return result;
     }
+
+    // public Boolean isBookMark(String pageId) {
+    // int count = pageRepository.findByIsBookMark(pageId,
+    // "6f30ca06-bff9-4534-aa13-727efb0a1f22");
+    // Boolean result = count > 0 ? true : false;
+    // return result;
+    // }
 
     /**
      * 페이지 추가 서비스

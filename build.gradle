@@ -13,6 +13,14 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+def queryDslVersion = '1.0.10'
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -36,6 +44,9 @@ dependencies {
     //query dsl
     implementation 'com.querydsl:querydsl-jpa'
     implementation 'org.jetbrains:annotations:20.1.0'
+    // compile "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    // annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+
 	compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     //swagger
@@ -49,29 +60,39 @@ test {
 
 //querydsl설정
 
-def querydslDir = "$buildDir/generated/querydsl"
+def querydslSrcDir = 'src/main/generated'
 
-querydsl {
-    jpa = true
-    querydslSourcesDir = querydslDir
+querydsl { 
+    library = "com.querydsl:querydsl-apt" 
+    jpa = true 
+    querydslSourcesDir = querydslSrcDir 
 }
 
-sourceSets {
-    main.java.srcDir querydslDir
+compileQuerydsl{ 
+    // querydsl 컴파일시 사용하는 애노테이션프로세서('com.querydsl.apt.jpa.JPAAnnotationProcessor')의 경로를 querydsl 이 지정한 경로를 이용한다는 선언 
+    options.annotationProcessorPath = configurations.querydsl 
+} 
+
+configurations { 
+    querydsl.extendsFrom compileClasspath 
+} 
+
+sourceSets { 
+    main { 
+        java { 
+            srcDirs = ['src/main/java', querydslSrcDir] 
+        } 
+    } 
+} 
+
+tasks.withType(JavaCompile) { 
+     options.annotationProcessorGeneratedSourcesDirectory = file(querydslSrcDir) 
 }
 
-configurations {
-    querydsl.extendsFrom compileClasspath
-}
-
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
-}
-
-project.afterEvaluate {
-    project.tasks.compileQuerydsl.options.compilerArgs = [
-            "-proc:only",
-            "-processor", project.querydsl.processors() +
-                    ',lombok.launch.AnnotationProcessorHider$AnnotationProcessor'
-    ]
-}
+// project.afterEvaluate {
+//     project.tasks.compileQuerydsl.options.compilerArgs = [
+//             "-proc:only",
+//             "-processor", project.querydsl.processors() +
+//                     ',lombok.launch.AnnotationProcessorHider$AnnotationProcessor'
+//     ]
+// }
