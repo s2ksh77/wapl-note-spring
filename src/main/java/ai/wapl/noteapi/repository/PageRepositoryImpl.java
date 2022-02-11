@@ -1,6 +1,8 @@
 package ai.wapl.noteapi.repository;
 
 import javax.persistence.EntityManager;
+
+import javax.persistence.Query;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -15,59 +17,51 @@ import ai.wapl.noteapi.domain.Tag;
 public class PageRepositoryImpl implements PageRepositoryInterface {
 
         private final JPAQueryFactory queryFactory;
+        private final EntityManager em;
 
         public PageRepositoryImpl(EntityManager em) {
                 this.queryFactory = new JPAQueryFactory(em);
+                this.em = em;
         }
 
         @Override
         public Page findByInterfaceId(String pageId, String userId) {
-                QPage page = QPage.page;
-                QTag tag = QTag.tag;
-                QFile file = QFile.file;
-                QBookmark bookmark = QBookmark.bookmark;
+                String query = "select n.note_id, \n"
+                                + "n.parent_notebook, \n"
+                                + "n.note_title, \n"
+                                + "n.note_content, \n"
+                                + "n.text_content, \n"
+                                + "n.created_date, \n"
+                                + "n.modified_date, \n"
+                                + "n.note_deleted_at, \n"
+                                + "n.USER_ID, \n"
+                                + "n.created_user_id, \n"
+                                + "n.type, \n"
+                                + "n.USER_NAME, \n"
+                                + "n.is_edit, \n"
+                                + "n.shared_room_name, \n"
+                                + "n.shared_user_id, \n"
+                                + "n.restoreChapterId, \n"
+                                + "CASE WHEN  \n"
+                                + "        (SELECT COUNT(*) FROM TB_NOTEAPP_BOOKMARK  \n"
+                                + "        WHERE note_id = :note_id AND USER_ID = :USER_ID) > 0  \n"
+                                + "THEN 'TRUE' \n"
+                                + "ELSE 'FALSE'  \n"
+                                + "END AS is_favorite, \n"
+                                + "f.*, \n"
+                                + "s.* \n"
+                                + "FROM TB_NOTEAPP_NOTE_MST as n \n"
+                                + "LEFT JOIN TB_NOTEAPP_NOTE_FILE_MAP as f \n"
+                                + "on n.note_id = f.note_id \n"
+                                + "LEFT JOIN TB_DRIVE_MST as s \n"
+                                + "on f.file_id = s.log_file_id \n"
+                                + "where n.note_id = :note_id";
 
-                Long count = queryFactory.select(bookmark.count())
-                                .from(bookmark)
-                                .where(bookmark.id.eq(pageId).and(bookmark.userId.eq(userId))).fetchFirst();
+                Query nativeQuery = em.createNativeQuery(query, Page.class);
+                nativeQuery.setParameter("note_id", pageId);
+                nativeQuery.setParameter("USER_ID", userId);
 
-                Expression<String> cases = new CaseBuilder()
-                                .when(JPAExpressions.select(bookmark)
-                                                .from(bookmark)
-                                                .where(bookmark.id.eq(pageId).and(bookmark.userId.eq(userId))).exists())
-                                .then("TRUE").otherwise("FALSE").as(page.favorite);
-
-                // Page result = queryFactory.select(Projections.bean(Page.class,
-                // page.id,
-                // page.name,
-                // page.createdDate,
-                // page.modifiedDate,
-                // page.userName,
-                // page.userId,
-                // page.editingUserId,
-                // page.content,
-                // page.type,
-                // page.sharedUserId,
-                // page.sharedRoomId,
-                // page.deletedDate,
-                // page.textContent,
-                // page.chapter,
-                // page.restoreChapterId,
-                // page.tagList,
-                // page.fileList,
-                // cases))
-                // .from(page)
-                // .leftJoin(page.tagList, tag)
-                // .fetchJoin()
-                // .leftJoin(page.fileList, file)
-                // .fetchJoin()
-                // .where(page.id.eq(pageId))
-                // .fetchFirst();
-                Page result = queryFactory.select(page)
-                                .from(page)
-                                .where(page.id.eq(pageId))
-                                .fetchFirst();
-                result.setFavorite(count > 0 ? "TRUE" : "FALSE");
+                Page result = (Page) nativeQuery.getSingleResult();
 
                 return result;
         }
