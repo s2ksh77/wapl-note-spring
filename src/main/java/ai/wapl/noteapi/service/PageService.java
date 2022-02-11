@@ -33,7 +33,8 @@ public class PageService {
      * @return
      */
     public Page getPageInfo(String pageId) {
-        Page result = pageRepository.findByInterfaceId(pageId, "6f30ca06-bff9-4534-aa13-727efb0a1f22");
+        // session 에서 userId 조회하는 부분 들어오면 userId 넣어야 함.
+        Page result = pageRepository.findById(pageId, "6f30ca06-bff9-4534-aa13-727efb0a1f22");
         // result.setFavorite(isBookMark(pageId));
         return result;
     }

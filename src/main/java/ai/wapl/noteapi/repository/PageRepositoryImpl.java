@@ -25,7 +25,7 @@ public class PageRepositoryImpl implements PageRepositoryInterface {
         }
 
         @Override
-        public Page findByInterfaceId(String pageId, String userId) {
+        public Page findById(String pageId, String userId) {
                 String query = "select n.note_id, \n"
                                 + "n.parent_notebook, \n"
                                 + "n.note_title, \n"
