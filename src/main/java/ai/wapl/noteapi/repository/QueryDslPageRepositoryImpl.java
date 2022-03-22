@@ -3,23 +3,16 @@ package ai.wapl.noteapi.repository;
 import javax.persistence.EntityManager;
 
 import javax.persistence.Query;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import generated.ai.wapl.noteapi.domain.*;
 import ai.wapl.noteapi.domain.Page;
-import ai.wapl.noteapi.domain.Tag;
 
-public class PageRepositoryImpl implements PageRepositoryInterface {
+public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
 
         private final JPAQueryFactory queryFactory;
         private final EntityManager em;
 
-        public PageRepositoryImpl(EntityManager em) {
+        public QueryDslPageRepositoryImpl(EntityManager em) {
                 this.queryFactory = new JPAQueryFactory(em);
                 this.em = em;
         }

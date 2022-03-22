@@ -2,7 +2,7 @@ package ai.wapl.noteapi.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +12,18 @@ import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
+import org.springframework.transaction.annotation.Transactional;
+
+import static ai.wapl.noteapi.domain.Page.PageType.*;
+import static ai.wapl.noteapi.dto.PageDTO.Type.*;
+import static ai.wapl.noteapi.util.Constants.*;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class PageService {
-    @Autowired
     private final PageRepository pageRepository;
     private final ChapterRepository chapterRepository;
-
-    @Autowired
-    public PageService(PageRepository pageRepository, ChapterRepository chapterRepository) {
-        this.pageRepository = pageRepository;
-        this.chapterRepository = chapterRepository;
-    }
 
     /**
      * 페이지 단일 조회 서비스
@@ -54,11 +54,9 @@ public class PageService {
      * @return
      */
     public Page createPage(Page inputPage) {
+        Page page = Page.createPage(inputPage);
 
-        inputPage.setCreatedDate(NoteUtil.generateDate());
-        inputPage.setModifiedDate(NoteUtil.generateDate());
-
-        Page result = pageRepository.save(inputPage);
+        Page result = pageRepository.save(page);
 
         return result;
     }
@@ -86,45 +84,48 @@ public class PageService {
         return output;
     }
 
-    public Page updatePage(Page inputPage) {
-        Page pageInfo = pageRepository.findById(inputPage.getId())
+    public Page updatePage(Page input) {
+        Page page = pageRepository.findById(input.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
         Page output = new Page();
 
-        if (inputPage.getType().equals("NONEDIT") && !pageInfo.getEditingUserId().isEmpty()
-                && inputPage.getUserId().equals(pageInfo.getEditingUserId())) {
-            pageInfo.setEditingUserId("");
-            pageRepository.save(pageInfo);
-            output.setResultMsg("Success");
+        if (input.getType().equals(NONEDIT) && !page.getEditingUserId().isEmpty()
+                && input.getUpdatedUserId().equals(page.getEditingUserId())) {
+            page.setEditingUserId("");
+            pageRepository.save(page);
+            output.setResultMsg(RETURN_MSG_SUCCESS);
             return output;
         }
 
-        if (inputPage.getType().equals("EDIT_START") && !pageInfo.getEditingUserId().isEmpty()
-                && !inputPage.getUserId().equals(pageInfo.getEditingUserId())) {
-            output.setResultMsg("Fail");
+        if (input.getType().equals(EDIT_START) && !page.getEditingUserId().isEmpty()
+                && !input.getUpdatedUserId().equals(page.getEditingUserId())) {
+            output.setResultMsg(RETURN_MSG_FAIL);
             return output;
         }
-        if (inputPage.getType().equals("MOVE")) {
-            pageInfo.setChapter(inputPage.getChapter());
-            pageInfo.setModifiedDate(NoteUtil.generateDate());
-        } else if (inputPage.getType().equals("RENAME") && pageInfo.getEditingUserId().isEmpty()) {
-            pageInfo.setName(inputPage.getName());
-            pageInfo.setModifiedDate(NoteUtil.generateDate());
-        } else if (inputPage.getType().equals("EDIT_DONE")) {
-            pageInfo.setName(inputPage.getName() != null ? inputPage.getName() : pageInfo.getName());
-            pageInfo.setContent(inputPage.getContent() != null ? inputPage.getContent() : pageInfo.getContent());
-            pageInfo.setTextContent(
-                    inputPage.getTextContent() != null ? inputPage.getTextContent() : pageInfo.getTextContent());
-            pageInfo.setModifiedDate(NoteUtil.generateDate());
-            pageInfo.setUserName(inputPage.getUserName() != null ? inputPage.getUserName() : pageInfo.getUserName());
-            pageInfo.setUserId(inputPage.getUserId() != null ? inputPage.getUserId() : pageInfo.getUserId());
+        if (input.getType().equals(MOVE)) {
+            page.setChapter(input.getChapter());
+            page.setModifiedDate(NoteUtil.generateDate());
+        } else if (input.getType().equals(RENAME) && page.getEditingUserId().isEmpty()) {
+            page.setName(input.getName());
+            page.setModifiedDate(NoteUtil.generateDate());
+        } else if (input.getType().equals(EDIT_DONE)) {
+            page.setName(getNotNull(input.getName(), page.getName()));
+            page.setContent(getNotNull(input.getContent(), page.getContent()));
+            page.setTextContent(getNotNull(input.getTextContent(), page.getTextContent()));
+            page.setModifiedDate(NoteUtil.generateDate());
+            page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
+            page.setUpdatedUserId(getNotNull(input.getUpdatedUserId(), page.getUpdatedUserId()));
         } else {
-            output.setResultMsg("Fail");
+            output.setResultMsg(RETURN_MSG_FAIL);
             return output;
         }
-        output.setResultMsg("Success");
-        pageRepository.save(pageInfo);
+        output.setResultMsg(RETURN_MSG_SUCCESS);
+        pageRepository.save(page);
         return output;
+    }
+
+    private String getNotNull(String name, String name2) {
+        return name != null ? name : name2;
     }
 
     /**
@@ -141,12 +142,12 @@ public class PageService {
             Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, "recycle_bin");
             for (PageDTO page : inputList) {
                 Page pageInfo = pageRepository.getById(page.getId());
-                if (type.equals("THROW")) {
+                if (type.equals(THROW)) {
                     pageInfo.setChapter(recycleBin);
                     pageInfo.setType("");
                     pageInfo.setRestoreChapterId(page.getRestoreChapterId());
                     pageInfo.setDeletedDate(NoteUtil.generateDate());
-                } else if (type.equals("RESTORE")) {
+                } else if (type.equals(RESTORE)) {
                     Chapter inputChapter = new Chapter();
                     inputChapter.setId(page.getChapterId());
                     pageInfo.setChapter(inputChapter);
@@ -155,7 +156,7 @@ public class PageService {
                     pageInfo.setDeletedDate("");
                     pageInfo.setModifiedDate(NoteUtil.generateDate());
                 }
-                pageRepository.save(pageInfo);
+//                pageRepository.save(pageInfo);
             }
             output.setResultMsg("Success");
         } catch (Exception e) {

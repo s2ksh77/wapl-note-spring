@@ -14,10 +14,8 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Getter
+@AllArgsConstructor
 @Table(name = "TB_NOTEAPP_TAG")
 public class Tag {
 
@@ -33,4 +31,7 @@ public class Tag {
     @Transient
     private String resultMsg;
 
+    public Tag(String name) {
+        this.name = name;
+    }
 }

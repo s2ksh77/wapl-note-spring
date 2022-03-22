@@ -34,4 +34,8 @@ public class PageDTO {
     @JsonProperty("TEXT_CONTENT")
     @Lob
     private String textContent;
+
+    public enum Type {
+        THROW, RESTORE,
+    }
 }

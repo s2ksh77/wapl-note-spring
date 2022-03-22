@@ -18,14 +18,17 @@ import ai.wapl.noteapi.service.ChapterService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/note-api")
+@RequestMapping(path = DEFAULT_API_URI)
 public class ChapterController {
-    @Autowired
     private final ChapterService chapterService;
+    // TODO: 챕터 전달 서비스 chaptershareCreate
+    // TODO: 노트 통합검색 서비스 noteSearchList
 
-    @ApiOperation(value = "채널 별 챕터 리스트 조회", notes = "채널 별 챕터 및 하위 페이지 리스트 조회 서비스")
+    @ApiOperation(value = "채널 별 챕터 리스트 조회 noteChapterList ", notes = "채널 별 챕터 및 하위 페이지 리스트 조회 서비스")
     @GetMapping(path = "app/{channelId}")
     public ResponseEntity<List<Chapter>> getChapterList(@PathVariable("channelId") String channelId) {
         List<Chapter> chapterList = chapterService.getChapterList(channelId);
@@ -38,7 +41,7 @@ public class ChapterController {
         return ResponseEntity.ok().body(chapterList);
     }
 
-    @ApiOperation(value = "단일 챕터 조회", notes = "채널 정보를 조회하는 서비스")
+    @ApiOperation(value = "단일 챕터 조회 chatpershareList ", notes = "채널 정보를 조회하는 서비스")
     @GetMapping(path = "chapter/{chapterId}")
     public ResponseEntity<Chapter> getChapterInfoList(@PathVariable("chapterId") String chapterId) {
         Chapter chapterInfo = chapterService.getChapterInfoList(chapterId);
@@ -46,7 +49,7 @@ public class ChapterController {
         return ResponseEntity.ok().body(chapterInfo);
     }
 
-    @ApiOperation(value = "챕터 생성 서비스", notes = "챕터 생성 서비스 ( 국제화 언어에 따라 챕터명 생성) ")
+    @ApiOperation(value = "챕터 생성 서비스 notebooksCreate ", notes = "챕터 생성 서비스 ( 국제화 언어에 따라 챕터명 생성) ")
     @PostMapping(path = "/chapter/{language}")
     public ResponseEntity<Chapter> createChapter(@RequestBody Chapter inputDTO, @PathVariable String language) {
         Chapter result = chapterService.createChapter(inputDTO, language);
@@ -54,7 +57,7 @@ public class ChapterController {
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "챕터 삭제 서비스", notes = "챕터 삭제 서비스")
+    @ApiOperation(value = "챕터 삭제 서비스 notebookDelete ", notes = "챕터 삭제 서비스")
     @PostMapping(path = "chapterDelete")
     public ResponseEntity<Chapter> deleteChapter(@RequestBody List<ChapterDTO> chapterList) {
         Chapter result = chapterService.deleteChapter(chapterList);
@@ -62,7 +65,7 @@ public class ChapterController {
         return ResponseEntity.ok().body(result);
     }
 
-    @ApiOperation(value = "챕터 업데이트 서비스", notes = "챕터 업데이트 서비스")
+    @ApiOperation(value = "챕터 업데이트 서비스 notebooksUpdate ", notes = "챕터 업데이트 서비스")
     @PostMapping(path = "chapterUpdate")
     public ResponseEntity<Chapter> updateChapter(@RequestBody Chapter inputDTO) {
         Chapter result = chapterService.updateChapter(inputDTO);

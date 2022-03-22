@@ -13,12 +13,12 @@ import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 
+import static ai.wapl.noteapi.util.Constants.RECYCLE_BIN;
+
 @Service
 public class ChapterService {
 
-    @Autowired
     private final ChapterRepository chapterRepository;
-    @Autowired
     private final PageService pageService;
 
     @Autowired
@@ -34,7 +34,6 @@ public class ChapterService {
      * @param channelId
      * @return
      */
-
     public List<Chapter> getChapterList(String channelId) {
         List<Chapter> result = chapterRepository.findByChannelId(channelId);
         return result;
@@ -68,12 +67,12 @@ public class ChapterService {
 
         Page pageDTO = new Page();
         pageDTO.setChapter(result);
-        pageDTO.setUserId(inputChapter.getUserId());
+        pageDTO.setUpdatedUserId(inputChapter.getUserId());
         pageDTO.setUserName(inputChapter.getUserName());
         pageDTO.setContent("<p></br></p>");
         pageDTO.setName(language.equals("ko") ? "새 페이지" : "New Page");
 
-        List<Page> pageList = new ArrayList<Page>();
+        List<Page> pageList = new ArrayList<>();
         pageList.add(pageService.createPage(pageDTO));
 
         result.setPageList(pageList);
@@ -134,9 +133,8 @@ public class ChapterService {
      * @param channelId
      * @return RecycleBinId
      */
-
-    public Chapter getRecycleBinId(String channelId) {
-        Chapter result = chapterRepository.findByChannelIdAndType(channelId, "recycle_bin");
+    public Chapter getRecycleBin(String channelId) {
+        Chapter result = chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN);
         return result;
     }
 }

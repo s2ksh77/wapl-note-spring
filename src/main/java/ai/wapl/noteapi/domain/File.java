@@ -17,7 +17,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Getter
 @Table(name = "TB_DRIVE_MST")
 public class File {
 
@@ -48,4 +47,6 @@ public class File {
 
     @Column(name = "LAST_UPDATE_USER_ID")
     private String createdUser;
+
+    // TODO: create, delete, update create method
 }

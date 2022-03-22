@@ -1,31 +1,26 @@
 package ai.wapl.noteapi.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import ai.wapl.noteapi.repository.PageRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
 import ai.wapl.noteapi.dto.TagDTO;
 import ai.wapl.noteapi.repository.TagRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class TagService {
-    @Autowired
     private final TagRepository tagRepository;
-
-    public TagService(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
+    private final PageRepository pageRepository;
 
     public Map<String, Map<String, List<Tag>>> getAllTagList(String channelId) {
-        List<Tag> tagList = tagRepository.findByChannelId(channelId);
+        Set<Tag> tagList = tagRepository.findByChannelId(channelId);
         Map<String, Map<String, List<Tag>>> tagMap = new LinkedHashMap<>() {
             {
                 put("KOR", null);
@@ -44,10 +39,10 @@ public class TagService {
                 tagMap.put(localize, sortMap);
             }
 
-            List<Tag> sortList = (List<Tag>) sortMap.get(key);
+            List<Tag> sortList = sortMap.get(key);
             if (sortList == null) {
-                sortList = new ArrayList<Tag>();
-                sortMap.put(key, (List<Tag>) sortList);
+                sortList = new ArrayList<>();
+                sortMap.put(key, sortList);
             }
             sortList.add(tag);
 
@@ -58,38 +53,23 @@ public class TagService {
         return tagMap;
     }
 
-    public Page getTagList(String pageId) {
-        List<Tag> tagList = tagRepository.pageforTagList(pageId);
-        Page result = new Page();
-        result.setId(pageId);
-        result.addTagList(tagList);
-        result.setTagCount(tagList.size());
-        return result;
+    public Set<Tag> getTagList(String pageId) {
+        return tagRepository.findByPageId(pageId);
+//        Page result = new Page();
+//        result.setId(pageId);
+//        result.addTagList(tagList);
+//        result.setTagCount(tagList.size());
+//        return pageRepository.findById(pageId).orElseThrow();
     }
 
-    public String getTagId(String text) {
-        Tag result = tagRepository.findByName(text);
-        String tagId = null;
-        if (result != null) {
-            tagId = result.getId();
-        }
-        return tagId;
+    public Tag getTagId(String text) {
+        return tagRepository.findByName(text);
     }
 
     public Tag createTag(List<TagDTO> inputList) {
         Tag result = new Tag();
         try {
-            for (TagDTO tag : inputList) {
-                if (getTagId(tag.getName()) == null) {
-                    Tag input = new Tag();
-                    input.setName(tag.getName());
-                    Tag createTag = tagRepository.save(input);
-                    tagRepository.createMapping(createTag.getId(), tag.getPageId());
-                } else {
-                    String tagId = getTagId(tag.getName());
-                    tagRepository.createMapping(tagId, tag.getPageId());
-                }
-            }
+            inputList.forEach(this::createTag);
             result.setResultMsg("Success");
         } catch (Exception e) {
             System.out.println("Execption occur with Delete Page ::" + e);
@@ -97,14 +77,25 @@ public class TagService {
         }
 
         return result;
+    }
+
+    private Tag createTag(TagDTO dto) {
+        Page page = pageRepository.findById(dto.getPageId()).orElseThrow();
+        Tag tag = getTagId(dto.getName());
+
+        if (tag == null) {
+            tag = new Tag(dto.getName());
+            tagRepository.save(tag);
+        }
+
+        page.addTag(tag);
+        return tag;
     }
 
     public Tag deleteTag(List<TagDTO> inputList) {
         Tag result = new Tag();
         try {
-            for (TagDTO tag : inputList) {
-                tagRepository.deleteMapping(tag.getId(), tag.getPageId());
-            }
+            inputList.forEach(this::deleteTag);
             result.setResultMsg("Success");
         } catch (Exception e) {
             System.out.println("Execption occur with Delete Page ::" + e);
@@ -113,19 +104,22 @@ public class TagService {
         return result;
     }
 
+    private void deleteTag(TagDTO input) {
+        Page page = pageRepository.findById(input.getPageId()).orElseThrow();
+//        page.deleteTag(input.getId());
+    }
+
     public Tag updateTag(List<TagDTO> inputList) {
         Tag result = new Tag();
         try {
-            for (TagDTO tag : inputList) {
-                if (getTagId(tag.getName()) == null) { // 기존에 있는지 확인
-                    Tag input = new Tag();
-                    input.setName(tag.getName());
-                    Tag createTag = tagRepository.save(input); // 없으면 만듬
-                    tagRepository.updateMapping(createTag.getId(), tag.getId(), tag.getPageId());
-                } else {
-                    String tagId = getTagId(tag.getName());
-                    tagRepository.updateMapping(tagId, tag.getId(), tag.getPageId());
+            for (TagDTO dto : inputList) {
+                Page page = pageRepository.findById(dto.getPageId()).orElseThrow();
+                Tag tag = getTagId(dto.getName());
+                if (tag == null) { // 기존에 있는지 확인
+                    tag = createTag(dto);
                 }
+
+                page.updateTag(tag, tagRepository.findById(dto.getId()).orElseThrow());
             }
             result.setResultMsg("Success");
         } catch (Exception e) {

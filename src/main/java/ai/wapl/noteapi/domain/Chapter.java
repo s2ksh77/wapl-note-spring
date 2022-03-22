@@ -17,8 +17,6 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Getter
 @Table(name = "TB_NOTEAPP_NOTEBOOK_MST")
 public class Chapter {
 
@@ -52,8 +50,8 @@ public class Chapter {
     @Column(name = "SHARED_ROOM_NAME")
     private String sharedRoomId;
 
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
-    private List<Page> pageList = new ArrayList<Page>();
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Page> pageList = new ArrayList<>();
 
     @Transient
     private String userId;
@@ -64,4 +62,16 @@ public class Chapter {
     @Transient
     private String resultMsg;
 
+    @Builder
+    public Chapter(String id, String channelId, String name, String type, String color, String userId, String userName) {
+        this.id = id;
+        this.channelId = channelId;
+        this.name = name;
+        this.type = type;
+        this.color = color;
+        this.userId = userId;
+        this.userName = userName;
+    }
+
+    // TODO: create, share create method
 }
