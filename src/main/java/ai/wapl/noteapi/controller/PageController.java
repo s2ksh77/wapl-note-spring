@@ -4,13 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.PageDTO;
@@ -58,7 +52,7 @@ public class PageController {
     }
 
     @ApiOperation(value = "페이지 삭제 서비스 noteDelete ", notes = "페이지 삭제 서비스")
-    @DeleteMapping(path = "/Delete")
+    @DeleteMapping
     public ResponseEntity<Page> deletePage(@RequestBody List<PageDTO> pageList) {
         System.out.println(pageList);
         Page result = pageService.deletePage(pageList);
@@ -67,7 +61,7 @@ public class PageController {
     }
 
     @ApiOperation(value = "페이지 업데이트 서비스 noteUpdate ", notes = "페이지 업데이트 서비스")
-    @PostMapping(path = "/Update")
+    @PutMapping
     public ResponseEntity<Page> updatePage(@RequestBody Page inputDTO) {
         System.out.println(inputDTO);
         Page result = pageService.updatePage(inputDTO);
@@ -76,7 +70,7 @@ public class PageController {
     }
 
     @ApiOperation(value = "휴지통 서비스 noteRecycleBinUpdate", notes = "휴지통 서비스")
-    @PostMapping(path = "/RecycleUpdate")
+    @PutMapping(path = "/recycle")
     public ResponseEntity<Page> updateRecyclePage(@RequestBody List<PageDTO> inputDTO) {
         System.out.println(inputDTO);
         Page result = pageService.updateRecyclePage(inputDTO);

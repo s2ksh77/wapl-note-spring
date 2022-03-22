@@ -6,12 +6,7 @@ import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
@@ -38,7 +33,7 @@ public class TagController {
      * 태그 ID, 태그 이름
      */
     @ApiOperation(value = "태그 전체 조회 정렬 서비스. tagSortList ", notes = "[KOR : [tagList], ENG : [tagList], NUM : [tagList], ETC : [tagList] 데이터 반환")
-    @GetMapping(path = "tag/{channelId}")
+    @GetMapping(path = "/app/{channelId}/tag")
     public ResponseEntity<Map<String, Map<String, List<Tag>>>> getAllTagList(
             @PathVariable("channelId") String channelId) {
         Map<String, Map<String, List<Tag>>> result = tagService.getAllTagList(channelId);
@@ -47,7 +42,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "페이지 하위 태그 리스트 조회 서비스", notes = "페이지 하위 태그 리스트 조회 서비스. tagList")
-    @GetMapping(path = "page-tag/{pageId}")
+    @GetMapping(path = "/page/{pageId}/tag")
     public ResponseEntity<Set<Tag>> getTagList(@PathVariable("pageId") String pageId) {
         Set<Tag> result = tagService.getTagList(pageId);
 
@@ -55,7 +50,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 생성 서비스", notes = "태그 생성 서비스. tagCreate")
-    @PostMapping(path = "tag")
+    @PostMapping(path = "/tag")
     public ResponseEntity<Tag> createTag(@RequestBody List<TagDTO> inputDTO) {
         Tag result = tagService.createTag(inputDTO);
 
@@ -63,7 +58,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 삭제 서비스", notes = "태그 삭제 서비스. tagDelete ")
-    @PostMapping(path = "tag/Delete")
+    @DeleteMapping(path = "/tag")
     public ResponseEntity<Tag> deleteTag(@RequestBody List<TagDTO> inputDTO) {
         Tag result = tagService.deleteTag(inputDTO);
 
@@ -71,7 +66,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 업데이트 서비스", notes = "태그 업데이트 서비스. tagUpdate ")
-    @PostMapping(path = "tag/Update")
+    @PutMapping(path = "/tag")
     public ResponseEntity<Tag> updateTag(@RequestBody List<TagDTO> inputDTO) {
         Tag result = tagService.updateTag(inputDTO);
 
