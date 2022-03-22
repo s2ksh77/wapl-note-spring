@@ -1,6 +1,7 @@
 package ai.wapl.noteapi.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -19,6 +20,9 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 
     Chapter findByChannelIdAndType(String channelId, String type);
 
+    @Query("select c from Chapter c join fetch c.pageList where c.id = :id")
+    Optional<Chapter> findByIdFetchJoin(@Param("id") String id);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE TB_NOTEAPP_NOTE_MST \n"
@@ -31,7 +35,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
             + "FROM TB_NOTEAPP_NOTE_MST \n"
             + "WHERE parent_notebook = :parent_notebook \n"
             + ");", nativeQuery = true)
-    public int updateRecycleBin(@Param("parent_notebook") String chapterId,
+    int updateRecycleBin(@Param("parent_notebook") String chapterId,
             @Param("note_channel_id") String channelId,
             @Param("note_delete_at") String deletedAt);
 

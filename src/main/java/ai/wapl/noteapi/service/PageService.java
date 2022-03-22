@@ -166,4 +166,12 @@ public class PageService {
 
         return output;
     }
+
+    // 전달받은 챕터, 전달받은 페이지
+    // 1. 챕터 id로 페이지 조회
+    // 2. 페이지 하위 첨부된 파일 조회
+    // 3. 파일 삭제
+    public int deleteFileInChapter(String chapterId) {
+        return 0;
+    }
 }
