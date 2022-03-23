@@ -55,11 +55,6 @@ public class TagService {
 
     public Set<Tag> getTagList(String pageId) {
         return tagRepository.findByPageId(pageId);
-//        Page result = new Page();
-//        result.setId(pageId);
-//        result.addTagList(tagList);
-//        result.setTagCount(tagList.size());
-//        return pageRepository.findById(pageId).orElseThrow();
     }
 
     public Tag getTagId(String text) {
@@ -92,41 +87,23 @@ public class TagService {
         return tag;
     }
 
-    public Tag deleteTag(List<TagDTO> inputList) {
-        Tag result = new Tag();
-        try {
-            inputList.forEach(this::deleteTag);
-            result.setResultMsg("Success");
-        } catch (Exception e) {
-            System.out.println("Execption occur with Delete Page ::" + e);
-            result.setResultMsg("Fail");
-        }
-        return result;
+    public void deleteTag(List<TagDTO> inputList) {
+        inputList.forEach(this::deleteTag);
     }
 
     private void deleteTag(TagDTO input) {
         Page page = pageRepository.findById(input.getPageId()).orElseThrow();
-//        page.deleteTag(input.getId());
+        Tag tag = tagRepository.findById(input.getId()).orElse(null);
+        if (tag!=null)
+            page.deleteTag(tag);
     }
 
-    public Tag updateTag(List<TagDTO> inputList) {
-        Tag result = new Tag();
-        try {
-            for (TagDTO dto : inputList) {
-                Page page = pageRepository.findById(dto.getPageId()).orElseThrow();
-                Tag tag = getTagId(dto.getName());
-                if (tag == null) { // 기존에 있는지 확인
-                    tag = createTag(dto);
-                }
-
-                page.updateTag(tag, tagRepository.findById(dto.getId()).orElseThrow());
-            }
-            result.setResultMsg("Success");
-        } catch (Exception e) {
-            System.out.println("Execption occur with Delete Page ::" + e);
-            result.setResultMsg("Fail");
+    public void updateTag(List<TagDTO> inputList) {
+        for (TagDTO dto : inputList) {
+            Page page = pageRepository.findById(dto.getPageId()).orElseThrow();
+            Tag tag = createTag(dto);
+            page.deleteTag(tagRepository.findById(dto.getId()).orElseThrow());
         }
-        return result;
     }
 
     public String getInitialSound(String text) {

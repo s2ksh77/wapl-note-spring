@@ -54,11 +54,11 @@ public class TagServiceTest {
         Map<String, Map<String, List<Tag>>> allTag = tagService.getAllTagList(channelId);
 
         // then
-        assertThat(allTag.get("KOR").size()).isEqualTo(4);
+        assertThat(allTag.size()).isEqualTo(4);
         assertThat(allTag.get("KOR").get("ㅇ").size()).isEqualTo(2);
         assertThat(allTag.get("KOR").get("ㅊ").size()).isEqualTo(2);
-        assertThat(allTag.get("ENG").get("a").size()).isEqualTo(1);
-        assertThat(allTag.get("ENG").get("i").size()).isEqualTo(1);
+        assertThat(allTag.get("ENG").get("A").size()).isEqualTo(1);
+        assertThat(allTag.get("ENG").get("I").size()).isEqualTo(1);
         assertThat(allTag.get("NUM").get("2").size()).isEqualTo(1);
         assertThat(allTag.get("ETC").get("?").size()).isEqualTo(1);
     }
@@ -130,7 +130,7 @@ public class TagServiceTest {
         TagDTO dto = new TagDTO(tag2.getId(), tag2.getName(), pageId);
 
         when(pageRepository.findById(pageId)).thenReturn(Optional.ofNullable(page));
-
+        when(tagRepository.findById(tag2.getId())).thenReturn(Optional.ofNullable(tag2));;
         // when
         tagService.deleteTag(Arrays.asList(dto));
 
@@ -155,6 +155,7 @@ public class TagServiceTest {
 
         when(tagRepository.findByName(text)).thenReturn(null);
         when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        when(tagRepository.findById(oldTagId)).thenReturn(Optional.of(oldTag));
 
         // when
         tagService.updateTag(Arrays.asList(dto));
