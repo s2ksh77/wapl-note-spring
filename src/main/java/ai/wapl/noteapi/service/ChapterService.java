@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import ai.wapl.noteapi.dto.SearchDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class ChapterService {
      * @param channelId
      * @return
      */
+    @Transactional(readOnly = true)
     public List<Chapter> getChapterList(String channelId) {
         List<Chapter> result = chapterRepository.findByChannelId(channelId);
         return result;
@@ -50,6 +52,7 @@ public class ChapterService {
      * @param chapterId
      * @return
      */
+    @Transactional(readOnly = true)
     public Chapter getChapterInfoList(String chapterId) {
         return chapterRepository.findByIdFetchJoin(chapterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
@@ -115,8 +118,22 @@ public class ChapterService {
      * @param channelId
      * @return RecycleBinId
      */
+    @Transactional(readOnly = true)
     public Chapter getRecycleBin(String channelId) {
-        Chapter result = chapterRepository.findByChannelIdAndType(channelId, recycle_bin.toString());
-        return result;
+        return chapterRepository.findByChannelIdAndType(channelId, recycle_bin.toString());
     }
+
+    public Chapter shareChapter(String userId, String chapterId) {
+        // create share type of chapter
+        Chapter originChapter = chapterRepository.findByIdFetchJoin(chapterId)
+                .orElseThrow(ResourceNotFoundException::new);
+        Chapter newChapter = Chapter.createShareChapter(userId, originChapter);
+        chapterRepository.save(newChapter);
+
+        // get page list of chapter
+        originChapter.getPageList().forEach(page -> pageService.sharePage(newChapter, page));
+
+        return newChapter;
+    }
+
 }

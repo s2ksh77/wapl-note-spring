@@ -63,29 +63,41 @@ public class Chapter {
     private String resultMsg;
 
     @Builder
-    public Chapter(String id, String channelId, String name, Type type, String color, String userId, String userName) {
+    public Chapter(String id, String channelId, String name, Type type, String color, String userId) {
         this.id = id;
         this.channelId = channelId;
         this.name = name;
         this.type = type;
         this.color = color;
         this.userId = userId;
-        this.userName = userName;
     }
 
     public static Chapter createChapter(String userId, Chapter input) {
-        input.modifiedDate = NoteUtil.generateDate();
-        input.type = Type.notebook;
-        input.userId = userId;
-        return input;
+        Chapter chapter = Chapter.builder().channelId(input.getChannelId())
+                .color(input.getColor()).name(input.getName())
+                .userId(userId)
+                .type(Type.notebook).build();
+        chapter.modifiedDate = NoteUtil.generateDate();
+        return chapter;
+    }
+
+    public static Chapter createShareChapter(String userId, Chapter input) {
+        Chapter chapter = Chapter.builder().channelId(input.getChannelId())
+                .color(input.getColor()).name(input.getName())
+                .userId(userId)
+                .type(Type.shared).build();
+
+        chapter.modifiedDate = NoteUtil.generateDate();
+        chapter.sharedDate = NoteUtil.generateDate();
+        chapter.sharedUserId = userId;
+        return chapter;
     }
 
     public void addPage(Page page) {
         pageList.add(page);
     }
 
-    // TODO: share create method
     public enum Type {
-        notebook, recycle_bin, shared, shared_page
+        notebook, recycle_bin, shared, shared_page, allNote
     }
 }

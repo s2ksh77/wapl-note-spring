@@ -19,6 +19,7 @@ public class TagService {
     private final TagRepository tagRepository;
     private final PageRepository pageRepository;
 
+    @Transactional(readOnly = true)
     public Map<String, Map<String, List<Tag>>> getAllTagList(String channelId) {
         Set<Tag> tagList = tagRepository.findByChannelId(channelId);
         Map<String, Map<String, List<Tag>>> tagMap = new LinkedHashMap<>() {
@@ -33,17 +34,9 @@ public class TagService {
         tagList.forEach(tag -> {
             String key = getInitialSound(tag.getName());
             String localize = getLocalization(key);
-            Map<String, List<Tag>> sortMap = tagMap.get(localize);
-            if (sortMap == null) {
-                sortMap = new HashMap<>();
-                tagMap.put(localize, sortMap);
-            }
+            Map<String, List<Tag>> sortMap = tagMap.computeIfAbsent(localize, k -> new HashMap<>());
 
-            List<Tag> sortList = sortMap.get(key);
-            if (sortList == null) {
-                sortList = new ArrayList<>();
-                sortMap.put(key, sortList);
-            }
+            List<Tag> sortList = sortMap.computeIfAbsent(key, k -> new ArrayList<>());
             sortList.add(tag);
 
             Object[] mapkey = sortMap.keySet().toArray();
@@ -53,10 +46,12 @@ public class TagService {
         return tagMap;
     }
 
+    @Transactional(readOnly = true)
     public Set<Tag> getTagList(String pageId) {
         return tagRepository.findByPageId(pageId);
     }
 
+    @Transactional(readOnly = true)
     public Tag getTagId(String text) {
         return tagRepository.findByName(text);
     }
@@ -94,8 +89,7 @@ public class TagService {
     private void deleteTag(TagDTO input) {
         Page page = pageRepository.findById(input.getPageId()).orElseThrow();
         Tag tag = tagRepository.findById(input.getId()).orElse(null);
-        if (tag!=null)
-            page.deleteTag(tag);
+        if (tag != null) page.deleteTag(tag);
     }
 
     public void updateTag(List<TagDTO> inputList) {

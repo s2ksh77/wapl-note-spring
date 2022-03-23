@@ -2,6 +2,8 @@ package ai.wapl.noteapi.controller;
 
 import java.util.List;
 
+import ai.wapl.noteapi.dto.SearchDTO;
+import ai.wapl.noteapi.util.ResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +21,6 @@ import static ai.wapl.noteapi.util.ResponseUtil.*;
 public class ChapterController {
     private final ChapterService chapterService;
     private String userId = "userId";
-    // TODO: 챕터 전달 서비스 chaptershareCreate
-    // TODO: 노트 통합검색 서비스 noteSearchList
 
     @ApiOperation(value = "채널 별 챕터 리스트 조회 noteChapterList ", notes = "채널 별 챕터 및 하위 페이지 리스트 조회 서비스")
     @GetMapping(path = "/app/{channelId}")
@@ -62,6 +62,13 @@ public class ChapterController {
         Chapter result = chapterService.updateChapter(inputDTO);
 
         return success(result);
+    }
+
+    @ApiOperation(value = "챕터 전달 서비스 chaptershareCreate ", notes = "챕터 전달 서비스")
+    @PostMapping(path = "/chapter/share")
+    public ResponseEntity<ResponseDTO<Chapter>> shareChapter(@RequestBody Chapter inputDTO) {
+        Chapter chapter = chapterService.shareChapter(userId, inputDTO.getId());
+        return ResponseUtil.success(chapter);
     }
 
 }

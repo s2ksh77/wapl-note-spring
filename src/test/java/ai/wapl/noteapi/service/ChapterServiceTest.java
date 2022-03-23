@@ -2,6 +2,7 @@ package ai.wapl.noteapi.service;
 
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.SearchDTO;
 import ai.wapl.noteapi.repository.PageRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,8 +63,7 @@ public class ChapterServiceTest {
     }
 
     @Test
-    @Transactional
-    public void deleteChapter() throws Exception {
+    public void deleteChapter() {
         // given
         String channelId = "channelId";
         String userId = "userId";
@@ -80,5 +80,6 @@ public class ChapterServiceTest {
         Page page = pageService.getPageInfo(chapter1.getPageList().get(0).getId());
         assertThat(page).isNotNull();
     }
+
 
 }

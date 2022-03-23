@@ -32,6 +32,7 @@ public class PageService {
      * @param pageId
      * @return
      */
+    @Transactional(readOnly = true)
     public Page getPageInfo(String pageId) {
         // session 에서 userId 조회하는 부분 들어오면 userId 넣어야 함.
         Page result = pageRepository.findById(pageId, "6f30ca06-bff9-4534-aa13-727efb0a1f22");
@@ -54,11 +55,11 @@ public class PageService {
      * @return
      */
     public Page createPage(Page inputPage) {
-        Page page = Page.createPage(inputPage);
-
-        Page result = pageRepository.save(page);
-
-        return result;
+//        Page page = Page.createPage(inputPage);
+//        Page result = pageRepository.save(page);
+//
+//        return result;
+        return null;
     }
 
     /**
@@ -173,5 +174,16 @@ public class PageService {
     // 3. 파일 삭제
     public int deleteFileInChapter(String chapterId) {
         return 0;
+    }
+
+    public Page sharePage(Chapter chapter, Page input) {
+        // create page with same content
+        Page page = Page.createPage(chapter, input);
+        pageRepository.save(page);
+
+        // deep copy files of page
+
+
+        return page;
     }
 }
