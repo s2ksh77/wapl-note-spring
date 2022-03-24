@@ -2,9 +2,11 @@ package ai.wapl.noteapi.dto;
 
 import javax.persistence.Lob;
 
+import ai.wapl.noteapi.domain.Page;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 @Getter
 @Setter
@@ -34,6 +36,10 @@ public class PageDTO {
     @JsonProperty("TEXT_CONTENT")
     @Lob
     private String textContent;
+
+    public PageDTO(Page source) {
+        BeanUtils.copyProperties(source, this);
+    }
 
     public enum Type {
         THROW, RESTORE,

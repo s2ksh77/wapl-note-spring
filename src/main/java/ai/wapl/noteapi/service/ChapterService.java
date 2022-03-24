@@ -1,10 +1,7 @@
 package ai.wapl.noteapi.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import ai.wapl.noteapi.dto.SearchDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
-import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,19 +34,14 @@ public class ChapterService {
 
     /**
      * 챕터 전체 조회 서비스
-     * @param channelId
-     * @return
      */
     @Transactional(readOnly = true)
     public List<Chapter> getChapterList(String channelId) {
-        List<Chapter> result = chapterRepository.findByChannelId(channelId);
-        return result;
+        return chapterRepository.findByChannelId(channelId);
     }
 
     /**
      * 챕터 하위 페이지 조회 서비스
-     * @param chapterId
-     * @return
      */
     @Transactional(readOnly = true)
     public Chapter getChapterInfoList(String chapterId) {
@@ -61,9 +52,6 @@ public class ChapterService {
     /**
      * 챕터 추가 서비스
      * createdDate, modifiedDate
-     *
-     * @param inputChapter
-     * @return
      */
     public Chapter createChapter(String userId, Chapter inputChapter, String language) {
         Chapter chapter = chapterRepository.save(Chapter.createChapter(userId, inputChapter));
@@ -114,10 +102,6 @@ public class ChapterService {
         return chapter;
     }
 
-    /**
-     * @param channelId
-     * @return RecycleBinId
-     */
     @Transactional(readOnly = true)
     public Chapter getRecycleBin(String channelId) {
         return chapterRepository.findByChannelIdAndType(channelId, recycle_bin.toString());

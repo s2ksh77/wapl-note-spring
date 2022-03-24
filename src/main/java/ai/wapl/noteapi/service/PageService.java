@@ -2,6 +2,7 @@ package ai.wapl.noteapi.service;
 
 import java.util.List;
 
+import ai.wapl.noteapi.dto.SearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,6 @@ public class PageService {
     /**
      * 페이지 단일 조회 서비스
      * tag mapping 리스트 및 file drive 리스트 조회
-     * 
-     * @param pageId
-     * @return
      */
     @Transactional(readOnly = true)
     public Page getPageInfo(String pageId) {
@@ -50,9 +48,6 @@ public class PageService {
     /**
      * 페이지 추가 서비스
      * createdDate, modifiedDate
-     * 
-     * @param inputPage
-     * @return
      */
     public Page createPage(Page inputPage) {
 //        Page page = Page.createPage(inputPage);
@@ -64,9 +59,6 @@ public class PageService {
 
     /**
      * 페이지 삭제 서비스
-     * 
-     * @param inputList
-     * @return
      */
     public Page deletePage(List<PageDTO> inputList) {
         Page output = new Page();
@@ -131,9 +123,6 @@ public class PageService {
 
     /**
      * 휴지통 관련 THROW 또는 RESOTRE 관련 서비스
-     * 
-     * @param inputList
-     * @return
      */
     public Page updateRecyclePage(List<PageDTO> inputList) {
         Page output = new Page();
@@ -186,4 +175,17 @@ public class PageService {
 
         return page;
     }
+
+    public SearchDTO search(String channelId, String text) {
+        SearchDTO output = new SearchDTO();
+
+        if(text.equals("%")) text = "@%%";
+        else if(text.equals("_")) text = "@__";
+        output.setChapterList(pageRepository.searchChapter(channelId, text));
+        output.setPageList(pageRepository.searchPage(channelId, text));
+        output.setTagList(pageRepository.searchTag(channelId, text));
+
+        return output;
+    }
+
 }

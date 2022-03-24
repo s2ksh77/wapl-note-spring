@@ -59,7 +59,7 @@ public class Page {
 
     @Column(name = "NOTE_CONTENT")
     @Lob
-    private String content;
+    private String content = EMPTY_CONTENT;
 
     @Column(name = "USER_ID")
     private String updatedUserId;
@@ -108,11 +108,6 @@ public class Page {
         tagSet.remove(tag);
     }
 
-    public void updateTag(Tag from, Tag to) {
-        deleteTag(from);
-        addTag(to);
-    }
-
     @Transient
     private int tagCount;
 
@@ -122,7 +117,7 @@ public class Page {
         page.setId(id);
         page.setChapter(chapter);
         page.setName(name);
-        page.setContent((content == null || content.isEmpty()) ? EMPTY_CONTENT : content);
+        page.setContent(content);
         page.setTextContent(textContent);
         page.setEditingUserId(editingUserId);
         page.setUpdatedUserId(userId);
@@ -135,9 +130,12 @@ public class Page {
         return page;
     }
 
-    public static Page createPage(Page page) {
-        if (page.content == null || page.content.isEmpty())
-            page.setContent(EMPTY_CONTENT);
+    public static Page createPage(Chapter chapter, Page input) {
+        Page page = Page.builder().chapter(chapter)
+                .name(input.getName()).content(input.getContent())
+                .userId(input.getCreatedUserId()).userName(input.getUserName())
+                .textContent(input.getTextContent()).build();
+
         page.setCreatedDate(NoteUtil.generateDate());
         page.setModifiedDate(NoteUtil.generateDate());
 
@@ -148,7 +146,7 @@ public class Page {
         return type != null && type.equals(SHARED_PAGE_TYPE);
     }
 
-    public static enum PageType {
+    public enum PageType {
         NONEDIT,EDIT_START,MOVE,RENAME, EDIT_DONE,
     }
 
