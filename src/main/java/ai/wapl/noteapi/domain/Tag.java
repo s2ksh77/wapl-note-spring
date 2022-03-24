@@ -31,6 +31,11 @@ public class Tag {
     @Transient
     private String resultMsg;
 
+    public Tag(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Tag(String name) {
         this.name = name;
     }
