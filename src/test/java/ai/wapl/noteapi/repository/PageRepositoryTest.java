@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.annotation.Resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class PageRepositoryTest {
@@ -22,7 +21,7 @@ public class PageRepositoryTest {
         String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9"; // 오다은
 
         // when
-        Page page = pageRepository.findById(pageId, userId);
+        Page page = pageRepository.findById(userId, pageId);
 
         // then
         assertThat(page.getCreatedUserId()).isEqualTo(userId);

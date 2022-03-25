@@ -4,6 +4,7 @@ import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
 import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.dto.PageDTO.Action;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.repository.PageRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,14 +15,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.*;
-import static ai.wapl.noteapi.domain.Page.PageType.*;
-import static ai.wapl.noteapi.dto.PageDTO.Type.THROW;
-import static ai.wapl.noteapi.util.Constants.RETURN_MSG_FAIL;
+import static ai.wapl.noteapi.dto.PageDTO.Action.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,7 +90,7 @@ public class PageServiceMockTest {
         when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
 
         // when
-        Page pageInfo = pageService.getPageInfo(pageId);
+        Page pageInfo = pageService.getPageInfo(userId, pageId);
 
         // then
         assertThat(pageInfo).isEqualTo(page);
@@ -123,20 +120,18 @@ public class PageServiceMockTest {
     public void updatePage_NONEDIT() {
         // given
         String pageId = "pageId";
+        String chapterId = "chapterId";
         String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        Page page = Page.builder().id(pageId).userId(userId)
-                .name("no title").type(NONEDIT.toString())
-                .chapter(Chapter.builder().id("chapterId").channelId("channelId").build())
-                .build();
-        page.addTag(new Tag("tagId", "name"));
-        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        PageDTO page = PageDTO.builder().id(pageId).name("no title")
+                .chapterId(chapterId).channelId("channelId").build();
+
+        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
 
         // when
-        pageService.updatePage(page);
+        Page updatePage = pageService.updatePage(userId, page, NON_EDIT);
 
         // then
-        page.setType(null);
-        verify(pageRepository).save(page);
+        assertThat(updatePage.isEditing()).isFalse();
     }
 
     @Test
@@ -144,19 +139,19 @@ public class PageServiceMockTest {
     public void updatePage_EDIT_START() {
         // given
         String pageId = "pageId";
+        String chapterId = "chapterId";
         String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        Page page = Page.builder().id(pageId).userId(userId)
-                .name("no title").type(EDIT_START.toString())
-                .chapter(Chapter.builder().id("chapterId").channelId("channelId").build())
-                .build();
-        page.addTag(new Tag("tagId", "name"));
-        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        PageDTO page = PageDTO.builder().id(pageId).name("no title").userName("user name")
+                .chapterId(chapterId).channelId("channelId").build();
+        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
 
         // when
-        Page output = pageService.updatePage(page);
+        Page updatePage = pageService.updatePage(userId, page, Action.EDIT_START);
 
         // then
-        assertThat(output.getResultMsg()).isEqualTo(RETURN_MSG_FAIL);
+        assertThat(updatePage.isEditing()).isTrue();
+        assertThat(updatePage.getUpdatedUserId()).isEqualTo(userId);
+        assertThat(updatePage.getUserName()).isEqualTo("user name");
     }
 
     @Test
@@ -164,23 +159,22 @@ public class PageServiceMockTest {
     public void updatePage_MOVE() {
         // given
         String pageId = "pageId";
+        String chapterId = "new chapter id";
         String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        Page page = Page.builder().id(pageId).userId(userId)
-                .name("no title").type(MOVE.toString())
-                .chapter(Chapter.builder().id("chapterId").channelId("channelId").build())
-                .build();
-        page.addTag(new Tag("tagId", "name"));
-        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        PageDTO page = PageDTO.builder().id(pageId).name("no title")
+                .chapterId("chapterId").channelId("channelId").build();
+        Chapter newChapter = Chapter.builder().id(chapterId).channelId("channelId").build();
 
-        Page input = Page.createPage(Chapter.builder().id("new chapter id").channelId("new channel id").build(), page);
-//        input.setChapter(Chapter.builder().id("new chapter id").channelId("new channel id").build());
+        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
+        when(chapterRepository.findById(chapterId)).thenReturn(Optional.of(newChapter));
+
+        page.setChapterId(chapterId);
 
         // when
-        Page output = pageService.updatePage(input);
+        Page output = pageService.updatePage(userId, page, Action.MOVE);
 
         // then
-        input.setType(null);
-        verify(pageRepository).save(input);
+        assertThat(output.getChapter().getId()).isEqualTo(chapterId);
     }
 
     @Test
@@ -189,22 +183,18 @@ public class PageServiceMockTest {
         // given
         String pageId = "pageId";
         String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        Page page = Page.builder().id(pageId).userId(userId)
-                .name("no title").type(RENAME.toString())
-                .chapter(Chapter.builder().id("chapterId").channelId("channelId").build())
-                .build();
-        page.addTag(new Tag("tagId", "name"));
-        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        PageDTO page = PageDTO.builder().id(pageId).name("no title")
+                .chapterId("chapterId").channelId("channelId").build();
 
-        Page input = Page.createPage(null, page);
-        input.setName("rename");
+        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
+
+        page.setName("rename");
 
         // when
-        Page output = pageService.updatePage(input);
+        Page output = pageService.updatePage(userId, page, Action.RENAME);
 
         // then
-        input.setType(null);
-        verify(pageRepository).save(input);
+        assertThat(output.getName()).isEqualTo("rename");
     }
 
     @Test
@@ -213,24 +203,19 @@ public class PageServiceMockTest {
         // given
         String pageId = "pageId";
         String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        Page page = Page.builder().id(pageId).userId(userId)
-                .editingUserId(userId)
-                .name("no title").type(EDIT_DONE.toString())
-                .chapter(Chapter.builder().id("chapterId").channelId("channelId").build())
-                .build();
-        page.addTag(new Tag("tagId", "name"));
-        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        PageDTO page = PageDTO.builder().id(pageId).name("no title").editingUserId(userId)
+                .userName("user name")
+                .chapterId("chapterId").channelId("channelId").build();
+        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
 
-        Page input = Page.createPage(null, page);
-        input.setContent("updated content");
-        input.setUpdatedUserId("updated user id");
+        page.setContent("updated content");
 
         // when
-        Page output = pageService.updatePage(input);
+        Page output = pageService.updatePage(userId, page, Action.EDIT_DONE);
 
         // then
-        input.setType(null);
-        verify(pageRepository).save(input);
+        assertThat(output.isEditing()).isFalse();
+        assertThat(output.getUserName()).isEqualTo("user name");
     }
 
     @Test
@@ -248,7 +233,7 @@ public class PageServiceMockTest {
 
         Page page = Page.builder().id(pageId).userId(userId)
                 .editingUserId(userId)
-                .name("no title").type(EDIT_DONE.toString())
+                .name("no title")
                 .chapter(chapter).build();
         page.addTag(new Tag("tagId", "name"));
         chapter.getPageList().add(page);
@@ -257,7 +242,7 @@ public class PageServiceMockTest {
         when(chapterRepository.findByChannelIdAndType(channelId, "recycle_bin")).thenReturn(chapter);
 
         // when
-        pageService.updateRecyclePage(Collections.singletonList(dto));
+        pageService.updateRecyclePage(dto, THROW);
 
         // then
         assertThat(page.getType()).isEqualTo("");
@@ -279,7 +264,7 @@ public class PageServiceMockTest {
 
         Page page = Page.builder().id(pageId).userId(userId)
                 .editingUserId(userId)
-                .name("no title").type(EDIT_DONE.toString())
+                .name("no title")
                 .chapter(chapter).build();
         page.addTag(new Tag("tagId", "name"));
         chapter.getPageList().add(page);
@@ -288,7 +273,7 @@ public class PageServiceMockTest {
         when(chapterRepository.findByChannelIdAndType(channelId, "recycle_bin")).thenReturn(chapter);
 
         // when
-        pageService.updateRecyclePage(Collections.singletonList(dto));
+        pageService.updateRecyclePage(dto, RESTORE);
 
         // then
         assertThat(page.getType()).isEqualTo("");

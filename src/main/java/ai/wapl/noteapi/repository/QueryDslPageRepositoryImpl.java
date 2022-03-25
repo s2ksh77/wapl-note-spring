@@ -34,7 +34,7 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
         }
 
         @Override
-        public Page findById(String pageId, String userId) {
+        public Page findById(String userId, String pageId) {
                 String query = "select n.note_id, \n"
                                 + "n.parent_notebook, \n"
                                 + "n.note_title, \n"

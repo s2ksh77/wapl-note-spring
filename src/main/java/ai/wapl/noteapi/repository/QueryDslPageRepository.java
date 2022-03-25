@@ -8,7 +8,7 @@ import ai.wapl.noteapi.dto.TagDTO;
 import java.util.List;
 
 public interface QueryDslPageRepository {
-    Page findById(String pageId, String userId);
+    Page findById(String userId, String pageId);
 
     long moveToRecycleBin(String channelId, String chapterId);
 

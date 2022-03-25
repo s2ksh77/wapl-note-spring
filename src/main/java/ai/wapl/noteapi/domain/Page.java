@@ -142,6 +142,10 @@ public class Page {
         return page;
     }
 
+    public boolean isEditing() {
+        return editingUserId != null && !editingUserId.isEmpty();
+    }
+
     public boolean isShared() {
         return type != null && type.equals(SHARED_PAGE_TYPE);
     }

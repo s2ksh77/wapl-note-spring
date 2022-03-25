@@ -39,9 +39,16 @@ public class PageDTO {
 
     public PageDTO(Page source) {
         BeanUtils.copyProperties(source, this);
+        if (source.getChapter() != null) this.chapterId = source.getChapter().getId();
     }
 
-    public enum Type {
-        THROW, RESTORE,
+    public Page toEntity() {
+        Page page = new Page();
+        BeanUtils.copyProperties(this, page);
+        return page;
+    }
+
+    public enum Action {
+        NON_EDIT, EDIT_START, MOVE, RENAME, EDIT_DONE, THROW, RESTORE,
     }
 }

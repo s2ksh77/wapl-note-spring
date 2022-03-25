@@ -2,23 +2,15 @@ package ai.wapl.noteapi.service;
 
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
-import ai.wapl.noteapi.dto.SearchDTO;
-import ai.wapl.noteapi.repository.PageRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
 import static ai.wapl.noteapi.domain.Chapter.Type.notebook;
-import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
 import static ai.wapl.noteapi.util.Constants.KOREAN;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -77,7 +69,7 @@ public class ChapterServiceTest {
         service.deleteChapter(channelId, chapter1.getId());
 
         // then
-        Page page = pageService.getPageInfo(chapter1.getPageList().get(0).getId());
+        Page page = pageService.getPageInfo(userId, chapter1.getPageList().get(0).getId());
         assertThat(page).isNotNull();
     }
 

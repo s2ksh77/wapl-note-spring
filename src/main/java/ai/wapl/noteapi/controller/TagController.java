@@ -22,7 +22,6 @@ import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 @RequestMapping(path = DEFAULT_API_URI)
 public class TagController {
     private final TagService tagService;
-    // TODO: 태그 페이지 조회 서비스. tagnoteList
 
     /**
      * tagSortList

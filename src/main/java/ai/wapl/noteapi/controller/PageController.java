@@ -2,7 +2,8 @@ package ai.wapl.noteapi.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import ai.wapl.noteapi.util.ResponseUtil;
+import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import ai.wapl.noteapi.service.PageService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import static ai.wapl.noteapi.dto.PageDTO.*;
 import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 
 @RestController
@@ -20,6 +22,8 @@ import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 public class PageController {
 
     private final PageService pageService;
+    // DEBUG
+    private String userId = "userId";
 
     // TODO: 최근 페이지 조회 서비스 noteRecentList
     // TODO: 채널 하위 모든 페이지 조회 서비스. allnoteList deprecated
@@ -36,45 +40,37 @@ public class PageController {
     // }
     @ApiOperation(value = "단일 페이지 정보 조회 서비스 noteinfoList ", notes = "단일 페이지 정보 조회 서비스")
     @GetMapping(path = "/{pageId}")
-    public ResponseEntity<Page> getPageInfoList(@PathVariable("pageId") String pageId) {
+    public ResponseEntity<ResponseDTO<Page>> getPageInfoList(@PathVariable("pageId") String pageId) {
         System.out.println("Request Method : GET");
-        Page pageInfo = pageService.getPageInfo(pageId);
-        return ResponseEntity.ok().body(pageInfo);
+        Page pageInfo = pageService.getPageInfo(userId, pageId);
+        return ResponseUtil.success(pageInfo);
     }
 
     @ApiOperation(value = "페이지 생성 서비스 noteCreate ", notes = "페이지 생성 서비스")
     @PostMapping
-    public ResponseEntity<Page> createPage(@RequestBody Page inputDTO) {
-        System.out.println(inputDTO);
-        // return ResponseEntity.ok().body(inputDTO);
+    public ResponseEntity<ResponseDTO<Page>> createPage(@RequestBody PageDTO inputDTO) {
         Page result = pageService.createPage(inputDTO);
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+        return ResponseUtil.success(result);
     }
 
     @ApiOperation(value = "페이지 삭제 서비스 noteDelete ", notes = "페이지 삭제 서비스")
-    @DeleteMapping
-    public ResponseEntity<Page> deletePage(@RequestBody List<PageDTO> pageList) {
-        System.out.println(pageList);
-        Page result = pageService.deletePage(pageList);
-        System.out.println(result);
-        return ResponseEntity.ok().body(result);
+    @DeleteMapping(path = "/{pageId}")
+    public ResponseEntity<ResponseDTO<Page>> deletePage(@PathVariable String pageId) {
+        Page result = pageService.deletePage(pageId);
+        return ResponseUtil.success(result);
     }
 
     @ApiOperation(value = "페이지 업데이트 서비스 noteUpdate ", notes = "페이지 업데이트 서비스")
     @PutMapping
-    public ResponseEntity<Page> updatePage(@RequestBody Page inputDTO) {
-        System.out.println(inputDTO);
-        Page result = pageService.updatePage(inputDTO);
-        return ResponseEntity.ok().body(result);
-        // return new ResponseEntity<>(result, HttpStatus.CREATED);
+    public ResponseEntity<ResponseDTO<Page>> updatePage(@RequestBody PageDTO inputDTO, @RequestParam("action") Action action) {
+        Page result = pageService.updatePage(userId, inputDTO, action);
+        return ResponseUtil.success(result);
     }
 
     @ApiOperation(value = "휴지통 서비스 noteRecycleBinUpdate", notes = "휴지통 서비스")
     @PutMapping(path = "/recycle")
-    public ResponseEntity<Page> updateRecyclePage(@RequestBody List<PageDTO> inputDTO) {
-        System.out.println(inputDTO);
-        Page result = pageService.updateRecyclePage(inputDTO);
-        return ResponseEntity.ok().body(result);
-        // return new ResponseEntity<>(result, HttpStatus.CREATED);
+    public ResponseEntity<ResponseDTO<Page>> updateRecyclePage(@RequestBody PageDTO inputDTO, @RequestParam("action") Action action) {
+        Page result = pageService.updateRecyclePage(inputDTO, action);
+        return ResponseUtil.success(result);
     }
 }
