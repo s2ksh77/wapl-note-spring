@@ -1,6 +1,7 @@
 package ai.wapl.noteapi.repository;
 
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.PageDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,17 +16,17 @@ public class PageRepositoryTest {
     PageRepository pageRepository;
 
     @Test
-    public void findById() throws Exception {
+    public void findById()  {
         // given
         String pageId = "2cd6dc17-229a-4ba2-9942-49d085ce0778";
         String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9"; // 오다은
 
         // when
-        Page page = pageRepository.findById(userId, pageId);
+        PageDTO page = pageRepository.findById(userId, pageId);
 
         // then
         assertThat(page.getCreatedUserId()).isEqualTo(userId);
-        assertThat(page.getFavorite()).isEqualTo("true");
+        assertThat(page.isFavorite()).isTrue();
     }
 
 }

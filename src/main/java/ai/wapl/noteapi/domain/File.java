@@ -1,52 +1,25 @@
 package ai.wapl.noteapi.domain;
 
-import javax.persistence.Id;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
-@Data
 @Entity
-@AllArgsConstructor
+@Table(name = "TB_NOTEAPP_NOTE_FILE_MAP")
+@Data
 @NoArgsConstructor
-@Builder
-@Table(name = "TB_DRIVE_MST")
-public class File {
+@IdClass(File.class)
+public class File implements Serializable {
 
     @Id
-    @Column(name = "LOG_FILE_ID")
-    private String id;
+    @Column(name = "NOTE_ID")
+    private String pageId;
 
-    @Column(name = "FILE_NAME")
-    private String name;
+    @Id
+    @Column(name = "FILE_ID")
+    private String fileId;
 
-    @Column(name = "FILE_EXTENSION")
-    private String extension;
-
-    @Column(name = "FILE_SIZE")
-    private String size;
-
-    @Column(name = "CREATED_AT")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private String createdAt;
-
-    @Column(name = "UPDATED_AT")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private String updatedAt;
-
-    @Column(name = "DELETED_AT")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private String deletedAt;
-
-    @Column(name = "LAST_UPDATE_USER_ID")
-    private String createdUser;
-
-    // TODO: create, delete, update create method
 }

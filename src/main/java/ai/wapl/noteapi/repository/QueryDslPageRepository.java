@@ -1,6 +1,6 @@
 package ai.wapl.noteapi.repository;
 
-import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.TagDTO;
@@ -8,7 +8,8 @@ import ai.wapl.noteapi.dto.TagDTO;
 import java.util.List;
 
 public interface QueryDslPageRepository {
-    Page findById(String userId, String pageId);
+
+    PageDTO findById(String userId, String pageId);
 
     long moveToRecycleBin(String channelId, String chapterId);
 

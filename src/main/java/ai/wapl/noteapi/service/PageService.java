@@ -1,8 +1,5 @@
 package ai.wapl.noteapi.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import ai.wapl.noteapi.dto.SearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -18,40 +15,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
 import static ai.wapl.noteapi.dto.PageDTO.*;
-import static ai.wapl.noteapi.dto.PageDTO.Action.RESTORE;
-import static ai.wapl.noteapi.dto.PageDTO.Action.THROW;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PageService {
-    private final PageRepository pageRepository;
     private final ChapterRepository chapterRepository;
+    private final PageRepository pageRepository;
+    private final FileService fileService;
 
     /**
      * 페이지 단일 조회 서비스
      * tag mapping 리스트 및 file drive 리스트 조회
      */
     @Transactional(readOnly = true)
-    public Page getPageInfo(String userId, String pageId) {
-        // session 에서 userId 조회하는 부분 들어오면 userId 넣어야 함.
-        Page result = pageRepository.findById(userId, pageId);
-        // result.setFavorite(isBookMark(pageId));
+    public PageDTO getPageInfo(String userId, String pageId) {
+        PageDTO result = pageRepository.findById(userId, pageId);
+        result.setFileList(fileService.getFileListByPageId(pageId));
         return result;
     }
 
-    // public Boolean isBookMark(String pageId) {
-    // int count = pageRepository.findByIsBookMark(pageId,
-    // "6f30ca06-bff9-4534-aa13-727efb0a1f22");
-    // Boolean result = count > 0 ? true : false;
-    // return result;
-    // }
     /**
      * 페이지 추가 서비스
      * createdDate, modifiedDate
      */
     public Page createPage(PageDTO inputPage) {
-        // FIXME when chapter is null then find chapter in persistence context
         Chapter chapter = chapterRepository.findById(inputPage.getChapterId()).orElseThrow(ResourceNotFoundException::new);
         Page page = Page.createPage(chapter, inputPage.toEntity());
         pageRepository.save(page);
@@ -129,22 +117,26 @@ public class PageService {
         String channelId = page.getChannelId();
         Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, recycle_bin.toString());
         Page pageInfo = pageRepository.getById(page.getId());
-        if (action.equals(THROW)) {
-            pageInfo.setChapter(recycleBin);
-            pageInfo.setType(null);
-            pageInfo.setRestoreChapterId(page.getRestoreChapterId());
-            pageInfo.setDeletedDate(NoteUtil.generateDate());
-        } else if (action.equals(RESTORE)) {
-            Chapter inputChapter = new Chapter();
-            inputChapter.setId(page.getChapterId());
-            pageInfo.setChapter(inputChapter);
-            pageInfo.setType(null);
-            pageInfo.setRestoreChapterId(null);
-            pageInfo.setDeletedDate(null);
-            pageInfo.setModifiedDate(NoteUtil.generateDate());
+        switch (action) {
+            case THROW:
+                pageInfo.setChapter(recycleBin);
+                pageInfo.setType(null);
+                pageInfo.setRestoreChapterId(page.getRestoreChapterId());
+                pageInfo.setDeletedDate(NoteUtil.generateDate());
+                return pageInfo;
+            case RESTORE:
+                pageInfo.setChapter(
+                        chapterRepository.findById(page.getChapterId())
+                                .orElseThrow(ResourceNotFoundException::new)
+                );
+                pageInfo.setType(null);
+                pageInfo.setRestoreChapterId(null);
+                pageInfo.setDeletedDate(null);
+                pageInfo.setModifiedDate(NoteUtil.generateDate());
+                return pageInfo;
+            default:
+                throw new IllegalArgumentException("Wrong Action");
         }
-
-        return pageInfo;
     }
 
     // 전달받은 챕터, 전달받은 페이지

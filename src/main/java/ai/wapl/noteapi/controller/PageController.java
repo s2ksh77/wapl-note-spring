@@ -1,7 +1,5 @@
 package ai.wapl.noteapi.controller;
 
-import java.util.List;
-
 import ai.wapl.noteapi.util.ResponseUtil;
 import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +38,9 @@ public class PageController {
     // }
     @ApiOperation(value = "단일 페이지 정보 조회 서비스 noteinfoList ", notes = "단일 페이지 정보 조회 서비스")
     @GetMapping(path = "/{pageId}")
-    public ResponseEntity<ResponseDTO<Page>> getPageInfoList(@PathVariable("pageId") String pageId) {
+    public ResponseEntity<ResponseDTO<PageDTO>> getPageInfoList(@PathVariable("pageId") String pageId) {
         System.out.println("Request Method : GET");
-        Page pageInfo = pageService.getPageInfo(userId, pageId);
+        PageDTO pageInfo = pageService.getPageInfo(userId, pageId);
         return ResponseUtil.success(pageInfo);
     }
 

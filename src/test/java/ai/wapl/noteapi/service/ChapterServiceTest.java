@@ -2,6 +2,7 @@ package ai.wapl.noteapi.service;
 
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.PageDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -69,7 +70,7 @@ public class ChapterServiceTest {
         service.deleteChapter(channelId, chapter1.getId());
 
         // then
-        Page page = pageService.getPageInfo(userId, chapter1.getPageList().get(0).getId());
+        PageDTO page = pageService.getPageInfo(userId, chapter1.getPageList().get(0).getId());
         assertThat(page).isNotNull();
     }
 

@@ -54,9 +54,6 @@ public class Page {
     @Column(name = "IS_EDIT")
     private String editingUserId;
 
-    @Column(name = "IS_FAVORITE")
-    private String favorite;
-
     @Column(name = "NOTE_CONTENT")
     @Lob
     private String content = EMPTY_CONTENT;
@@ -89,10 +86,6 @@ public class Page {
     @ManyToMany(targetEntity = Tag.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "TB_NOTEAPP_TAG_MST", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "TAG_ID"))
     private Set<Tag> tagSet = new HashSet<>();
-
-//    @ManyToMany
-//    @JoinTable(name = "TB_NOTEAPP_NOTE_FILE_MAP", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "FILE_ID"))
-//    private final List<File> fileList = new ArrayList<>();
 
     @Transient
     private String resultMsg;
@@ -148,10 +141,6 @@ public class Page {
 
     public boolean isShared() {
         return type != null && type.equals(SHARED_PAGE_TYPE);
-    }
-
-    public enum PageType {
-        NONEDIT,EDIT_START,MOVE,RENAME, EDIT_DONE,
     }
 
 }

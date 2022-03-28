@@ -3,6 +3,7 @@ package ai.wapl.noteapi.service;
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
+import ai.wapl.noteapi.dto.FileDTO;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.PageDTO.Action;
 import ai.wapl.noteapi.repository.ChapterRepository;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.*;
@@ -27,15 +29,17 @@ import static org.mockito.Mockito.when;
 public class PageServiceMockTest {
 
     @Mock
+    ChapterRepository chapterRepository;
+    @Mock
     PageRepository pageRepository;
     @Mock
-    ChapterRepository chapterRepository;
+    FileService fileService;
     PageService pageService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        pageService = new PageService(pageRepository, chapterRepository);
+        pageService = new PageService(chapterRepository, pageRepository, fileService);
     }
 
     @Test
@@ -82,15 +86,15 @@ public class PageServiceMockTest {
         String pageId = "pageId";
         String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
 
-        Page page = Page.builder().id(pageId).userId(userId)
-                .name("no title")
-                .chapter(Chapter.builder().id("chapterId").channelId("channelId").build())
-                .build();
-        page.addTag(new Tag("tagId", "name"));
-        when(pageRepository.findById(pageId)).thenReturn(Optional.of(page));
+        PageDTO page = PageDTO.builder().id(pageId).createdUserId(userId)
+                .name("no title").chapterId("chapterId").build();
+        when(pageRepository.findById(userId, pageId)).thenReturn(page);
+        when(fileService.getFileListByPageId(pageId)).thenReturn(Arrays.asList(
+                FileDTO.builder().id("logicalFileId").name("image").extension("jpg").createdUser(userId).build()
+        ));
 
         // when
-        Page pageInfo = pageService.getPageInfo(userId, pageId);
+        PageDTO pageInfo = pageService.getPageInfo(userId, pageId);
 
         // then
         assertThat(pageInfo).isEqualTo(page);
