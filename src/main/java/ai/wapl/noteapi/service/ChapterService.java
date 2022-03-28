@@ -24,12 +24,14 @@ public class ChapterService {
 
     private final ChapterRepository chapterRepository;
     private final PageService pageService;
+    private final FileService fileService;
     private final Logger logger = LoggerFactory.getLogger(ChapterService.class);
 
     @Autowired
-    public ChapterService(ChapterRepository chapterRepository, PageService pageService) {
+    public ChapterService(ChapterRepository chapterRepository, PageService pageService, FileService fileService) {
         this.chapterRepository = chapterRepository;
         this.pageService = pageService;
+        this.fileService = fileService;
     }
 
     /**
@@ -79,7 +81,7 @@ public class ChapterService {
             chapterRepository.updateRecycleBin(chapterId, channelId,
                     NoteUtil.generateDate());
         else
-            pageService.deleteFileInChapter(chapterId);
+            fileService.deleteFileByChapterId(chapterId);
 
         chapterRepository.deleteById(chapterId);
     }

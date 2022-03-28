@@ -42,8 +42,7 @@ public class PageService {
     public Page createPage(PageDTO inputPage) {
         Chapter chapter = chapterRepository.findById(inputPage.getChapterId()).orElseThrow(ResourceNotFoundException::new);
         Page page = Page.createPage(chapter, inputPage.toEntity());
-        pageRepository.save(page);
-        return page;
+        return pageRepository.save(page);
     }
 
     /**
@@ -52,9 +51,7 @@ public class PageService {
      */
     public Page createPage(Page inputPage) {
         Page page = Page.createPage(inputPage.getChapter(), inputPage);
-        Page result = pageRepository.save(page);
-
-        return result;
+        return pageRepository.save(page);
     }
 
     /**
@@ -62,7 +59,7 @@ public class PageService {
      */
     public Page deletePage(String pageId) {
         Page page = pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new);
-        // TODO 페이지 별 파일 조회해서 삭제 후 페이지 삭제하도록
+        fileService.deleteFileByPageId(pageId);
         pageRepository.delete(page);
         return page;
     }
@@ -106,10 +103,6 @@ public class PageService {
         }
     }
 
-    private String getNotNull(String name, String name2) {
-        return name != null ? name : name2;
-    }
-
     /**
      * 휴지통 관련 THROW 또는 RESTORE 관련 서비스
      */
@@ -139,21 +132,13 @@ public class PageService {
         }
     }
 
-    // 전달받은 챕터, 전달받은 페이지
-    // 1. 챕터 id로 페이지 조회
-    // 2. 페이지 하위 첨부된 파일 조회
-    // 3. 파일 삭제
-    public int deleteFileInChapter(String chapterId) {
-        return 0;
-    }
-
     public Page sharePage(Chapter chapter, Page input) {
         // create page with same content
         Page page = Page.createPage(chapter, input);
         pageRepository.save(page);
 
         // deep copy files of page
-
+        fileService.copyFileListByPageId(input.getId(), page.getId());
 
         return page;
     }
@@ -168,6 +153,10 @@ public class PageService {
         output.setTagList(pageRepository.searchTag(channelId, text));
 
         return output;
+    }
+
+    private String getNotNull(String name, String name2) {
+        return name != null ? name : name2;
     }
 
 }
