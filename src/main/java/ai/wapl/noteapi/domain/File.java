@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "TB_NOTEAPP_NOTE_FILE_MAP")
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @IdClass(File.class)
 public class File implements Serializable {

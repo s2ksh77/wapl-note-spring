@@ -57,9 +57,9 @@ public class PageService {
     /**
      * 페이지 삭제 서비스
      */
-    public Page deletePage(String pageId) {
+    public Page deletePage(String channelId, String pageId) {
         Page page = pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new);
-        fileService.deleteFileByPageId(pageId);
+        fileService.deleteFileByPageId(channelId, pageId);
         pageRepository.delete(page);
         return page;
     }
@@ -138,7 +138,7 @@ public class PageService {
         pageRepository.save(page);
 
         // deep copy files of page
-        fileService.copyFileListByPageId(input.getId(), page.getId());
+        fileService.copyFileListByPageId(chapter.getChannelId(), input.getId(), page.getId());
 
         return page;
     }

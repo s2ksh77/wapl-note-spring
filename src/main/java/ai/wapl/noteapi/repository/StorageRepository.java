@@ -7,7 +7,7 @@ public interface StorageRepository {
 
     FileDTO findFileInfo(String fileId);
 
-    FileDTO deepCopy(String channelId, String userId, String fileId);
+    FileDTO deepCopy(String channelId, String fileId);
 
-    void delete(String channelId, String userId, String fileId);
+    void delete(String channelId, String fileId);
 }

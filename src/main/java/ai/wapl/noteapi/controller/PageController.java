@@ -16,12 +16,12 @@ import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = DEFAULT_API_URI + "/page")
+@RequestMapping(path = DEFAULT_API_URI + "/app/{channelId}/page")
 public class PageController {
 
     private final PageService pageService;
     // DEBUG
-    private String userId = "userId";
+    private String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9";
 
     // TODO: 최근 페이지 조회 서비스 noteRecentList
     // TODO: 채널 하위 모든 페이지 조회 서비스. allnoteList deprecated
@@ -53,8 +53,8 @@ public class PageController {
 
     @ApiOperation(value = "페이지 삭제 서비스 noteDelete ", notes = "페이지 삭제 서비스")
     @DeleteMapping(path = "/{pageId}")
-    public ResponseEntity<ResponseDTO<Page>> deletePage(@PathVariable String pageId) {
-        Page result = pageService.deletePage(pageId);
+    public ResponseEntity<ResponseDTO<Page>> deletePage(@PathVariable String channelId, @PathVariable String pageId) {
+        Page result = pageService.deletePage(channelId, pageId);
         return ResponseUtil.success(result);
     }
 

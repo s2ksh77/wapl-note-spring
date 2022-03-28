@@ -81,7 +81,7 @@ public class ChapterService {
             chapterRepository.updateRecycleBin(chapterId, channelId,
                     NoteUtil.generateDate());
         else
-            fileService.deleteFileByChapterId(chapterId);
+            fileService.deleteFileByChapterId(channelId, chapterId);
 
         chapterRepository.deleteById(chapterId);
     }
