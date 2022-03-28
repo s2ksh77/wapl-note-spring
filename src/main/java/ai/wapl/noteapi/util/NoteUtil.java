@@ -1,6 +1,7 @@
 package ai.wapl.noteapi.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
@@ -25,8 +26,32 @@ public class NoteUtil {
         };
 
         int idx = new Random().nextInt(colorArray.length);
-        String randomColor = colorArray[idx];
 
-        return randomColor;
+        return colorArray[idx];
     }
+
+    public static boolean isMobile(String userAgent){
+        String[] mobile = {
+                "okhttp",
+                "iPhone",
+                "iPod",
+                "Android",
+                "BlackBerry",
+                "Windows CE",
+                "Nokia",
+                "Webos",
+                "Opera Mini",
+                "SonyEricsson",
+                "Opera Mobi",
+                "IEMobile"
+        };
+
+        return Arrays.stream(mobile).anyMatch(userAgent::contains);
+    }
+
+    public static boolean isImage(String FileExtension) {
+        String[] ImageExt = {"jpg", "gif", "jpeg", "jfif", "tiff", "bmp", "bpg", "png"};
+        return Arrays.asList(ImageExt).contains(FileExtension.toLowerCase());
+    }
+
 }
