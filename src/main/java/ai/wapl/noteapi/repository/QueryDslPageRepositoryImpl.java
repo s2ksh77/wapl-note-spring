@@ -44,6 +44,19 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
         }
 
         @Override
+        public List<PageDTO> findByChannelIdOrderByModifiedDate(String userId, String channelId, int count) {
+                return queryFactory.select(Projections.constructor(PageDTO.class, page
+                        , JPAExpressions.select(bookmark.pageId).from(bookmark)
+                                .where(bookmark.pageId.eq(page.id).and(bookmark.userId.eq(userId)))
+                ))
+                        .from(page).join(chapter).on(chapter.eq(page.chapter))
+                        .where(chapter.channelId.eq(channelId))
+                        .orderBy(page.modifiedDate.desc())
+                        .limit(count)
+                        .fetch();
+        }
+
+        @Override
         public long moveToRecycleBin(String channelId, String chapterId) {
                 QChapter r = new QChapter("r");
                 return queryFactory.update(page.chapter).where(page.chapter.id.eq(chapterId))

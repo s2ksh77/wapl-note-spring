@@ -13,6 +13,8 @@ import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
 import static ai.wapl.noteapi.dto.PageDTO.*;
 
@@ -146,6 +148,10 @@ public class PageService {
         output.setTagList(pageRepository.searchTag(channelId, text));
 
         return output;
+    }
+
+    public List<PageDTO> getRecentPageList(String userId, String channelId, int count) {
+        return pageRepository.findByChannelIdOrderByModifiedDate(userId, channelId, count);
     }
 
     private String getNotNull(String name, String name2) {

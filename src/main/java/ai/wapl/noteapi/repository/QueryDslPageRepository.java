@@ -11,6 +11,8 @@ public interface QueryDslPageRepository {
 
     PageDTO findById(String userId, String pageId);
 
+    List<PageDTO> findByChannelIdOrderByModifiedDate(String userId, String channelId, int count);
+
     long moveToRecycleBin(String channelId, String chapterId);
 
     List<ChapterDTO> searchChapter(String channelId, String text);

@@ -12,6 +12,8 @@ import ai.wapl.noteapi.service.PageService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import static ai.wapl.noteapi.dto.PageDTO.*;
 import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 
@@ -33,6 +35,13 @@ public class PageController {
     // TODO: 즐겨찾기 해제 서비스. bookmarkDelete
     // TODO: 즐겨찾기 조회 서비스. bookmarkList
     // TODO: new 기능
+
+    @ApiOperation(value = "최근 페이지 조회 서비스 noteRecentList", notes = "최근 페이지 조회 서비스")
+    @GetMapping("/page")
+    public ResponseEntity<ResponseDTO<List<PageDTO>>> getRecentPageList(@PathVariable("channelId") String channelId,
+                                                                        @RequestParam("count") int count) {
+        return ResponseUtil.success(pageService.getRecentPageList(userId, channelId, count));
+    }
 
     @ApiOperation(value = "단일 페이지 정보 조회 서비스 noteinfoList ", notes = "단일 페이지 정보 조회 서비스")
     @GetMapping(path = "/page/{pageId}")
@@ -76,4 +85,5 @@ public class PageController {
         SearchDTO output = pageService.search(channelId, text);
         return ResponseUtil.success(output);
     }
+
 }
