@@ -26,7 +26,7 @@ public class TagController {
     /**
      * tagSortList
      *
-     * @param channelId
+     * @param channelId 태그 조회할 채널 id
      * @return "KOR" / "ENG" / "NUM" / "ETC"</p>
      * <p>태그 이름 첫 번째 문자 (모음/자음) </p>
      * 태그 ID, 태그 이름
@@ -49,7 +49,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 생성 서비스", notes = "태그 생성 서비스. tagCreate")
-    @PostMapping(path = "/tag")
+    @PostMapping(path = "/page/{pageId}/tag")
     public ResponseEntity<ResponseDTO<Tag>> createTag(@RequestBody List<TagDTO> inputDTO) {
         Tag result = tagService.createTag(inputDTO);
 
@@ -57,7 +57,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 삭제 서비스", notes = "태그 삭제 서비스. tagDelete ")
-    @DeleteMapping(path = "/tag")
+    @DeleteMapping(path = "/page/{pageId}/tag")
     public ResponseEntity<ResponseDTO<Tag>> deleteTag(@RequestBody List<TagDTO> inputDTO) {
         tagService.deleteTag(inputDTO);
 
@@ -65,7 +65,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 업데이트 서비스", notes = "태그 업데이트 서비스. tagUpdate ")
-    @PutMapping(path = "/tag")
+    @PutMapping(path = "/page/{pageId}/tag")
     public ResponseEntity<ResponseDTO<Tag>> updateTag(@RequestBody List<TagDTO> inputDTO) {
         tagService.updateTag(inputDTO);
 

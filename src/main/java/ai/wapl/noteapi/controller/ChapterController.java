@@ -17,13 +17,16 @@ import static ai.wapl.noteapi.util.ResponseUtil.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = DEFAULT_API_URI)
+@RequestMapping(path = DEFAULT_API_URI + "/app/{channelId}")
 public class ChapterController {
     private final ChapterService chapterService;
     private String userId = "userId";
 
+    // TODO: noteappCreate
+    // TODO: noteappDelete
+
     @ApiOperation(value = "채널 별 챕터 리스트 조회 noteChapterList ", notes = "채널 별 챕터 및 하위 페이지 리스트 조회 서비스")
-    @GetMapping(path = "/app/{channelId}")
+    @GetMapping
     public ResponseEntity<ResponseDTO<List<Chapter>>> getChapterList(@PathVariable("channelId") String channelId) {
         List<Chapter> chapterList = chapterService.getChapterList(channelId);
 
@@ -50,7 +53,7 @@ public class ChapterController {
     }
 
     @ApiOperation(value = "챕터 삭제 서비스 notebookDelete ", notes = "챕터 삭제 서비스")
-    @DeleteMapping(path = "/app/{channelId}/chapter/{chapterId}")
+    @DeleteMapping(path = "/chapter/{chapterId}")
     public ResponseEntity<?> deleteChapter(@PathVariable String channelId, @PathVariable String chapterId) {
         chapterService.deleteChapter(channelId, chapterId);
         return noContent();
