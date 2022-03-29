@@ -35,10 +35,6 @@ public class PageService {
         return result;
     }
 
-    /**
-     * 페이지 추가 서비스
-     * createdDate, modifiedDate
-     */
     public Page createPage(PageDTO inputPage) {
         Chapter chapter = chapterRepository.findById(inputPage.getChapterId()).orElseThrow(ResourceNotFoundException::new);
         Page page = Page.createPage(chapter, inputPage.toEntity());
@@ -54,9 +50,6 @@ public class PageService {
         return pageRepository.save(page);
     }
 
-    /**
-     * 페이지 삭제 서비스
-     */
     public Page deletePage(String channelId, String pageId) {
         Page page = pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new);
         fileService.deleteFileByPageId(channelId, pageId);

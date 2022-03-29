@@ -50,10 +50,10 @@ public class TagController {
 
     @ApiOperation(value = "태그 생성 서비스", notes = "태그 생성 서비스. tagCreate")
     @PostMapping(path = "/page/{pageId}/tag")
-    public ResponseEntity<ResponseDTO<Tag>> createTag(@RequestBody List<TagDTO> inputDTO) {
-        Tag result = tagService.createTag(inputDTO);
+    public ResponseEntity<ResponseDTO<List<Tag>>> createTag(@RequestBody List<TagDTO> inputDTO) {
+        List<Tag> tags = tagService.createTag(inputDTO);
 
-        return ResponseUtil.success(result);
+        return ResponseUtil.success(tags);
     }
 
     @ApiOperation(value = "태그 삭제 서비스", notes = "태그 삭제 서비스. tagDelete ")

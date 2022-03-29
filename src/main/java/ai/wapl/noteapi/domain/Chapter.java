@@ -59,9 +59,6 @@ public class Chapter {
     @Transient
     private String userName;
 
-    @Transient
-    private String resultMsg;
-
     @Builder
     public Chapter(String id, String channelId, String name, Type type, String color, String userId) {
         this.id = id;

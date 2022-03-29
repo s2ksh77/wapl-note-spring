@@ -56,16 +56,9 @@ public class TagService {
         return tagRepository.findByName(text);
     }
 
-    public Tag createTag(List<TagDTO> inputList) {
-        Tag result = new Tag();
-        try {
-            inputList.forEach(this::createTag);
-            result.setResultMsg("Success");
-        } catch (Exception e) {
-            System.out.println("Execption occur with Delete Page ::" + e);
-            result.setResultMsg("Fail");
-        }
-
+    public List<Tag> createTag(List<TagDTO> inputList) {
+        List<Tag> result = new ArrayList<>();
+        inputList.forEach(dto -> result.add(createTag(dto)));
         return result;
     }
 
@@ -88,8 +81,7 @@ public class TagService {
 
     private void deleteTag(TagDTO input) {
         Page page = pageRepository.findById(input.getPageId()).orElseThrow();
-        Tag tag = tagRepository.findById(input.getId()).orElse(null);
-        if (tag != null) page.deleteTag(tag);
+        tagRepository.findById(input.getId()).ifPresent(page::deleteTag);
     }
 
     public void updateTag(List<TagDTO> inputList) {

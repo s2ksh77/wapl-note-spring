@@ -28,14 +28,6 @@ public class Tag {
     @Column(name = "TEXT")
     private String name;
 
-    @Transient
-    private String resultMsg;
-
-    public Tag(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public Tag(String name) {
         this.name = name;
     }

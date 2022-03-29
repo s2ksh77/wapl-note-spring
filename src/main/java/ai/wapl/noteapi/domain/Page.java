@@ -87,12 +87,6 @@ public class Page {
     @JoinTable(name = "TB_NOTEAPP_TAG_MST", joinColumns = @JoinColumn(name = "NOTE_ID"), inverseJoinColumns = @JoinColumn(name = "TAG_ID"))
     private Set<Tag> tagSet = new HashSet<>();
 
-    @Transient
-    private String resultMsg;
-
-    @Transient
-    private String channelId;
-
     public void addTag(Tag tag) {
         tagSet.add(tag);
     }
