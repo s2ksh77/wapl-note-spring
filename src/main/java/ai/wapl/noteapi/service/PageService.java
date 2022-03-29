@@ -154,6 +154,12 @@ public class PageService {
         return pageRepository.findByChannelIdOrderByModifiedDate(userId, channelId, count);
     }
 
+    public List<PageDTO> getAllPageList(String userId, String channelId) {
+        List<PageDTO> dtoList = pageRepository.findAllPageByChannelId(userId, channelId);
+        dtoList.forEach(pageDTO -> pageDTO.setFileList(fileService.getFileListByPageId(pageDTO.getId())));
+        return dtoList;
+    }
+
     private String getNotNull(String name, String name2) {
         return name != null ? name : name2;
     }

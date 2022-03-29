@@ -2,14 +2,16 @@ package ai.wapl.noteapi.dto;
 
 import javax.persistence.Lob;
 
-import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.domain.Tag;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -39,10 +41,21 @@ public class PageDTO {
     @Lob
     private String textContent;
     private List<FileDTO> fileList;
+    private List<Tag> tagList;
 
-    public PageDTO(Page source, String bookmark) {
+    public PageDTO(Page source) {
         BeanUtils.copyProperties(source, this);
         if (source.getChapter() != null) this.chapterId = source.getChapter().getId();
+    }
+
+    public PageDTO(Page source, Set<Tag> tagSet) {
+        this(source);
+        if (tagSet != null && !tagSet.isEmpty())
+            this.tagList = new ArrayList<>(tagSet);
+    }
+
+    public PageDTO(Page source, String bookmark) {
+        this(source);
         this.favorite = bookmark != null;
     }
 

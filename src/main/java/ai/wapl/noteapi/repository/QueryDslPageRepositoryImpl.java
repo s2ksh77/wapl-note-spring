@@ -2,8 +2,6 @@ package ai.wapl.noteapi.repository;
 
 import javax.persistence.EntityManager;
 
-import javax.persistence.Query;
-
 import ai.wapl.noteapi.domain.*;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
@@ -53,6 +51,16 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
                         .where(chapter.channelId.eq(channelId))
                         .orderBy(page.modifiedDate.desc())
                         .limit(count)
+                        .fetch();
+        }
+
+        @Override
+        public List<PageDTO> findAllPageByChannelId(String userId, String channelId) {
+                // FIXME Tag 조회 안 됨
+                return queryFactory.select(Projections.constructor(PageDTO.class, page))
+                        .from(page).join(chapter).on(chapter.eq(page.chapter))
+                        .leftJoin(tag).on(page.tagSet.any().id.eq(tag.id))
+                        .where(chapter.channelId.eq(channelId))
                         .fetch();
         }
 

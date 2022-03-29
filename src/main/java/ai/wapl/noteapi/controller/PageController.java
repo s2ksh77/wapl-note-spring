@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 import static ai.wapl.noteapi.dto.PageDTO.*;
 import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
@@ -26,8 +27,6 @@ public class PageController {
     // DEBUG
     private String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9";
 
-    // TODO: 최근 페이지 조회 서비스 noteRecentList
-    // TODO: 채널 하위 모든 페이지 조회 서비스. allnoteList deprecated
     // TODO: 휴지통 비우기 서비스. 스케쥴링 noteRecycleBinDelete
     // TODO: unlock 서비스. 스케쥴링 UnlockUpdate
     // TODO: 페이지 전달 서비스 noteshareCreate
@@ -36,17 +35,20 @@ public class PageController {
     // TODO: 즐겨찾기 조회 서비스. bookmarkList
     // TODO: new 기능
 
-    @ApiOperation(value = "최근 페이지 조회 서비스 noteRecentList", notes = "최근 페이지 조회 서비스")
+    @ApiOperation(value = "최근 페이지 조회 서비스 noteRecentList & 채널 하위 모든 페이지 조회 서비스. allnoteList deprecated", notes = "count > 0면 최근 페이지 조회 서비스, else 전체 조회")
     @GetMapping("/page")
     public ResponseEntity<ResponseDTO<List<PageDTO>>> getRecentPageList(@PathVariable("channelId") String channelId,
-                                                                        @RequestParam("count") int count) {
-        return ResponseUtil.success(pageService.getRecentPageList(userId, channelId, count));
+                                                                        @RequestParam(value = "count", required = false) Integer count) {
+        List<PageDTO> pageDTOS = count != null
+                ? pageService.getRecentPageList(userId, channelId, count)
+                : pageService.getAllPageList(userId, channelId);
+        
+        return ResponseUtil.success(pageDTOS);
     }
 
     @ApiOperation(value = "단일 페이지 정보 조회 서비스 noteinfoList ", notes = "단일 페이지 정보 조회 서비스")
     @GetMapping(path = "/page/{pageId}")
     public ResponseEntity<ResponseDTO<PageDTO>> getPageInfoList(@PathVariable("pageId") String pageId) {
-        System.out.println("Request Method : GET");
         PageDTO pageInfo = pageService.getPageInfo(userId, pageId);
         return ResponseUtil.success(pageInfo);
     }
