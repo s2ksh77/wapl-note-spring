@@ -2,12 +2,14 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import ai.wapl.noteapi.util.DateTimeConverter;
 import ai.wapl.noteapi.util.NoteUtil;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.thymeleaf.util.DateUtils;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +34,8 @@ public class Chapter {
     private String name;
 
     @Column(name = "MODIFIED_DATE")
-    private String modifiedDate = NoteUtil.generateDate();
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime modifiedDate = NoteUtil.now();
 
     @Column(name = "TYPE")
     @Enumerated(EnumType.STRING)
@@ -42,7 +45,8 @@ public class Chapter {
     private String color;
 
     @Column(name = "SHARED_DATE")
-    private String sharedDate;
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime sharedDate;
 
     @Column(name = "SHARED_USER_ID")
     private String sharedUserId;
@@ -74,7 +78,7 @@ public class Chapter {
                 .color(input.getColor()).name(input.getName())
                 .userId(userId)
                 .type(Type.notebook).build();
-        chapter.modifiedDate = NoteUtil.generateDate();
+        chapter.modifiedDate = NoteUtil.now();
         return chapter;
     }
 
@@ -84,8 +88,8 @@ public class Chapter {
                 .userId(userId)
                 .type(Type.shared).build();
 
-        chapter.modifiedDate = NoteUtil.generateDate();
-        chapter.sharedDate = NoteUtil.generateDate();
+        chapter.modifiedDate = NoteUtil.now();
+        chapter.sharedDate = NoteUtil.now();
         chapter.sharedUserId = userId;
         return chapter;
     }

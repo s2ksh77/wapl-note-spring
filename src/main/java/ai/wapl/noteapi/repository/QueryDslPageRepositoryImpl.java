@@ -12,6 +12,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ai.wapl.noteapi.domain.Chapter.*;
@@ -20,6 +21,7 @@ import static ai.wapl.noteapi.domain.QBookmark.bookmark;
 import static ai.wapl.noteapi.domain.QChapter.chapter;
 import static ai.wapl.noteapi.domain.QPage.*;
 import static ai.wapl.noteapi.domain.QTag.*;
+import static ai.wapl.noteapi.domain.QFile.*;
 
 @Repository
 public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
@@ -114,6 +116,22 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
                                 .and(tag.name.lower().like(lowerText, '@'))
                         )
                         .fetch();
+        }
+
+        @Override
+        public List<File> getFileInRecycleBin(LocalDateTime targetDate) {
+                return queryFactory.select(Projections.fields(File.class,
+                        page.id.as("pageId"), file.fileId.as("fileId"), chapter.channelId.as("channelId")
+                )).from(page).join(chapter).on(chapter.id.eq(page.chapter.id))
+                        .join(file).on(file.pageId.eq(page.id))
+                        .where(page.deletedDate.before(targetDate))
+                        .fetch();
+        }
+
+        @Override
+        public long deleteInRecycleBin(LocalDateTime targetDate) {
+                return queryFactory.delete(page)
+                        .where(page.deletedDate.before(targetDate)).execute();
         }
 
         private JPQLQuery<String> getPageIdWithTag(String channelId) {

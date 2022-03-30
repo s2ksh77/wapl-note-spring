@@ -2,6 +2,7 @@ package ai.wapl.noteapi.domain;
 
 import javax.persistence.Id;
 
+import ai.wapl.noteapi.util.DateTimeConverter;
 import ai.wapl.noteapi.util.NoteUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,10 +14,8 @@ import lombok.ToString;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static ai.wapl.noteapi.util.Constants.EMPTY_CONTENT;
 import static ai.wapl.noteapi.util.Constants.SHARED_PAGE_TYPE;
@@ -43,10 +42,12 @@ public class Page {
     private String name;
 
     @Column(name = "CREATED_DATE")
-    private String createdDate;
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime createdDate;
 
     @Column(name = "MODIFIED_DATE")
-    private String modifiedDate;
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime modifiedDate;
 
     @Column(name = "USER_NAME")
     private String userName;
@@ -74,7 +75,8 @@ public class Page {
     private String createdUserId;
 
     @Column(name = "NOTE_DELETED_AT")
-    private String deletedDate;
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime deletedDate;
 
     @Column(name = "TEXT_CONTENT")
     @Lob
@@ -110,8 +112,8 @@ public class Page {
         page.setUpdatedUserId(userId);
         page.setCreatedUserId(userId);
         page.setUserName(userName);
-        page.setCreatedDate(NoteUtil.generateDate());
-        page.setModifiedDate(NoteUtil.generateDate());
+        page.setCreatedDate(NoteUtil.now());
+        page.setModifiedDate(NoteUtil.now());
         page.setType(type);
 
         return page;
@@ -123,8 +125,8 @@ public class Page {
                 .userId(input.getCreatedUserId()).userName(input.getUserName())
                 .textContent(input.getTextContent()).build();
 
-        page.setCreatedDate(NoteUtil.generateDate());
-        page.setModifiedDate(NoteUtil.generateDate());
+        page.setCreatedDate(NoteUtil.now());
+        page.setModifiedDate(NoteUtil.now());
 
         return page;
     }

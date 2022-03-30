@@ -1,20 +1,27 @@
 package ai.wapl.noteapi.util;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Random;
-import java.util.TimeZone;
+
+import static ai.wapl.noteapi.util.Constants.ASIA_SEOUL;
 
 public class NoteUtil {
+    static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
+    static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
-    public static String generateDate() {
-        Date time = new Date();
-        String dateFormat = "yyyy.MM.dd HH:mm:ss";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+    public static LocalDateTime stringToDate(String date) {
+        return date == null ? null : LocalDateTime.parse(date, DATE_TIME_FORMATTER);
+    }
 
-        return sdf.format(time) + " Asia/Seoul";
+    public static String dateToString(LocalDateTime date) {
+        return DATE_TIME_FORMATTER.format(date);
+    }
+
+    public static LocalDateTime now() {
+        return ZonedDateTime.now(ASIA_SEOUL).toLocalDateTime();
     }
 
     public static String getRandomColor() {

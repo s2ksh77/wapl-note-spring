@@ -1,6 +1,10 @@
 package ai.wapl.noteapi.util;
 
+import java.time.ZoneId;
+
 public class Constants {
+    public static final ZoneId ASIA_SEOUL = ZoneId.of("Asia/Seoul");
+
     public static final String EMPTY_CONTENT = "<p></br></p>";
     public static final String SHARED_PAGE_TYPE = "shared";
 

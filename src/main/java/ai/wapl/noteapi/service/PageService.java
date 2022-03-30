@@ -1,5 +1,6 @@
 package ai.wapl.noteapi.service;
 
+import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.dto.SearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -13,6 +14,8 @@ import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
@@ -77,18 +80,18 @@ public class PageService {
                 page.setChapter(chapterRepository.findById(input.getChapterId())
                         .orElseThrow(ResourceNotFoundException::new));
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
-                page.setModifiedDate(NoteUtil.generateDate());
+                page.setModifiedDate(NoteUtil.now());
                 page.setUpdatedUserId(userId);
                 return page;
             case RENAME:
                 page.setName(input.getName());
-                page.setModifiedDate(NoteUtil.generateDate());
+                page.setModifiedDate(NoteUtil.now());
                 return page;
             case EDIT_DONE:
                 page.setName(getNotNull(input.getName(), page.getName()));
                 page.setContent(getNotNull(input.getContent(), page.getContent()));
                 page.setTextContent(getNotNull(input.getTextContent(), page.getTextContent()));
-                page.setModifiedDate(NoteUtil.generateDate());
+                page.setModifiedDate(NoteUtil.now());
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
                 page.setUpdatedUserId(getNotNull(userId, page.getUpdatedUserId()));
                 page.setEditingUserId(null);
@@ -110,7 +113,7 @@ public class PageService {
                 pageInfo.setChapter(recycleBin);
                 pageInfo.setType(null);
                 pageInfo.setRestoreChapterId(page.getRestoreChapterId());
-                pageInfo.setDeletedDate(NoteUtil.generateDate());
+                pageInfo.setDeletedDate(NoteUtil.now());
                 return pageInfo;
             case RESTORE:
                 pageInfo.setChapter(
@@ -120,7 +123,7 @@ public class PageService {
                 pageInfo.setType(null);
                 pageInfo.setRestoreChapterId(null);
                 pageInfo.setDeletedDate(null);
-                pageInfo.setModifiedDate(NoteUtil.generateDate());
+                pageInfo.setModifiedDate(NoteUtil.now());
                 return pageInfo;
             default:
                 throw new IllegalArgumentException("Wrong Action");
@@ -158,6 +161,14 @@ public class PageService {
         List<PageDTO> dtoList = pageRepository.findAllPageByChannelId(userId, channelId);
         dtoList.forEach(pageDTO -> pageDTO.setFileList(fileService.getFileListByPageId(pageDTO.getId())));
         return dtoList;
+    }
+
+
+    public long clearRecycleBin() {
+        LocalDateTime targetDateTime = NoteUtil.now().minusDays(30);
+        List<File> files = pageRepository.getFileInRecycleBin(targetDateTime);
+        files.forEach(file -> fileService.deleteFileByPageId(file.getChannelId(), file.getFileId()));
+        return pageRepository.deleteInRecycleBin(targetDateTime);
     }
 
     private String getNotNull(String name, String name2) {

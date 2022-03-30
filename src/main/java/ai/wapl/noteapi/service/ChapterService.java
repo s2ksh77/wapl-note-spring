@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static ai.wapl.noteapi.domain.Chapter.*;
 import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
 import static ai.wapl.noteapi.util.Constants.*;
+import static ai.wapl.noteapi.util.NoteUtil.*;
 
 @Service
 @Transactional
@@ -78,8 +79,7 @@ public class ChapterService {
         Chapter chapter = chapterRepository.findById(chapterId).orElseThrow(ResourceNotFoundException::new);
 
         if (chapter.getType().equals("default") || chapter.getType().equals(Type.notebook))
-            chapterRepository.updateRecycleBin(chapterId, channelId,
-                    NoteUtil.generateDate());
+            chapterRepository.updateRecycleBin(chapterId, channelId, dateToString(now()));
         else
             fileService.deleteFileByChapterId(channelId, chapterId);
 
@@ -96,10 +96,10 @@ public class ChapterService {
 
         if (inputDTO.getName() != null) {
             chapter.setName(inputDTO.getName());
-            chapter.setModifiedDate(NoteUtil.generateDate());
+            chapter.setModifiedDate(now());
         } else if (inputDTO.getColor() != null) {
             chapter.setColor(inputDTO.getColor());
-            chapter.setModifiedDate(NoteUtil.generateDate());
+            chapter.setModifiedDate(now());
         }
         return chapter;
     }

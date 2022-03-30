@@ -10,7 +10,6 @@ import java.io.Serializable;
 @Entity
 @Table(name = "TB_NOTEAPP_NOTE_FILE_MAP")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @IdClass(File.class)
 public class File implements Serializable {
@@ -23,4 +22,11 @@ public class File implements Serializable {
     @Column(name = "FILE_ID")
     private String fileId;
 
+    @Transient
+    private String channelId;
+
+    public File(String pageId, String fileId) {
+        this.pageId = pageId;
+        this.fileId = fileId;
+    }
 }

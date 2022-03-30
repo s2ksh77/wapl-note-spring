@@ -1,14 +1,20 @@
 package ai.wapl.noteapi.repository;
 
+import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.util.NoteUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
+import static ai.wapl.noteapi.util.Constants.ASIA_SEOUL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -57,6 +63,19 @@ public class PageRepositoryTest {
 
         // then
         assertThat(pages.size()).isEqualTo(133);
-//        assertThat(pages.get(0).getName()).isEqualTo("postman create");
+    }
+
+    @Test
+    public void getFileInRecycleBin() {
+        // given
+        String channelId = "deef09e9-9f67-4e24-aef7-23b6be588cd2";
+        LocalDateTime localDate = LocalDateTime.of(2022, 3, 30,0,0,0).minusDays(30);
+
+        // when
+        List<File> files = pageRepository.getFileInRecycleBin(localDate);
+
+        // then
+        assertThat(files.size()).isEqualTo(1);
+        assertThat(files.get(0).getChannelId()).isEqualTo(channelId);
     }
 }
