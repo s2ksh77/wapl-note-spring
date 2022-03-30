@@ -250,7 +250,8 @@ public class PageServiceMockTest {
         chapter.getPageList().add(page);
 
         when(pageRepository.getById(pageId)).thenReturn(page);
-        when(chapterRepository.findByChannelIdAndType(channelId, "recycle_bin")).thenReturn(chapter);
+        when(chapterRepository.findByChannelIdAndType(channelId, recycle_bin)).thenReturn(
+            Optional.of(chapter));
 
         // when
         pageService.updateRecyclePage(dto, THROW);
@@ -281,7 +282,8 @@ public class PageServiceMockTest {
         chapter.getPageList().add(page);
 
         when(pageRepository.getById(pageId)).thenReturn(page);
-        when(chapterRepository.findByChannelIdAndType(channelId, "recycle_bin")).thenReturn(chapter);
+        when(chapterRepository.findByChannelIdAndType(channelId, recycle_bin)).thenReturn(
+            Optional.of(chapter));
 
         // when
         pageService.updateRecyclePage(dto, RESTORE);

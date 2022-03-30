@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.repository.ChapterRepository;
-import ai.wapl.noteapi.util.NoteUtil;
 import org.springframework.transaction.annotation.Transactional;
 
 import static ai.wapl.noteapi.domain.Chapter.*;
@@ -106,18 +105,19 @@ public class ChapterService {
 
     @Transactional(readOnly = true)
     public Chapter getRecycleBin(String channelId) {
-        return chapterRepository.findByChannelIdAndType(channelId, recycle_bin.toString());
+        return chapterRepository.findByChannelIdAndType(channelId, recycle_bin)
+            .orElseThrow(ResourceNotFoundException::new);
     }
 
     public Chapter shareChapter(String userId, String chapterId) {
         // create share type of chapter
         Chapter originChapter = chapterRepository.findByIdFetchJoin(chapterId)
                 .orElseThrow(ResourceNotFoundException::new);
-        Chapter newChapter = Chapter.createShareChapter(userId, originChapter);
+        Chapter newChapter = Chapter.createChapterForShare(userId, originChapter);
         chapterRepository.save(newChapter);
 
         // get page list of chapter
-        originChapter.getPageList().forEach(page -> pageService.sharePage(newChapter, page));
+        originChapter.getPageList().forEach(page -> pageService.sharePageToChapter(newChapter, page));
 
         return newChapter;
     }

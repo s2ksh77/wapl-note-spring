@@ -13,11 +13,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 import static ai.wapl.noteapi.util.Constants.ASIA_SEOUL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 public class PageRepositoryTest {
 
     @Resource

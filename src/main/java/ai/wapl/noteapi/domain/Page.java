@@ -1,5 +1,6 @@
 package ai.wapl.noteapi.domain;
 
+import ai.wapl.noteapi.domain.Chapter.Type;
 import javax.persistence.Id;
 
 import ai.wapl.noteapi.util.DateTimeConverter;
@@ -17,6 +18,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static ai.wapl.noteapi.domain.Chapter.Type.shared;
 import static ai.wapl.noteapi.util.Constants.EMPTY_CONTENT;
 import static ai.wapl.noteapi.util.Constants.SHARED_PAGE_TYPE;
 
@@ -63,7 +65,8 @@ public class Page {
     private String updatedUserId;
 
     @Column(name = "TYPE")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
     @Column(name = "SHARED_USER_ID")
     private String sharedUserId;
@@ -101,7 +104,7 @@ public class Page {
     private int tagCount;
 
     @Builder
-    public static Page createPage(String id, String name, String content, String textContent, String editingUserId, Chapter chapter, String userId, String userName, String type) {
+    public static Page createPage(String id, String name, String content, String textContent, String editingUserId, Chapter chapter, String userId, String userName, Type type) {
         Page page = new Page();
         page.setId(id);
         page.setChapter(chapter);
@@ -125,6 +128,20 @@ public class Page {
                 .userId(input.getCreatedUserId()).userName(input.getUserName())
                 .textContent(input.getTextContent()).build();
 
+        page.setCreatedDate(NoteUtil.now());
+        page.setModifiedDate(NoteUtil.now());
+
+        return page;
+    }
+
+    public static Page createSharedPage(String userId, Chapter chapter, Page input, String sharedRoomName) {
+        Page page = Page.builder().chapter(chapter)
+            .name(input.getName()).content(input.getContent()).type(shared)
+            .userId(userId).userName(input.getUserName())
+            .textContent(input.getTextContent()).build();
+
+        page.setSharedRoomId(sharedRoomName);
+        page.setSharedUserId(userId);
         page.setCreatedDate(NoteUtil.now());
         page.setModifiedDate(NoteUtil.now());
 

@@ -1,17 +1,30 @@
 package ai.wapl.noteapi.domain;
 
-import javax.persistence.Id;
+import static ai.wapl.noteapi.domain.Chapter.Type.shared_page;
 
 import ai.wapl.noteapi.util.DateTimeConverter;
 import ai.wapl.noteapi.util.NoteUtil;
-import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.thymeleaf.util.DateUtils;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
 @ToString
 @Data
@@ -64,7 +77,8 @@ public class Chapter {
     private String userName;
 
     @Builder
-    public Chapter(String id, String channelId, String name, Type type, String color, String userId) {
+    public Chapter(String id, String channelId, String name, Type type, String color,
+        String userId) {
         this.id = id;
         this.channelId = channelId;
         this.name = name;
@@ -75,19 +89,28 @@ public class Chapter {
 
     public static Chapter createChapter(String userId, Chapter input) {
         Chapter chapter = Chapter.builder().channelId(input.getChannelId())
-                .color(input.getColor()).name(input.getName())
-                .userId(userId)
-                .type(Type.notebook).build();
+            .color(input.getColor()).name(input.getName())
+            .userId(userId)
+            .type(Type.notebook).build();
         chapter.modifiedDate = NoteUtil.now();
         return chapter;
     }
 
-    public static Chapter createShareChapter(String userId, Chapter input) {
+    public static Chapter createChapterForShare(String userId, Chapter input) {
         Chapter chapter = Chapter.builder().channelId(input.getChannelId())
-                .color(input.getColor()).name(input.getName())
-                .userId(userId)
-                .type(Type.shared).build();
+            .color(input.getColor()).name(input.getName())
+            .userId(userId)
+            .type(Type.shared).build();
 
+        chapter.modifiedDate = NoteUtil.now();
+        chapter.sharedDate = NoteUtil.now();
+        chapter.sharedUserId = userId;
+        return chapter;
+    }
+
+    public static Chapter createShareChapter(String userId, String channelId) {
+        Chapter chapter = Chapter.builder().channelId(channelId).name("전달받은 페이지")
+            .type(shared_page).build();
         chapter.modifiedDate = NoteUtil.now();
         chapter.sharedDate = NoteUtil.now();
         chapter.sharedUserId = userId;

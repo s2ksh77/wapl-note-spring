@@ -17,7 +17,7 @@ public class NoteUtil {
     }
 
     public static String dateToString(LocalDateTime date) {
-        return DATE_TIME_FORMATTER.format(date);
+        return date == null ? null : DATE_TIME_FORMATTER.format(date);
     }
 
     public static LocalDateTime now() {

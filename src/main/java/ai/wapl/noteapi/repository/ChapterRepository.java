@@ -1,6 +1,6 @@
 package ai.wapl.noteapi.repository;
 
-import java.time.LocalDate;
+import ai.wapl.noteapi.domain.Chapter.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 
     List<Chapter> findByChannelId(String channelId);
 
-    Chapter findByChannelIdAndType(String channelId, String type);
+    Optional<Chapter> findByChannelIdAndType(String channelId, Type type);
 
     @Query("select c from Chapter c join fetch c.pageList where c.id = :id")
     Optional<Chapter> findByIdFetchJoin(@Param("id") String id);

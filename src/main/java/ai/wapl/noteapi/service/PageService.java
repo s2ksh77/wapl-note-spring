@@ -18,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
+import static ai.wapl.noteapi.domain.Chapter.Type.shared_page;
 import static ai.wapl.noteapi.dto.PageDTO.*;
 
 @Service
@@ -108,7 +110,8 @@ public class PageService {
      */
     public Page updateRecyclePage(PageDTO page, Action action) {
         String channelId = page.getChannelId();
-        Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, recycle_bin.toString());
+        Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, recycle_bin)
+            .orElseThrow(ResourceNotFoundException::new);
         Page pageInfo = pageRepository.getById(page.getId());
         switch (action) {
             case THROW:
@@ -132,7 +135,7 @@ public class PageService {
         }
     }
 
-    public Page sharePage(Chapter chapter, Page input) {
+    public Page sharePageToChapter(Chapter chapter, Page input) {
         // create page with same content
         Page page = Page.createPage(chapter, input);
         pageRepository.save(page);
@@ -190,6 +193,20 @@ public class PageService {
         Bookmark bookmark = new Bookmark(userId, pageId);
         bookmarkRepository.delete(bookmark);
         return bookmark;
+    }
+
+    public Page sharePageToChannel(String userId, String channelId, String pageId, String sharedRoomId) {
+        Chapter sharedChapter = chapterRepository.findByChannelIdAndType(channelId, shared_page)
+            .orElseGet(() -> chapterRepository.save(Chapter.createShareChapter(userId, channelId)));
+
+        Page sharedPage = pageRepository.save(
+            Page.createSharedPage(userId, sharedChapter,
+            pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new),sharedRoomId)
+        );
+
+        fileService.copyFileListByPageId(channelId, pageId, sharedPage.getId());
+
+        return sharedPage;
     }
 
     private String getNotNull(String name, String name2) {
