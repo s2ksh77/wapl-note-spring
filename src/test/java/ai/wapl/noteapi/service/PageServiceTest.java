@@ -3,12 +3,14 @@ package ai.wapl.noteapi.service;
 import ai.wapl.noteapi.dto.SearchDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 public class PageServiceTest {
     @Resource
     PageService pageService;
@@ -26,6 +28,17 @@ public class PageServiceTest {
         assertThat(search.getChapterList().size()).isEqualTo(1);
         assertThat(search.getPageList().size()).isEqualTo(17);
         assertThat(search.getTagList().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void changeStateToUnLock() {
+        // given
+
+        // when
+        long l = pageService.changeStateToUnLock();
+
+        // then
+        assertThat(l).isEqualTo(8);
     }
 
 }

@@ -24,7 +24,10 @@ public interface QueryDslPageRepository {
 
     List<TagDTO> searchTag(String channelId, String text);
 
-    List<File> getFileInRecycleBin(LocalDateTime targetDate);
+    List<File> getFileInRecycleBin(LocalDateTime targetDateTime);
 
-    long deleteInRecycleBin(LocalDateTime targetDate);
+    long deleteInRecycleBin(LocalDateTime targetDateTime);
+
+    long updatePageToNonEdit(LocalDateTime targetDateTime);
+
 }

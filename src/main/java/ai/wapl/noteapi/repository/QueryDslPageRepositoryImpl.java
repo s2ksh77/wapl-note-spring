@@ -134,6 +134,13 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
                         .where(page.deletedDate.before(targetDate)).execute();
         }
 
+        @Override
+        public long updatePageToNonEdit(LocalDateTime targetDateTime) {
+                return queryFactory.update(page).set(page.editingUserId, (String) null)
+                        .where(page.editingUserId.isNotNull().and(page.modifiedDate.before(targetDateTime)))
+                .execute();
+        }
+
         private JPQLQuery<String> getPageIdWithTag(String channelId) {
                 return JPAExpressions.select(page.id).from(page)
                         .join(tag).on(page.tagSet.any().id.eq(tag.id))

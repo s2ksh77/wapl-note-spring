@@ -163,12 +163,16 @@ public class PageService {
         return dtoList;
     }
 
-
     public long clearRecycleBin() {
         LocalDateTime targetDateTime = NoteUtil.now().minusDays(30);
         List<File> files = pageRepository.getFileInRecycleBin(targetDateTime);
         files.forEach(file -> fileService.deleteFileByPageId(file.getChannelId(), file.getFileId()));
         return pageRepository.deleteInRecycleBin(targetDateTime);
+    }
+
+    public long changeStateToUnLock() {
+        LocalDateTime targetDateTime = NoteUtil.now().minusMinutes(30);
+        return pageRepository.updatePageToNonEdit(targetDateTime);
     }
 
     private String getNotNull(String name, String name2) {
