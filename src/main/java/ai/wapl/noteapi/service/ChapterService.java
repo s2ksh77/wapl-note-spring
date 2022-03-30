@@ -78,9 +78,9 @@ public class ChapterService {
     public void deleteChapter(String channelId, String chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId).orElseThrow(ResourceNotFoundException::new);
 
-        if (chapter.getType().equals("default") || chapter.getType().equals(Type.notebook))
-            chapterRepository.updateRecycleBin(chapterId, channelId, dateToString(now()));
-        else
+        if (chapter.getType().equals("default") || chapter.getType().equals(Type.notebook)) {
+            chapterRepository.updateRecycleBin(chapterId, channelId, now());
+        } else
             fileService.deleteFileByChapterId(channelId, chapterId);
 
         chapterRepository.deleteById(chapterId);

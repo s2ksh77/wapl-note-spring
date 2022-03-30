@@ -1,5 +1,7 @@
 package ai.wapl.noteapi.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,18 +27,13 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE TB_NOTEAPP_NOTE_MST \n"
-            + "SET parent_notebook = \n"
-            + "(SELECT ID FROM TB_NOTEAPP_NOTEBOOK_MST \n"
-            + "WHERE type = 'recycle_bin' AND note_channel_id = :note_channel_id), \n"
-            + "note_deleted_at = :note_delete_at \n"
-            + "WHERE NOTE_ID IN ( \n"
-            + "SELECT NOTE_ID \n"
-            + "FROM TB_NOTEAPP_NOTE_MST \n"
-            + "WHERE parent_notebook = :parent_notebook \n"
-            + ");", nativeQuery = true)
-    int updateRecycleBin(@Param("parent_notebook") String chapterId,
-            @Param("note_channel_id") String channelId,
-            @Param("note_delete_at") String deletedAt);
+    @Query("update Page p\n"
+        + "set p.chapter = (select c from Chapter c \n"
+        + "        where c.type = 'recycle_bin' and c.channelId = :channelId),\n"
+        + "p.deletedDate = :deletedAt \n"
+        + "where p.chapter.id = :chapterId")
+    int updateRecycleBin(@Param("chapterId") String chapterId,
+            @Param("channelId") String channelId,
+            @Param("deletedAt") LocalDateTime deletedAt);
 
 }
