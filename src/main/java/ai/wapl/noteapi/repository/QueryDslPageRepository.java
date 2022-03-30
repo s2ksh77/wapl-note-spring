@@ -1,6 +1,7 @@
 package ai.wapl.noteapi.repository;
 
 import ai.wapl.noteapi.domain.File;
+import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.TagDTO;
@@ -29,5 +30,9 @@ public interface QueryDslPageRepository {
     long deleteInRecycleBin(LocalDateTime targetDateTime);
 
     long updatePageToNonEdit(LocalDateTime targetDateTime);
+
+    List<Page> findBookmarkedPageByChannel(String userId, String channelId);
+
+    List<Page> findBookmarkedPageByUser(String userId);
 
 }

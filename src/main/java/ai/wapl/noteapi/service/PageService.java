@@ -1,7 +1,9 @@
 package ai.wapl.noteapi.service;
 
+import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.dto.SearchDTO;
+import ai.wapl.noteapi.repository.BookmarkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,6 @@ import ai.wapl.noteapi.repository.PageRepository;
 import ai.wapl.noteapi.util.NoteUtil;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class PageService {
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
     private final FileService fileService;
+    private final BookmarkRepository bookmarkRepository;
 
     /**
      * 페이지 단일 조회 서비스
@@ -173,6 +175,21 @@ public class PageService {
     public long changeStateToUnLock() {
         LocalDateTime targetDateTime = NoteUtil.now().minusMinutes(30);
         return pageRepository.updatePageToNonEdit(targetDateTime);
+    }
+
+    public Bookmark createBookmark(String userId, String pageId) {
+        return bookmarkRepository.save(new Bookmark(userId, pageId));
+    }
+
+    public List<Page> getBookmark(String userId, String channelId) {
+        return channelId == null ? pageRepository.findBookmarkedPageByUser(userId)
+            : pageRepository.findBookmarkedPageByChannel(userId, channelId);
+    }
+
+    public Bookmark deleteBookmark(String userId, String pageId) {
+        Bookmark bookmark = new Bookmark(userId, pageId);
+        bookmarkRepository.delete(bookmark);
+        return bookmark;
     }
 
     private String getNotNull(String name, String name2) {

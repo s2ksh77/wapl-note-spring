@@ -6,8 +6,10 @@ import ai.wapl.noteapi.domain.Tag;
 import ai.wapl.noteapi.dto.FileDTO;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.PageDTO.Action;
+import ai.wapl.noteapi.repository.BookmarkRepository;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.repository.PageRepository;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,12 +36,16 @@ public class PageServiceMockTest {
     PageRepository pageRepository;
     @Mock
     FileService fileService;
+    @Mock
+    BookmarkRepository bookmarkRepository;
+
     PageService pageService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        pageService = new PageService(chapterRepository, pageRepository, fileService);
+        pageService = new PageService(chapterRepository, pageRepository, fileService,
+            bookmarkRepository);
     }
 
     @Test
@@ -89,8 +95,9 @@ public class PageServiceMockTest {
         PageDTO page = PageDTO.builder().id(pageId).createdUserId(userId)
                 .name("no title").chapterId("chapterId").build();
         when(pageRepository.findById(userId, pageId)).thenReturn(page);
-        when(fileService.getFileListByPageId(pageId)).thenReturn(Arrays.asList(
-                FileDTO.builder().id("logicalFileId").name("image").extension("jpg").createdUser(userId).build()
+        when(fileService.getFileListByPageId(pageId)).thenReturn(Collections.singletonList(
+            FileDTO.builder().id("logicalFileId").name("image").extension("jpg").createdUser(userId)
+                .build()
         ));
 
         // when

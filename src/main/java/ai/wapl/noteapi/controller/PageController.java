@@ -1,5 +1,6 @@
 package ai.wapl.noteapi.controller;
 
+import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.dto.SearchDTO;
 import ai.wapl.noteapi.util.ResponseUtil;
 import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
@@ -13,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 
 import static ai.wapl.noteapi.dto.PageDTO.*;
 import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
@@ -28,9 +28,6 @@ public class PageController {
     private String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9";
 
     // TODO: 페이지 전달 서비스 noteshareCreate
-    // TODO: 즐겨찾기 등록 서비스. bookmarkCreate
-    // TODO: 즐겨찾기 해제 서비스. bookmarkDelete
-    // TODO: 즐겨찾기 조회 서비스. bookmarkList
     // TODO: new 기능
     // TODO: link share
     // TODO: 공동 편집 기능

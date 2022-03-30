@@ -9,6 +9,7 @@ import static ai.wapl.noteapi.domain.QPage.page;
 import static ai.wapl.noteapi.domain.QTag.tag;
 
 import ai.wapl.noteapi.domain.File;
+import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.QChapter;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
@@ -139,6 +140,22 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     return queryFactory.update(page).set(page.editingUserId, (String) null)
         .where(page.editingUserId.isNotNull().and(page.modifiedDate.before(targetDateTime)))
         .execute();
+  }
+
+  @Override
+  public List<Page> findBookmarkedPageByChannel(String userId, String channelId) {
+   return queryFactory.selectFrom(page)
+        .join(bookmark).on(bookmark.pageId.eq(page.id))
+        .join(chapter).on(chapter.id.eq(page.chapter.id))
+        .where(chapter.channelId.eq(channelId).and(bookmark.userId.eq(userId)))
+    .fetch();
+  }
+
+  @Override
+  public List<Page> findBookmarkedPageByUser(String userId) {
+    return queryFactory.selectFrom(page)
+        .join(bookmark).on(bookmark.pageId.eq(page.id))
+        .where(bookmark.userId.eq(userId)).fetch();
   }
 
   private JPQLQuery<String> getPageIdWithTag(String channelId) {
