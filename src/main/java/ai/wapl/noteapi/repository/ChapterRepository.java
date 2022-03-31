@@ -25,7 +25,6 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
     @Query("select c from Chapter c join fetch c.pageList where c.id = :id")
     Optional<Chapter> findByIdFetchJoin(@Param("id") String id);
 
-    @Transactional
     @Modifying
     @Query("update Page p\n"
         + "set p.chapter = (select c from Chapter c \n"
@@ -33,7 +32,11 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
         + "p.deletedDate = :deletedAt \n"
         + "where p.chapter.id = :chapterId")
     int updateRecycleBin(@Param("chapterId") String chapterId,
-            @Param("channelId") String channelId,
-            @Param("deletedAt") LocalDateTime deletedAt);
+        @Param("channelId") String channelId,
+        @Param("deletedAt") LocalDateTime deletedAt);
+
+    @Modifying
+    @Query("delete from Chapter c where c.channelId = :channelId")
+    int deleteAllByChannelId(@Param("channelId") String channelId);
 
 }

@@ -1,7 +1,9 @@
 package ai.wapl.noteapi.service;
 
+import ai.wapl.noteapi.util.Color;
 import java.util.List;
 
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,25 @@ public class ChapterService {
         this.fileService = fileService;
     }
 
+    public String createApp(String language) {
+        String channelId = UUID.randomUUID().toString();
+
+        Chapter chapter = createChapter(null,
+            Chapter.builder().channelId(channelId)
+            .name(language.equals(KOREAN) ? NEW_CHAPTER_KOREAN : NEW_CHAPTER_ENGLISH)
+            .color(Color.getRandomColor()).build(),
+            language);
+
+        chapterRepository.save(Chapter.createRecycleBin(channelId));
+
+        return channelId;
+    }
+
+    public void deleteApp(String channelId) {
+        pageService.deleteAllByChannel(channelId);
+        chapterRepository.deleteAllByChannelId(channelId);
+    }
+
     /**
      * 챕터 전체 조회 서비스
      */
@@ -62,7 +83,7 @@ public class ChapterService {
                 .userId(inputChapter.getUserId())
                 .userName(inputChapter.getUserName())
                 .content(EMPTY_CONTENT)
-                .name(language.equals(KOREAN) ? NEWPAGE_KOREAN : NEWPAGE_ENGLISH)
+                .name(language.equals(KOREAN) ? NEW_PAGE_KOREAN : NEW_PAGE_ENGLISH)
                 .build();
 
         chapter.addPage(pageService.createPage(page));

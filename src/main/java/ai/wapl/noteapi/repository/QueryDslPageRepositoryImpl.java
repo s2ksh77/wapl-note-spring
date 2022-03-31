@@ -148,7 +148,7 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
         .join(bookmark).on(bookmark.pageId.eq(page.id))
         .join(chapter).on(chapter.id.eq(page.chapter.id))
         .where(chapter.channelId.eq(channelId).and(bookmark.userId.eq(userId)))
-    .fetch();
+       .fetch();
   }
 
   @Override
@@ -156,6 +156,14 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     return queryFactory.selectFrom(page)
         .join(bookmark).on(bookmark.pageId.eq(page.id))
         .where(bookmark.userId.eq(userId)).fetch();
+  }
+
+  @Override
+  public long deleteAllByChannelId(String channelId) {
+    JPQLQuery<String> query = JPAExpressions.select(page.id).from(page).join(chapter)
+        .on(chapter.eq(page.chapter))
+        .where(chapter.channelId.eq(channelId));
+    return queryFactory.delete(page).where(page.id.in(query)).execute();
   }
 
   private JPQLQuery<String> getPageIdWithTag(String channelId) {

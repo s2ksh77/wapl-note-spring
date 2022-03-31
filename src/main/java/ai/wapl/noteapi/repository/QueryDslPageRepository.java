@@ -35,4 +35,5 @@ public interface QueryDslPageRepository {
 
     List<Page> findBookmarkedPageByUser(String userId);
 
+    long deleteAllByChannelId(String channelId);
 }

@@ -16,6 +16,9 @@ public class Constants {
     public static final String KOREAN = "ko";
     public static final String ENGLISH = "en";
 
-    public static final String NEWPAGE_KOREAN = "새 페이지";
-    public static final String NEWPAGE_ENGLISH = "New Page";
+    public static final String NEW_PAGE_KOREAN = "새 페이지";
+    public static final String NEW_PAGE_ENGLISH = "New Page";
+    public static final String NEW_CHAPTER_KOREAN = "새 챕터";
+    public static final String NEW_CHAPTER_ENGLISH = "New Chapter";
+    public static final String RECYCLE_BIN_NAME = "휴지통";
 }

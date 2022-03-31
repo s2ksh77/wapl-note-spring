@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -97,5 +98,17 @@ public class PageServiceTest {
         // then
         assertThat(bookmark.getUserId()).isEqualTo(userId);
         assertThat(bookmark.getPageId()).isEqualTo(pageId);
+    }
+
+    @Test
+    public void deleteAllByChannel() {
+        // given
+        String channelId = "deef09e9-9f67-4e24-aef7-23b6be588cd2";
+
+        // when
+        long l = pageService.deleteAllByChannel(channelId);
+
+        // then
+        assertThat(l).isEqualTo(113);
     }
 }

@@ -22,6 +22,7 @@ public class ChapterDTO {
     private LocalDateTime modifiedDate;
     private String type;
     private String color;
+    private String createdUserId;
     private LocalDateTime sharedDate;
     private String sharedUserId;
     private String sharedRoomId;

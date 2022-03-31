@@ -209,6 +209,10 @@ public class PageService {
         return sharedPage;
     }
 
+    public long deleteAllByChannel(String channelId) {
+        return pageRepository.deleteAllByChannelId(channelId);
+    }
+
     private String getNotNull(String name, String name2) {
         return name != null ? name : name2;
     }
