@@ -19,12 +19,11 @@ configurations {
     }
 }
 
-def queryDslVersion = '1.0.10'
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'junit:junit:4.13.1'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -37,6 +36,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
     testImplementation 'io.projectreactor:reactor-test'
 
+    implementation "org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16"
     // Tibero
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
@@ -52,6 +52,9 @@ dependencies {
     //swagger
     implementation 'io.springfox:springfox-swagger2:3.0.0'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    // 기존 와플 jar
+    implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }
 
 test {
@@ -84,10 +87,6 @@ sourceSets {
         } 
     } 
 } 
-
-tasks.withType(JavaCompile) { 
-     options.annotationProcessorGeneratedSourcesDirectory = file(querydslSrcDir) 
-}
 
 // project.afterEvaluate {
 //     project.tasks.compileQuerydsl.options.compilerArgs = [
