@@ -1,6 +1,9 @@
 package ai.wapl.noteapi.controller;
 
 import ai.wapl.noteapi.dto.SearchDTO;
+import ai.wapl.noteapi.util.NoteUtil;
+import ai.wapl.noteapi.util.Notifier;
+import ai.wapl.noteapi.util.Notifier.Method;
 import ai.wapl.noteapi.util.ResponseUtil;
 import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
 import org.springframework.http.ResponseEntity;
@@ -50,33 +53,57 @@ public class PageController {
     }
 
     @ApiOperation(value = "페이지 생성 서비스 noteCreate ", notes = "페이지 생성 서비스")
-    @PostMapping("/page")
-    public ResponseEntity<ResponseDTO<Page>> createPage(@RequestBody PageDTO inputDTO) {
+    @PostMapping("/chapter/{chapterId}/page")
+    public ResponseEntity<ResponseDTO<Page>> createPage(@PathVariable String channelId,
+        @PathVariable String chapterId,
+        @RequestBody PageDTO inputDTO, @RequestHeader("user-agent") String userAgent) {
         Page result = pageService.createPage(inputDTO);
+
+        Notifier notifier = new Notifier(userId, channelId, Method.CREATE,
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(chapterId, result.getId(), result.getName());
+
         return ResponseUtil.success(result);
     }
 
     @ApiOperation(value = "페이지 삭제 서비스 noteDelete ", notes = "페이지 삭제 서비스")
-    @DeleteMapping(path = "/page/{pageId}")
+    @DeleteMapping(path = "/chapter/{chapterId}/page/{pageId}")
     public ResponseEntity<ResponseDTO<Page>> deletePage(@PathVariable String channelId,
-        @PathVariable String pageId) {
+        @PathVariable String chapterId,
+        @PathVariable String pageId, @RequestHeader("user-agent") String userAgent) {
         Page result = pageService.deletePage(channelId, pageId);
+
+        Notifier notifier = new Notifier(userId, channelId, Method.DELETE,
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(chapterId, result.getId(), result.getName());
+
         return ResponseUtil.success(result);
     }
 
     @ApiOperation(value = "페이지 업데이트 서비스 noteUpdate ", notes = "페이지 업데이트 서비스")
-    @PutMapping("/page")
-    public ResponseEntity<ResponseDTO<Page>> updatePage(@RequestBody PageDTO inputDTO,
-        @RequestParam("action") Action action) {
+    @PutMapping("/chapter/{chapterId}/page")
+    public ResponseEntity<ResponseDTO<Page>> updatePage(@PathVariable String channelId,
+        @PathVariable String chapterId,
+        @RequestBody PageDTO inputDTO,
+        @RequestParam("action") Action action, @RequestHeader("user-agent") String userAgent) {
         Page result = pageService.updatePage(userId, inputDTO, action);
+
+        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action.name()),
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(chapterId, result.getId(), result.getName());
+
         return ResponseUtil.success(result);
     }
 
     @ApiOperation(value = "휴지통 서비스 noteRecycleBinUpdate", notes = "휴지통 서비스")
     @PutMapping(path = "/page/recycle")
-    public ResponseEntity<ResponseDTO<Page>> updateRecyclePage(@RequestBody PageDTO inputDTO,
-        @RequestParam("action") Action action) {
+    public ResponseEntity<ResponseDTO<Page>> updateRecyclePage(@PathVariable String channelId,
+        @RequestBody PageDTO inputDTO,
+        @RequestParam("action") Action action, @RequestHeader("user-agent") String userAgent) {
         Page result = pageService.updateRecyclePage(inputDTO, action);
+        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action.name()),
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(result.getChapter().getId(), result.getId(), result.getName());
         return ResponseUtil.success(result);
     }
 
@@ -90,8 +117,12 @@ public class PageController {
 
     @ApiOperation(value = "페이지 전달 서비스 noteshareCreate", notes = "페이지 전달 서비스")
     @PostMapping("/page/copy")
-    public ResponseEntity<ResponseDTO<Page>> sharePage(@RequestBody PageDTO dto) {
-        return ResponseUtil.success(
-            pageService.sharePageToChannel(userId, dto.getChannelId(), dto.getId(), dto.getSharedRoomId()));
+    public ResponseEntity<ResponseDTO<Page>> sharePage(@RequestBody PageDTO dto, @RequestHeader("user-agent") String userAgent) {
+        Page page = pageService
+            .sharePageToChannel(userId, dto.getChannelId(), dto.getId(), dto.getSharedRoomId());
+        Notifier notifier = new Notifier(userId, dto.getChannelId(), Method.SHAREPAGE,
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(page.getChapter().getId(), page.getId(), page.getName());
+        return ResponseUtil.success(page);
     }
 }

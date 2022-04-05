@@ -21,4 +21,6 @@ public class Constants {
     public static final String NEW_CHAPTER_KOREAN = "새 챕터";
     public static final String NEW_CHAPTER_ENGLISH = "New Chapter";
     public static final String RECYCLE_BIN_NAME = "휴지통";
+
+    public static final String NOTE_CHANNEL_CODE = "CHN0003";
 }

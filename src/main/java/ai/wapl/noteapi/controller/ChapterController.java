@@ -1,5 +1,8 @@
 package ai.wapl.noteapi.controller;
 
+import ai.wapl.noteapi.util.NoteUtil;
+import ai.wapl.noteapi.util.Notifier;
+import ai.wapl.noteapi.util.Notifier.Method;
 import java.util.List;
 
 import ai.wapl.noteapi.util.ResponseUtil;
@@ -60,30 +63,54 @@ public class ChapterController {
 
     @ApiOperation(value = "챕터 생성 서비스 notebooksCreate ", notes = "챕터 생성 서비스 ( 국제화 언어에 따라 챕터명 생성) ")
     @PostMapping(path = "/app/{channelId}/chapter/{language}")
-    public ResponseEntity<ResponseDTO<Chapter>> createChapter(@RequestBody Chapter inputDTO, @PathVariable String language) {
+    public ResponseEntity<ResponseDTO<Chapter>> createChapter(@PathVariable String channelId,
+        @PathVariable String language, @RequestBody Chapter inputDTO, @RequestHeader("user-agent") String userAgent) {
         Chapter result = chapterService.createChapter(userId, inputDTO, language);
+
+        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERCREATE, NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(result.getId(), null, result.getName());
+
         return success(result);
     }
 
     @ApiOperation(value = "챕터 삭제 서비스 notebookDelete ", notes = "챕터 삭제 서비스")
     @DeleteMapping(path = "/app/{channelId}/chapter/{chapterId}")
-    public ResponseEntity<?> deleteChapter(@PathVariable String channelId, @PathVariable String chapterId) {
+    public ResponseEntity<?> deleteChapter(@PathVariable String channelId,
+        @PathVariable String chapterId, @RequestHeader("user-agent") String userAgent) {
         chapterService.deleteChapter(channelId, chapterId);
+
+        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERDELETE,
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(chapterId, null, null);
+
         return noContent();
     }
 
     @ApiOperation(value = "챕터 업데이트 서비스 notebooksUpdate ", notes = "챕터 업데이트 서비스")
     @PutMapping(path = "/app/{channelId}/chapter")
-    public ResponseEntity<ResponseDTO<Chapter>> updateChapter(@RequestBody Chapter inputDTO) {
+    public ResponseEntity<ResponseDTO<Chapter>> updateChapter(@PathVariable String channelId,
+        @RequestBody Chapter inputDTO,
+        @RequestHeader("user-agent") String userAgent) {
         Chapter result = chapterService.updateChapter(inputDTO);
+
+        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERRENAME,
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(inputDTO.getId(), null, null);
 
         return success(result);
     }
 
     @ApiOperation(value = "챕터 전달 서비스 chaptershareCreate ", notes = "챕터 전달 서비스")
     @PostMapping(path = "/app/{channelId}/chapter/share")
-    public ResponseEntity<ResponseDTO<Chapter>> shareChapter(@RequestBody Chapter inputDTO) {
+    public ResponseEntity<ResponseDTO<Chapter>> shareChapter(@PathVariable String channelId,
+        @RequestBody Chapter inputDTO,
+        @RequestHeader("user-agent") String userAgent) {
         Chapter chapter = chapterService.shareChapter(userId, inputDTO.getId());
+
+        Notifier notifier = new Notifier(userId, channelId, Method.SHARECHAPTER,
+            NoteUtil.isMobile(userAgent));
+        notifier.publishMQTT(inputDTO.getId(), null, chapter.getName());
+
         return ResponseUtil.success(chapter);
     }
 
