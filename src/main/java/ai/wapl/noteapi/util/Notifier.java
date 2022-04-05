@@ -1,8 +1,11 @@
 package ai.wapl.noteapi.util;
 
+import ai.wapl.noteapi.dto.PageDTO.Action;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.tmax.common.dto.DOUserNoti;
 import lombok.Data;
 import net.minidev.json.JSONObject;
@@ -24,6 +27,7 @@ public class Notifier {
   private final String channelId;
   private final Method method;
   private final boolean isMobile;
+  private JsonObject alarmCenterObj;
 
   public Notifier(String userId, String channelId, Method method, boolean isMobile) {
     this.userId = userId;
@@ -43,6 +47,16 @@ public class Notifier {
     return builder.toString();
   }
 
+  public void setAlarmCenter(String resourceId, String resourceName) {
+    alarmCenterObj = new JsonObject();
+    alarmCenterObj.addProperty("key", "CM_NOTI_CENTER_09");
+    alarmCenterObj.addProperty("contentId", resourceId);
+
+    JsonArray jsonArray = new JsonArray();
+    jsonArray.add(resourceName);
+    alarmCenterObj.add("values", jsonArray);
+  }
+
   public void publishMQTT(String chapterId, String pageId, String resourceName) {
     com.tmax.common.dto.DOUserNoti noti = new com.tmax.common.dto.DOUserNoti();
     noti.setCH_TYPE(Constants.NOTE_CHANNEL_CODE);
@@ -51,6 +65,10 @@ public class Notifier {
     noti.setNOTI_TYPE(method.type);
     noti.setNOTI_MSG(method.getMessage(resourceName));
     noti.setNOTI_ETC(getJsonString(chapterId, pageId));
+    if (alarmCenterObj != null) {
+      noti.setTYPE("history");
+      noti.setNotiMessage(alarmCenterObj.toString());
+    }
 
     _publishToMQTT(noti);
   }
@@ -63,7 +81,7 @@ public class Notifier {
         .body(Mono.just(new ProObjectDTO<>(userNoti)), ProObjectDTO.class)
         .retrieve().toEntity(JSONObject.class);
 
-//    logger.info("Publish Wwms Event: " + userNoti.getNOTI_ETC());
+    logger.info("Publish Wwms Event: " + userNoti);
 //    logger.info("Publish Result: " + jsonObjectMono.block().getBody().toString());
   }
 
@@ -144,6 +162,16 @@ public class Notifier {
     }
 
     public abstract String getMessage(String name);
+
+    public static Method valueOf(Action action) {
+      if (action.equals(Action.EDIT_START))
+        return EDIT;
+      if (action.equals(Action.EDIT_DONE))
+        return EDITDONE;
+      if (action.equals(Action.NON_EDIT))
+        return NONEDIT;
+      return UPDATE;
+    }
   }
 
   @Data

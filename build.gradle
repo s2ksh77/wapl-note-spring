@@ -32,6 +32,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.google.code.gson:gson:2.8.7'
 
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
     testImplementation 'io.projectreactor:reactor-test'
@@ -43,7 +44,6 @@ dependencies {
 
     //query dsl
     implementation 'com.querydsl:querydsl-jpa'
-    implementation 'org.jetbrains:annotations:20.1.0'
     // compile "com.querydsl:querydsl-jpa:${queryDslVersion}"
     // annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 
@@ -52,9 +52,6 @@ dependencies {
     //swagger
     implementation 'io.springfox:springfox-swagger2:3.0.0'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
-
-    // 기존 와플 jar
-    implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }
 
 test {
@@ -86,12 +83,4 @@ sourceSets {
             srcDirs = ['src/main/java', querydslSrcDir] 
         } 
     } 
-} 
-
-// project.afterEvaluate {
-//     project.tasks.compileQuerydsl.options.compilerArgs = [
-//             "-proc:only",
-//             "-processor", project.querydsl.processors() +
-//                     ',lombok.launch.AnnotationProcessorHider$AnnotationProcessor'
-//     ]
-// }
+}

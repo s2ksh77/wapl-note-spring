@@ -85,11 +85,14 @@ public class PageController {
     public ResponseEntity<ResponseDTO<Page>> updatePage(@PathVariable String channelId,
         @PathVariable String chapterId,
         @RequestBody PageDTO inputDTO,
-        @RequestParam("action") Action action, @RequestHeader("user-agent") String userAgent) {
+        @RequestParam("action") Action action, @RequestParam("isNewPage") boolean isNewPage,
+        @RequestHeader("user-agent") String userAgent) {
         Page result = pageService.updatePage(userId, inputDTO, action);
 
-        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action.name()),
+        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action),
             NoteUtil.isMobile(userAgent));
+        if (action.equals(Action.EDIT_DONE) && isNewPage)
+            notifier.setAlarmCenter(result.getId(), result.getName());
         notifier.publishMQTT(chapterId, result.getId(), result.getName());
 
         return ResponseUtil.success(result);
@@ -101,7 +104,7 @@ public class PageController {
         @RequestBody PageDTO inputDTO,
         @RequestParam("action") Action action, @RequestHeader("user-agent") String userAgent) {
         Page result = pageService.updateRecyclePage(inputDTO, action);
-        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action.name()),
+        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action),
             NoteUtil.isMobile(userAgent));
         notifier.publishMQTT(result.getChapter().getId(), result.getId(), result.getName());
         return ResponseUtil.success(result);
