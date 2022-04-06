@@ -6,6 +6,7 @@ import ai.wapl.noteapi.util.Notifier;
 import ai.wapl.noteapi.util.Notifier.Method;
 import ai.wapl.noteapi.util.ResponseUtil;
 import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
+import ai.wapl.noteapi.util.ServiceCaller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -123,6 +124,12 @@ public class PageController {
     public ResponseEntity<ResponseDTO<Page>> sharePage(@RequestBody PageDTO dto, @RequestHeader("user-agent") String userAgent) {
         Page page = pageService
             .sharePageToChannel(userId, dto.getChannelId(), dto.getId(), dto.getSharedRoomId());
+
+        ServiceCaller caller = new ServiceCaller();
+        caller.createTalkMeta("", userId, page.getId(), page.getName(), page.getType().name(),
+            NoteUtil.dateToString(page.getModifiedDate()
+            ));
+
         Notifier notifier = new Notifier(userId, dto.getChannelId(), Method.SHAREPAGE,
             NoteUtil.isMobile(userAgent));
         notifier.publishMQTT(page.getChapter().getId(), page.getId(), page.getName());

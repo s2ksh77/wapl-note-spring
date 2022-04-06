@@ -58,28 +58,28 @@ public class Notifier {
   }
 
   public void publishMQTT(String chapterId, String pageId, String resourceName) {
-    com.tmax.common.dto.DOUserNoti noti = new com.tmax.common.dto.DOUserNoti();
-    noti.setCH_TYPE(Constants.NOTE_CHANNEL_CODE);
-    noti.setCH_ID(channelId);
-    noti.setNOTI_TARGET(pageId != null ? pageId : chapterId);
-    noti.setNOTI_TYPE(method.type);
-    noti.setNOTI_MSG(method.getMessage(resourceName));
-    noti.setNOTI_ETC(getJsonString(chapterId, pageId));
+    JsonObject noti = new JsonObject();
+    noti.addProperty("CH_TYPE", Constants.NOTE_CHANNEL_CODE);
+    noti.addProperty("CH_ID", channelId);
+    noti.addProperty("NOTI_TARGET", pageId != null ? pageId : chapterId);
+    noti.addProperty("NOTI_TYPE", method.type);
+    noti.addProperty("NOTI_MSG", method.getMessage(resourceName));
+    noti.addProperty("NOTI_ETC", getJsonString(chapterId, pageId));
     if (alarmCenterObj != null) {
-      noti.setTYPE("history");
-      noti.setNotiMessage(alarmCenterObj.toString());
+      noti.addProperty("TYPE", "history");
+      noti.addProperty("NotiMessage", alarmCenterObj.toString());
     }
 
     _publishToMQTT(noti);
   }
 
-  private void _publishToMQTT(DOUserNoti userNoti) {
-    Mono<ResponseEntity<JSONObject>> jsonObjectMono = webClient.post()
+  private void _publishToMQTT(JsonObject userNoti) {
+    Mono<ResponseEntity<JsonObject>> jsonObjectMono = webClient.post()
         .uri(notifyService)
         .accept(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
-        .body(Mono.just(new ProObjectDTO<>(userNoti)), ProObjectDTO.class)
-        .retrieve().toEntity(JSONObject.class);
+        .body(Mono.just(userNoti), JsonObject.class)
+        .retrieve().toEntity(JsonObject.class);
 
     logger.info("Publish Wwms Event: " + userNoti);
 //    logger.info("Publish Result: " + jsonObjectMono.block().getBody().toString());
@@ -174,22 +174,4 @@ public class Notifier {
     }
   }
 
-  @Data
-  @JsonNaming(CustomNamingStrategy.class)
-  public class ProObjectDTO<T> {
-    private T dto;
-
-    public ProObjectDTO(T dto) {
-      this.dto = dto;
-    }
-  }
-
-  public static class CustomNamingStrategy extends PropertyNamingStrategies.NamingBase {
-    public static final PropertyNamingStrategy PROOBJECT_DTO_CASE = new CustomNamingStrategy();
-
-    @Override
-    public String translate(String input) {
-      return input;
-    }
-  }
 }

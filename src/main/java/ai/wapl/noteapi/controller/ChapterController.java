@@ -3,6 +3,7 @@ package ai.wapl.noteapi.controller;
 import ai.wapl.noteapi.util.NoteUtil;
 import ai.wapl.noteapi.util.Notifier;
 import ai.wapl.noteapi.util.Notifier.Method;
+import ai.wapl.noteapi.util.ServiceCaller;
 import java.util.List;
 
 import ai.wapl.noteapi.util.ResponseUtil;
@@ -106,6 +107,12 @@ public class ChapterController {
         @RequestBody Chapter inputDTO,
         @RequestHeader("user-agent") String userAgent) {
         Chapter chapter = chapterService.shareChapter(userId, inputDTO.getId());
+
+        ServiceCaller caller = new ServiceCaller();
+        caller.createTalkMeta("", userId, chapter.getId(), chapter.getName(),
+            chapter.getType().name(),
+            NoteUtil.dateToString(chapter.getModifiedDate()
+            ));
 
         Notifier notifier = new Notifier(userId, channelId, Method.SHARECHAPTER,
             NoteUtil.isMobile(userAgent));
