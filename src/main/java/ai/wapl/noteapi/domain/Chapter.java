@@ -1,6 +1,9 @@
 package ai.wapl.noteapi.domain;
 
-import static ai.wapl.noteapi.domain.Chapter.Type.shared_page;
+import static ai.wapl.noteapi.domain.Chapter.Type.NOTEBOOK;
+import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
+import static ai.wapl.noteapi.domain.Chapter.Type.SHARED;
+import static ai.wapl.noteapi.domain.Chapter.Type.SHARED_PAGE;
 
 import ai.wapl.noteapi.util.Constants;
 import ai.wapl.noteapi.util.DateTimeConverter;
@@ -53,7 +56,7 @@ public class Chapter {
 
     @Column(name = "TYPE")
     @Enumerated(EnumType.STRING)
-    private Type type = Type.notebook;
+    private Type type = NOTEBOOK;
 
     @Column(name = "COLOR")
     private String color;
@@ -95,7 +98,7 @@ public class Chapter {
         Chapter chapter = Chapter.builder().channelId(input.getChannelId())
             .color(input.getColor()).name(input.getName())
             .createdUserId(userId)
-            .type(Type.notebook).build();
+            .type(NOTEBOOK).build();
         chapter.modifiedDate = NoteUtil.now();
         return chapter;
     }
@@ -103,7 +106,7 @@ public class Chapter {
     public static Chapter createRecycleBin(String channelId) {
         Chapter chapter = Chapter.builder().channelId(channelId)
             .name(Constants.RECYCLE_BIN_NAME)
-            .type(Type.recycle_bin).build();
+            .type(RECYCLE_BIN).build();
         chapter.modifiedDate = NoteUtil.now();
         chapter.modifiedDate = NoteUtil.now();
         return chapter;
@@ -112,7 +115,7 @@ public class Chapter {
     public static Chapter createChapterForShare(String userId, Chapter input) {
         Chapter chapter = Chapter.builder().channelId(input.getChannelId())
             .color(input.getColor()).name(input.getName())
-            .type(Type.shared).build();
+            .type(SHARED).build();
 
         chapter.modifiedDate = NoteUtil.now();
         chapter.sharedDate = NoteUtil.now();
@@ -122,7 +125,7 @@ public class Chapter {
 
     public static Chapter createShareChapter(String userId, String channelId) {
         Chapter chapter = Chapter.builder().channelId(channelId).name("전달받은 페이지")
-            .type(shared_page).build();
+            .type(SHARED_PAGE).build();
         chapter.modifiedDate = NoteUtil.now();
         chapter.sharedDate = NoteUtil.now();
         chapter.sharedUserId = userId;
@@ -134,6 +137,13 @@ public class Chapter {
     }
 
     public enum Type {
-        notebook, recycle_bin, shared, shared_page, allNote
+        NOTEBOOK("notebook"), RECYCLE_BIN("recycle_bin"), SHARED("shared"), SHARED_PAGE(
+            "shared_page"), ALL_NOTE("allNote"), DEFAULT(
+            "default");
+        String value;
+
+        Type(String value) {
+            this.value = value;
+        }
     }
 }

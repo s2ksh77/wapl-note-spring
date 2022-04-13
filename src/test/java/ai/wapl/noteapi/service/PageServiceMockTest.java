@@ -239,7 +239,7 @@ public class PageServiceMockTest {
         PageDTO dto = PageDTO.builder().channelId(channelId).type(THROW.name())
                 .id(pageId).build();
         Chapter chapter = Chapter.builder().id("chapterId").channelId(channelId)
-                .type(recycle_bin)
+                .type(RECYCLE_BIN)
                 .build();
 
         Page page = Page.builder().id(pageId).userId(userId)
@@ -250,15 +250,15 @@ public class PageServiceMockTest {
         chapter.getPageList().add(page);
 
         when(pageRepository.getById(pageId)).thenReturn(page);
-        when(chapterRepository.findByChannelIdAndType(channelId, recycle_bin)).thenReturn(
+        when(chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)).thenReturn(
             Optional.of(chapter));
 
         // when
         pageService.updateRecyclePage(dto, THROW);
 
         // then
-        assertThat(page.getType()).isEqualTo("");
-        assertThat(page.getChapter().getType()).isEqualTo(recycle_bin);
+        assertThat(page.isShared()).isFalse();
+        assertThat(page.getChapter().getType()).isEqualTo(RECYCLE_BIN);
     }
 
     @Test
@@ -271,7 +271,7 @@ public class PageServiceMockTest {
         PageDTO dto = PageDTO.builder().channelId(channelId).type(THROW.name())
                 .id(pageId).build();
         Chapter chapter = Chapter.builder().id("chapterId").channelId(channelId)
-                .type(recycle_bin)
+                .type(RECYCLE_BIN)
                 .build();
 
         Page page = Page.builder().id(pageId).userId(userId)
@@ -282,14 +282,14 @@ public class PageServiceMockTest {
         chapter.getPageList().add(page);
 
         when(pageRepository.getById(pageId)).thenReturn(page);
-        when(chapterRepository.findByChannelIdAndType(channelId, recycle_bin)).thenReturn(
+        when(chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)).thenReturn(
             Optional.of(chapter));
 
         // when
         pageService.updateRecyclePage(dto, RESTORE);
 
         // then
-        assertThat(page.getType()).isEqualTo("");
+        assertThat(page.isShared()).isFalse();
         assertThat(page.getChapter().getType()).isNull();
     }
 }

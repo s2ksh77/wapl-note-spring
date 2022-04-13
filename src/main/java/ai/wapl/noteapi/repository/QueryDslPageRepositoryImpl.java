@@ -1,7 +1,7 @@
 package ai.wapl.noteapi.repository;
 
 import static ai.wapl.noteapi.domain.Chapter.Type;
-import static ai.wapl.noteapi.domain.Chapter.Type.allNote;
+import static ai.wapl.noteapi.domain.Chapter.Type.ALL_NOTE;
 import static ai.wapl.noteapi.domain.QBookmark.bookmark;
 import static ai.wapl.noteapi.domain.QChapter.chapter;
 import static ai.wapl.noteapi.domain.QFile.file;
@@ -73,7 +73,7 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     return queryFactory.update(page.chapter).where(page.chapter.id.eq(chapterId))
         .set(page.chapter,
             queryFactory.selectFrom(r)
-                .where(r.channelId.eq(channelId).and(r.type.eq(Type.recycle_bin)))
+                .where(r.channelId.eq(channelId).and(r.type.eq(Type.RECYCLE_BIN)))
         ).execute();
   }
 
@@ -83,7 +83,7 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     return queryFactory.select(Projections.constructor(ChapterDTO.class, chapter)).from(chapter)
         .where(chapter.channelId.eq(channelId)
             .and(chapter.name.lower().like(lowerText, '@'))
-            .and(chapter.type.ne(allNote))
+            .and(chapter.type.ne(ALL_NOTE))
         ).fetch();
   }
 

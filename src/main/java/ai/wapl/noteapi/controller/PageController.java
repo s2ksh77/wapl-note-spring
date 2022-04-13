@@ -126,7 +126,7 @@ public class PageController {
             .sharePageToChannel(userId, dto.getChannelId(), dto.getId(), dto.getSharedRoomId());
 
         ServiceCaller caller = new ServiceCaller();
-        caller.createTalkMeta("", userId, page.getId(), page.getName(), page.getType().name(),
+        caller.createTalkMeta("", userId, page.getId(), page.getName(), page.getShared(),
             NoteUtil.dateToString(page.getModifiedDate()
             ));
 

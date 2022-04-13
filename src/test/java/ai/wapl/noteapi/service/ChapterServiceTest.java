@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
-import static ai.wapl.noteapi.domain.Chapter.Type.notebook;
+import static ai.wapl.noteapi.domain.Chapter.Type.NOTEBOOK;
 import static ai.wapl.noteapi.util.Constants.KOREAN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +48,7 @@ public class ChapterServiceTest {
         Chapter chapter1 = service.createChapter(userId, chapter, KOREAN);
 
         // then
-        assertThat(chapter1.getType()).isEqualTo(notebook);
+        assertThat(chapter1.getType()).isEqualTo(NOTEBOOK);
         assertThat(chapter1.getColor()).isEqualTo(color);
         assertThat(chapter1.getUserId()).isEqualTo(userId);
         assertThat(chapter1.getModifiedDate()).isNotNull();

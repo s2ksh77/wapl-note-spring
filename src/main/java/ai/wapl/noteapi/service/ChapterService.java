@@ -16,7 +16,8 @@ import ai.wapl.noteapi.repository.ChapterRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import static ai.wapl.noteapi.domain.Chapter.*;
-import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
+import static ai.wapl.noteapi.domain.Chapter.Type.DEFAULT;
+import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
 import static ai.wapl.noteapi.util.Constants.*;
 import static ai.wapl.noteapi.util.NoteUtil.*;
 
@@ -98,7 +99,7 @@ public class ChapterService {
     public void deleteChapter(String channelId, String chapterId) {
         Chapter chapter = chapterRepository.findById(chapterId).orElseThrow(ResourceNotFoundException::new);
 
-        if (chapter.getType().equals("default") || chapter.getType().equals(Type.notebook)) {
+        if (chapter.getType().equals(DEFAULT) || chapter.getType().equals(Type.NOTEBOOK)) {
             chapterRepository.updateRecycleBin(chapterId, channelId, now());
         } else
             fileService.deleteFileByChapterId(channelId, chapterId);
@@ -126,7 +127,7 @@ public class ChapterService {
 
     @Transactional(readOnly = true)
     public Chapter getRecycleBin(String channelId) {
-        return chapterRepository.findByChannelIdAndType(channelId, recycle_bin)
+        return chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)
             .orElseThrow(ResourceNotFoundException::new);
     }
 

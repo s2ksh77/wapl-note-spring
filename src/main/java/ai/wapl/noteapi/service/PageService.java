@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static ai.wapl.noteapi.domain.Chapter.Type.recycle_bin;
-import static ai.wapl.noteapi.domain.Chapter.Type.shared_page;
+import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
+import static ai.wapl.noteapi.domain.Chapter.Type.SHARED_PAGE;
 import static ai.wapl.noteapi.dto.PageDTO.*;
 
 @Service
@@ -68,7 +68,7 @@ public class PageService {
 
     public Page updatePage(String userId, PageDTO input, Action action) {
         Page page = pageRepository.findById(input.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
+            .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
         if (!action.equals(Action.EDIT_DONE) && (page.isEditing() || !userId.equals(page.getEditingUserId())))
             throw new IllegalStateException("Can not access this page!");
 
@@ -82,7 +82,7 @@ public class PageService {
                 return page;
             case MOVE:
                 page.setChapter(chapterRepository.findById(input.getChapterId())
-                        .orElseThrow(ResourceNotFoundException::new));
+                    .orElseThrow(ResourceNotFoundException::new));
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
                 page.setModifiedDate(NoteUtil.now());
                 page.setUpdatedUserId(userId);
@@ -110,22 +110,22 @@ public class PageService {
      */
     public Page updateRecyclePage(PageDTO page, Action action) {
         String channelId = page.getChannelId();
-        Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, recycle_bin)
+        Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)
             .orElseThrow(ResourceNotFoundException::new);
         Page pageInfo = pageRepository.getById(page.getId());
         switch (action) {
             case THROW:
                 pageInfo.setChapter(recycleBin);
-                pageInfo.setType(null);
+                pageInfo.setShared(false);
                 pageInfo.setRestoreChapterId(page.getRestoreChapterId());
                 pageInfo.setDeletedDate(NoteUtil.now());
                 return pageInfo;
             case RESTORE:
                 pageInfo.setChapter(
-                        chapterRepository.findById(page.getChapterId())
-                                .orElseThrow(ResourceNotFoundException::new)
+                    chapterRepository.findById(page.getChapterId())
+                        .orElseThrow(ResourceNotFoundException::new)
                 );
-                pageInfo.setType(null);
+                pageInfo.setShared(false);
                 pageInfo.setRestoreChapterId(null);
                 pageInfo.setDeletedDate(null);
                 pageInfo.setModifiedDate(NoteUtil.now());
@@ -196,12 +196,12 @@ public class PageService {
     }
 
     public Page sharePageToChannel(String userId, String channelId, String pageId, String sharedRoomId) {
-        Chapter sharedChapter = chapterRepository.findByChannelIdAndType(channelId, shared_page)
+        Chapter sharedChapter = chapterRepository.findByChannelIdAndType(channelId, SHARED_PAGE)
             .orElseGet(() -> chapterRepository.save(Chapter.createShareChapter(userId, channelId)));
 
         Page sharedPage = pageRepository.save(
             Page.createSharedPage(userId, sharedChapter,
-            pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new),sharedRoomId)
+                pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new),sharedRoomId)
         );
 
         fileService.copyFileListByPageId(channelId, pageId, sharedPage.getId());
