@@ -33,14 +33,21 @@ public class PageController {
     // TODO: new 기능. pending
     // TODO: 공동 편집 기능. pending
 
-    @ApiOperation(value = "최근 페이지 조회 서비스 noteRecentList & 채널 하위 모든 페이지 조회 서비스. allnoteList deprecated", notes = "count > 0면 최근 페이지 조회 서비스, else 전체 조회")
+    @ApiOperation(value = "채널 하위 모든 페이지 조회 서비스. allnoteList (deprecated)", notes = "전체 조회")
+    @GetMapping("/page/all")
+    public ResponseEntity<ResponseDTO<List<PageDTO>>> getAllPageList(
+        @PathVariable("channelId") String channelId) {
+        List<PageDTO> pageDTOS = pageService.getAllPageList(userId, channelId);
+
+        return ResponseUtil.success(pageDTOS);
+    }
+
+    @ApiOperation(value = "최근 페이지 조회 서비스 noteRecentList", notes = "최근 페이지 조회 서비스")
     @GetMapping("/page")
     public ResponseEntity<ResponseDTO<List<PageDTO>>> getRecentPageList(
         @PathVariable("channelId") String channelId,
-        @RequestParam(value = "count", required = false) Integer count) {
-        List<PageDTO> pageDTOS = count != null
-            ? pageService.getRecentPageList(userId, channelId, count)
-            : pageService.getAllPageList(userId, channelId);
+        @RequestParam(value = "count", defaultValue = "5") Integer count) {
+        List<PageDTO> pageDTOS = pageService.getRecentPageList(userId, channelId, count);
 
         return ResponseUtil.success(pageDTOS);
     }

@@ -27,7 +27,7 @@ public class ChapterController {
     private String userId = "userId";
 
     @ApiOperation(value = "채널 생성 noteappCreate ", notes = "채널 생성")
-    @PostMapping
+    @PostMapping("/app")
     public ResponseEntity<ResponseDTO<JSONObject>> createChannelApp(@RequestBody JSONObject dto) {
         JSONObject object = new JSONObject();
         String channelId = chapterService.createApp(dto.getAsString("language"));
@@ -55,7 +55,7 @@ public class ChapterController {
         return success(chapterList);
     }
 
-    @ApiOperation(value = "단일 챕터 조회 chatpershareList ", notes = "채널 정보를 조회하는 서비스")
+    @ApiOperation(value = "단일 챕터 조회 chatpershareList ", notes = "채널 정보 조회 서비스")
     @GetMapping(path = "/app/{channelId}/chapter/{chapterId}")
     public ResponseEntity<ResponseDTO<Chapter>> getChapterInfoList(@PathVariable("chapterId") String chapterId) {
         Chapter chapterInfo = chapterService.getChapterInfoList(chapterId);
@@ -63,9 +63,10 @@ public class ChapterController {
     }
 
     @ApiOperation(value = "챕터 생성 서비스 notebooksCreate ", notes = "챕터 생성 서비스 ( 국제화 언어에 따라 챕터명 생성) ")
-    @PostMapping(path = "/app/{channelId}/chapter/{language}")
+    @PostMapping(path = "/app/{channelId}/chapter")
     public ResponseEntity<ResponseDTO<Chapter>> createChapter(@PathVariable String channelId,
-        @PathVariable String language, @RequestBody Chapter inputDTO, @RequestHeader("user-agent") String userAgent) {
+        @RequestBody Chapter inputDTO, @RequestParam String language,
+        @RequestHeader("user-agent") String userAgent) {
         Chapter result = chapterService.createChapter(userId, inputDTO, language);
 
         Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERCREATE, NoteUtil.isMobile(userAgent));
