@@ -4,6 +4,8 @@ import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.dto.SearchDTO;
 import ai.wapl.noteapi.repository.BookmarkRepository;
+import ai.wapl.noteapi.repository.LogRepository;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class PageService {
     private final PageRepository pageRepository;
     private final FileService fileService;
     private final BookmarkRepository bookmarkRepository;
+    private final LogRepository logRepository;
 
     /**
      * 페이지 단일 조회 서비스
@@ -41,6 +44,7 @@ public class PageService {
     public PageDTO getPageInfo(String userId, String pageId) {
         PageDTO result = pageRepository.findById(userId, pageId);
         result.setFileList(fileService.getFileListByPageId(pageId));
+
         return result;
     }
 
@@ -164,7 +168,11 @@ public class PageService {
 
     public List<PageDTO> getAllPageList(String userId, String channelId) {
         List<PageDTO> dtoList = pageRepository.findAllPageByChannelId(userId, channelId);
-        dtoList.forEach(pageDTO -> pageDTO.setFileList(fileService.getFileListByPageId(pageDTO.getId())));
+        Set<String> readSet = logRepository.getReadListByChannelId(userId, channelId);
+        dtoList.forEach(pageDTO -> {
+            pageDTO.setFileList(fileService.getFileListByPageId(pageDTO.getId()));
+            pageDTO.setRead(readSet.contains(pageDTO.getId()));
+        });
         return dtoList;
     }
 

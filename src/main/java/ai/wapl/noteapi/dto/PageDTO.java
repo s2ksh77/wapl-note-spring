@@ -40,6 +40,7 @@ public class PageDTO {
     @JsonProperty("TEXT_CONTENT")
     @Lob
     private String textContent;
+    private boolean read;
     private List<FileDTO> fileList;
     private List<Tag> tagList;
 

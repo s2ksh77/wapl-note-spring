@@ -8,6 +8,7 @@ import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.PageDTO.Action;
 import ai.wapl.noteapi.repository.BookmarkRepository;
 import ai.wapl.noteapi.repository.ChapterRepository;
+import ai.wapl.noteapi.repository.LogRepository;
 import ai.wapl.noteapi.repository.PageRepository;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,8 @@ public class PageServiceMockTest {
     FileService fileService;
     @Mock
     BookmarkRepository bookmarkRepository;
+    @Mock
+    LogRepository logRepository;
 
     PageService pageService;
 
@@ -45,7 +48,7 @@ public class PageServiceMockTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         pageService = new PageService(chapterRepository, pageRepository, fileService,
-            bookmarkRepository);
+            bookmarkRepository, logRepository);
     }
 
     @Test

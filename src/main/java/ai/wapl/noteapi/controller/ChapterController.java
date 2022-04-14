@@ -1,5 +1,6 @@
 package ai.wapl.noteapi.controller;
 
+import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.util.NoteUtil;
 import ai.wapl.noteapi.util.Notifier;
 import ai.wapl.noteapi.util.Notifier.Method;
@@ -44,8 +45,8 @@ public class ChapterController {
 
     @ApiOperation(value = "채널 별 챕터 리스트 조회 noteChapterList ", notes = "채널 별 챕터 및 하위 페이지 리스트 조회 서비스")
     @GetMapping("/app/{channelId}")
-    public ResponseEntity<ResponseDTO<List<Chapter>>> getChapterList(@PathVariable("channelId") String channelId) {
-        List<Chapter> chapterList = chapterService.getChapterList(channelId);
+    public ResponseEntity<ResponseDTO<List<ChapterDTO>>> getChapterList(@PathVariable("channelId") String channelId) {
+        List<ChapterDTO> chapterList = chapterService.getChapterList(userId, channelId);
 
         chapterList.forEach(chapter -> chapter.getPageList().forEach(page -> {
             page.setContent(null);
@@ -57,8 +58,8 @@ public class ChapterController {
 
     @ApiOperation(value = "단일 챕터 조회 chatpershareList ", notes = "채널 정보 조회 서비스")
     @GetMapping(path = "/app/{channelId}/chapter/{chapterId}")
-    public ResponseEntity<ResponseDTO<Chapter>> getChapterInfoList(@PathVariable("chapterId") String chapterId) {
-        Chapter chapterInfo = chapterService.getChapterInfoList(chapterId);
+    public ResponseEntity<ResponseDTO<ChapterDTO>> getChapterInfoList(@PathVariable("chapterId") String chapterId) {
+        ChapterDTO chapterInfo = chapterService.getChapterInfoList(userId, chapterId);
         return success(chapterInfo);
     }
 
@@ -111,7 +112,8 @@ public class ChapterController {
 
         ServiceCaller caller = new ServiceCaller();
         caller.createTalkMeta("", userId, chapter.getId(), chapter.getName(),
-            chapter.getType().name(),
+//            chapter.getType().name(),
+            "",
             NoteUtil.dateToString(chapter.getModifiedDate()
             ));
 

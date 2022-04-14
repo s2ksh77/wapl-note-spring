@@ -30,7 +30,6 @@ public class PageController {
     // DEBUG
     private String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9";
 
-    // TODO: new 기능. pending
     // TODO: 공동 편집 기능. pending
 
     @ApiOperation(value = "채널 하위 모든 페이지 조회 서비스. allnoteList (deprecated)", notes = "전체 조회")

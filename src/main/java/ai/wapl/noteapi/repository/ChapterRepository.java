@@ -28,7 +28,8 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
     @Modifying
     @Query("update Page p\n"
         + "set p.chapter = (select c from Chapter c \n"
-        + "        where c.type = 'recycle_bin' and c.channelId = :channelId),\n"
+        + "        where c.type = RECYCLE_BIN"
+        + " and c.channelId = :channelId),\n"
         + "p.deletedDate = :deletedAt \n"
         + "where p.chapter.id = :chapterId")
     int updateRecycleBin(@Param("chapterId") String chapterId,

@@ -1,9 +1,15 @@
 package ai.wapl.noteapi.service;
 
+import ai.wapl.noteapi.dto.ChapterDTO;
+import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.repository.LogRepository;
 import ai.wapl.noteapi.util.Color;
+import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +29,14 @@ import static ai.wapl.noteapi.util.NoteUtil.*;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ChapterService {
 
     private final ChapterRepository chapterRepository;
+    private final LogRepository logRepository;
     private final PageService pageService;
     private final FileService fileService;
     private final Logger logger = LoggerFactory.getLogger(ChapterService.class);
-
-    @Autowired
-    public ChapterService(ChapterRepository chapterRepository, PageService pageService, FileService fileService) {
-        this.chapterRepository = chapterRepository;
-        this.pageService = pageService;
-        this.fileService = fileService;
-    }
 
     public String createApp(String language) {
         String channelId = UUID.randomUUID().toString();
@@ -60,17 +61,32 @@ public class ChapterService {
      * 챕터 전체 조회 서비스
      */
     @Transactional(readOnly = true)
-    public List<Chapter> getChapterList(String channelId) {
-        return chapterRepository.findByChannelId(channelId);
+    public List<ChapterDTO> getChapterList(String userId, String channelId) {
+        List<ChapterDTO> chapterDTOS = new ArrayList<>();
+        List<Chapter> chapters = chapterRepository.findByChannelId(channelId);
+        Set<String> readSet = logRepository.getReadListByChannelId(userId, channelId);
+        chapters.forEach(chapter -> {
+            ChapterDTO dto = new ChapterDTO(chapter);
+            dto.setRead(readSet.contains(dto.getId()));
+            chapterDTOS.add(dto);
+        });
+        return chapterDTOS;
     }
 
     /**
      * 챕터 하위 페이지 조회 서비스
      */
     @Transactional(readOnly = true)
-    public Chapter getChapterInfoList(String chapterId) {
-        return chapterRepository.findByIdFetchJoin(chapterId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
+    public ChapterDTO getChapterInfoList(String userId, String chapterId) {
+        Chapter chapter = chapterRepository.findByIdFetchJoin(chapterId)
+            .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
+        Set<String> readSet = logRepository.getReadListByChapterId(userId, chapterId);
+
+        ChapterDTO dto = new ChapterDTO(chapter);
+        dto.setRead(readSet.contains(dto.getId()));
+        dto.getPageList().forEach(pageDTO -> pageDTO.setRead(readSet.contains(pageDTO.getId())));
+
+        return dto;
     }
 
     /**

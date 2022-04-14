@@ -1,7 +1,5 @@
 package ai.wapl.noteapi.service;
 
-import static ai.wapl.noteapi.dto.PageDTO.Action.RESTORE;
-import static ai.wapl.noteapi.dto.PageDTO.Action.THROW;
 import static ai.wapl.noteapi.util.NoteUtil.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -9,12 +7,8 @@ import static org.mockito.Mockito.when;
 
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Chapter.Type;
-import ai.wapl.noteapi.domain.Page;
-import ai.wapl.noteapi.domain.Tag;
-import ai.wapl.noteapi.dto.PageDTO;
-import ai.wapl.noteapi.repository.BookmarkRepository;
 import ai.wapl.noteapi.repository.ChapterRepository;
-import ai.wapl.noteapi.repository.PageRepository;
+import ai.wapl.noteapi.repository.LogRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +23,8 @@ public class ChapterMockTest {
   @Mock
   ChapterRepository chapterRepository;
   @Mock
+  LogRepository logRepository;
+  @Mock
   PageService pageService;
   @Mock
   FileService fileService;
@@ -38,7 +34,7 @@ public class ChapterMockTest {
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    chapterService = new ChapterService(chapterRepository, pageService, fileService);
+    chapterService = new ChapterService(chapterRepository, logRepository, pageService, fileService);
   }
 
   @Test

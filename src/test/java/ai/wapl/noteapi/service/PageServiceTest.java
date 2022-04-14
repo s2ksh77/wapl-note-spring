@@ -2,6 +2,7 @@ package ai.wapl.noteapi.service;
 
 import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.SearchDTO;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -111,4 +112,18 @@ public class PageServiceTest {
         // then
         assertThat(l).isEqualTo(113);
     }
+
+    @Test
+    public void getAllPageList() {
+        // given
+        String channelId = "deef09e9-9f67-4e24-aef7-23b6be588cd2";
+        String userId = "userId";
+
+        // when
+        List<PageDTO> l = pageService.getAllPageList(userId, channelId);
+
+        // then
+        assertThat(l.size()).isEqualTo(122);
+    }
+
 }

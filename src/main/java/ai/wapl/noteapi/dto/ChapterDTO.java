@@ -3,6 +3,8 @@ package ai.wapl.noteapi.dto;
 import java.time.LocalDateTime;
 
 import ai.wapl.noteapi.domain.Chapter;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,8 +28,12 @@ public class ChapterDTO {
     private LocalDateTime sharedDate;
     private String sharedUserId;
     private String sharedRoomId;
+    private boolean read;
+    private List<PageDTO> pageList = new ArrayList<>();
 
     public ChapterDTO(Chapter source) {
         BeanUtils.copyProperties(source, this);
+        if (source.getPageList() != null && !source.getPageList().isEmpty())
+            source.getPageList().forEach(page -> pageList.add(new PageDTO(page)));
     }
 }
