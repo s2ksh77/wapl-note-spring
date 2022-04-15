@@ -207,6 +207,8 @@ public class PageService {
 
     public long changeStateToUnLock() {
         LocalDateTime targetDateTime = NoteUtil.now().minusMinutes(30);
+
+        logRepository.insertUnLockPageLog(targetDateTime);
         return pageRepository.updatePageToNonEdit(targetDateTime);
     }
 

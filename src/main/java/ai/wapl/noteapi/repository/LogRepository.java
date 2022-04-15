@@ -1,6 +1,7 @@
 package ai.wapl.noteapi.repository;
 
 import ai.wapl.noteapi.domain.NoteLog;
+import java.time.LocalDateTime;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,5 +38,13 @@ public interface LogRepository extends JpaRepository<NoteLog, Long> {
       + "where a.user_id = :userId", nativeQuery = true)
   Set<String> getReadListByChannelId(@Param("userId") String userId,
       @Param("channelId") String channelId);
+
+  @Query(value = "insert into tb_noteapp_log (log_id, ws_id, user_id, resource_id, resource_type, log_timestamp, action, device_type)\n"
+      + "select seq_note_log_id.nextval, c.ws_id, a.is_edit, a.note_id, 'page', systimestamp, 'edit_done', 'pc'\n"
+      + "from tb_noteapp_note_mst a\n"
+      + "join tb_noteapp_notebook_mst b on b.id = a.parent_notebook\n"
+      + "join tb_map_ws_ch c on c.ch_id = b.note_channel_id\n"
+      + "where a.is_edit != null and a.modified_date < :targetDateTime", nativeQuery = true)
+  void insertUnLockPageLog(@Param("targetDateTime") LocalDateTime targetDateTime);
 
 }
