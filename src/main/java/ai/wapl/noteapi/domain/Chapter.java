@@ -10,13 +10,14 @@ import ai.wapl.noteapi.util.DateTimeConverter;
 import ai.wapl.noteapi.util.NoteUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import javax.persistence.AttributeConverter;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
+import javax.persistence.Converter;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -55,7 +56,7 @@ public class Chapter {
     private LocalDateTime modifiedDate = NoteUtil.now();
 
     @Column(name = "TYPE")
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = EnumConverter.class)
     private Type type = NOTEBOOK;
 
     @Column(name = "COLOR")
@@ -145,5 +146,30 @@ public class Chapter {
         Type(String value) {
             this.value = value;
         }
+
+        public static Type find(String value) {
+            return Arrays.stream(Type.values()).filter(type -> type.value.equals(value)).findFirst()
+                .orElse(null);
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
+
+    @Converter
+    public static class EnumConverter implements AttributeConverter<Type, String> {
+
+        @Override
+        public String convertToDatabaseColumn(Type attribute) {
+            return attribute.getValue();
+        }
+
+        @Override
+        public Type convertToEntityAttribute(String dbData) {
+            return Type.find(dbData);
+        }
+
+    }
+
 }
