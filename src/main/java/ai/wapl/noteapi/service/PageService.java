@@ -2,6 +2,8 @@ package ai.wapl.noteapi.service;
 
 import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.domain.File;
+import ai.wapl.noteapi.domain.NoteLog;
+import ai.wapl.noteapi.domain.NoteLog.LogAction;
 import ai.wapl.noteapi.dto.SearchDTO;
 import ai.wapl.noteapi.repository.BookmarkRepository;
 import ai.wapl.noteapi.repository.LogRepository;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
 import static ai.wapl.noteapi.domain.Chapter.Type.SHARED_PAGE;
@@ -30,6 +31,8 @@ import static ai.wapl.noteapi.dto.PageDTO.*;
 @RequiredArgsConstructor
 @Transactional
 public class PageService {
+    public static final String RESOURCE_TYPE = "page";
+
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
     private final FileService fileService;
@@ -48,33 +51,40 @@ public class PageService {
         return result;
     }
 
-    public Page createPage(PageDTO inputPage) {
-        Chapter chapter = chapterRepository.findById(inputPage.getChapterId()).orElseThrow(ResourceNotFoundException::new);
-        Page page = Page.createPage(chapter, inputPage.toEntity());
-        return pageRepository.save(page);
-    }
-
     /**
-     * 페이지 추가 서비스
-     * createdDate, modifiedDate
+     * 페이지 추가 서비스 createdDate, modifiedDate
      */
-    public Page createPage(Page inputPage) {
-        Page page = Page.createPage(inputPage.getChapter(), inputPage);
-        return pageRepository.save(page);
-    }
+    public Page createPage(String userId, PageDTO inputPage, boolean mobile) {
+        Chapter chapter = chapterRepository.findById(inputPage.getChapterId())
+            .orElseThrow(ResourceNotFoundException::new);
+        Page page = pageRepository.save(Page.createPage(chapter, inputPage.toEntity()));
 
-    public Page deletePage(String channelId, String pageId) {
-        Page page = pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new);
-        fileService.deleteFileByPageId(channelId, pageId);
-        pageRepository.delete(page);
+        createPageLog(userId, page.getId(), LogAction.create, mobile);
         return page;
     }
 
-    public Page updatePage(String userId, PageDTO input, Action action) {
+    Page createPage(Page inputPage, boolean mobile) {
+        Page page = pageRepository.save(Page.createPage(inputPage.getChapter(), inputPage));
+        createPageLog(inputPage.getCreatedUserId(), page.getId(), LogAction.create, mobile);
+        return page;
+    }
+
+    public Page deletePage(String userId, String channelId, String pageId, boolean mobile) {
+        Page page = pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new);
+        fileService.deleteFileByPageId(channelId, pageId);
+        pageRepository.delete(page);
+
+        createPageLog(userId, page.getId(), LogAction.delete, mobile);
+        return page;
+    }
+
+    public Page updatePage(String userId, PageDTO input, Action action, boolean mobile) {
         Page page = pageRepository.findById(input.getId())
             .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
-        if (!action.equals(Action.EDIT_DONE) && (page.isEditing() || !userId.equals(page.getEditingUserId())))
+        if (!action.equals(Action.EDIT_DONE) && (page.isEditing() && !userId
+            .equals(page.getEditingUserId()))) {
             throw new IllegalStateException("Can not access this page!");
+        }
 
         switch (action) {
             case NON_EDIT:
@@ -83,6 +93,7 @@ public class PageService {
             case EDIT_START:
                 page.setEditingUserId(userId);
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
+                createPageLog(userId, page.getId(), LogAction.edit_start, mobile);
                 return page;
             case MOVE:
                 page.setChapter(chapterRepository.findById(input.getChapterId())
@@ -90,9 +101,17 @@ public class PageService {
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
                 page.setModifiedDate(NoteUtil.now());
                 page.setUpdatedUserId(userId);
+                createPageLog(userId, page.getId(), LogAction.move, mobile);
                 return page;
             case RENAME:
                 page.setName(input.getName());
+                page.setModifiedDate(NoteUtil.now());
+                createPageLog(userId, page.getId(), LogAction.rename, mobile);
+                return page;
+            case EDITING:
+                page.setName(getNotNull(input.getName(), page.getName()));
+                page.setContent(getNotNull(input.getContent(), page.getContent()));
+                page.setTextContent(getNotNull(input.getTextContent(), page.getTextContent()));
                 page.setModifiedDate(NoteUtil.now());
                 return page;
             case EDIT_DONE:
@@ -103,6 +122,7 @@ public class PageService {
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
                 page.setUpdatedUserId(getNotNull(userId, page.getUpdatedUserId()));
                 page.setEditingUserId(null);
+                createPageLog(userId, page.getId(), LogAction.edit_done, mobile);
                 return page;
             default:
                 throw new IllegalArgumentException("Wrong Action");
@@ -112,7 +132,7 @@ public class PageService {
     /**
      * 휴지통 관련 THROW 또는 RESTORE 관련 서비스
      */
-    public Page updateRecyclePage(PageDTO page, Action action) {
+    public Page updateRecyclePage(String userId, PageDTO page, Action action, boolean mobile) {
         String channelId = page.getChannelId();
         Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)
             .orElseThrow(ResourceNotFoundException::new);
@@ -123,6 +143,7 @@ public class PageService {
                 pageInfo.setShared(false);
                 pageInfo.setRestoreChapterId(page.getRestoreChapterId());
                 pageInfo.setDeletedDate(NoteUtil.now());
+                createPageLog(userId, page.getId(), LogAction.throw_to_recycle_bin, mobile);
                 return pageInfo;
             case RESTORE:
                 pageInfo.setChapter(
@@ -133,20 +154,21 @@ public class PageService {
                 pageInfo.setRestoreChapterId(null);
                 pageInfo.setDeletedDate(null);
                 pageInfo.setModifiedDate(NoteUtil.now());
+                createPageLog(userId, page.getId(), LogAction.restore, mobile);
                 return pageInfo;
             default:
                 throw new IllegalArgumentException("Wrong Action");
         }
     }
 
-    public Page sharePageToChapter(Chapter chapter, Page input) {
+    public Page sharePageToChapter(String userId, Chapter chapter, Page input, boolean mobile) {
         // create page with same content
         Page page = Page.createPage(chapter, input);
         pageRepository.save(page);
 
         // deep copy files of page
         fileService.copyFileListByPageId(chapter.getChannelId(), input.getId(), page.getId());
-
+        createPageLog(userId, page.getId(), LogAction.create, mobile);
         return page;
     }
 
@@ -203,7 +225,7 @@ public class PageService {
         return bookmark;
     }
 
-    public Page sharePageToChannel(String userId, String channelId, String pageId, String sharedRoomId) {
+    public Page sharePageToChannel(String userId, String channelId, String pageId, String sharedRoomId, boolean mobile) {
         Chapter sharedChapter = chapterRepository.findByChannelIdAndType(channelId, SHARED_PAGE)
             .orElseGet(() -> chapterRepository.save(Chapter.createShareChapter(userId, channelId)));
 
@@ -214,11 +236,17 @@ public class PageService {
 
         fileService.copyFileListByPageId(channelId, pageId, sharedPage.getId());
 
+        createPageLog(userId, sharedPage.getId(), LogAction.create, mobile);
         return sharedPage;
     }
 
     public long deleteAllByChannel(String channelId) {
         return pageRepository.deleteAllByChannelId(channelId);
+    }
+
+    private void createPageLog(String userId, String pageId, LogAction action, boolean mobile) {
+        NoteLog log = new NoteLog("", userId, pageId, RESOURCE_TYPE, action, mobile);
+        logRepository.save(log);
     }
 
     private String getNotNull(String name, String name2) {

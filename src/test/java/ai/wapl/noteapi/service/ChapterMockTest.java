@@ -50,7 +50,7 @@ public class ChapterMockTest {
     when(chapterRepository.findById(chapterId)).thenReturn(Optional.ofNullable(chapter));
 
     // when
-    chapterService.deleteChapter(channelId, chapterId);
+    chapterService.deleteChapter(userId, channelId, chapterId, false);
 
     // then
     verify(chapterRepository).updateRecycleBin(chapterId, channelId, now());

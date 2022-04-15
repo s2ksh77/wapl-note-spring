@@ -50,7 +50,7 @@ public class ChapterServiceTest {
                 .build();
 
         // when
-        Chapter chapter1 = service.createChapter(userId, chapter, KOREAN);
+        Chapter chapter1 = service.createChapter(userId, chapter, KOREAN,false);
 
         // then
 //        assertThat(chapter1.getType()).isEqualTo(NOTEBOOK);
@@ -69,10 +69,10 @@ public class ChapterServiceTest {
         Chapter chapter = Chapter.builder()
                 .name("새 챕터").channelId(channelId).color(color)
                 .build();
-        Chapter chapter1 = service.createChapter(userId, chapter, KOREAN);
+        Chapter chapter1 = service.createChapter(userId, chapter, KOREAN, false);
 
         // when
-        service.deleteChapter(channelId, chapter1.getId());
+        service.deleteChapter(userId, channelId, chapter1.getId(), false);
 
         // then
         PageDTO page = pageService.getPageInfo(userId, chapter1.getPageList().get(0).getId());

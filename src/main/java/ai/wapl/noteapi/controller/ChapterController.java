@@ -68,9 +68,10 @@ public class ChapterController {
     public ResponseEntity<ResponseDTO<Chapter>> createChapter(@PathVariable String channelId,
         @RequestBody Chapter inputDTO, @RequestParam String language,
         @RequestHeader("user-agent") String userAgent) {
-        Chapter result = chapterService.createChapter(userId, inputDTO, language);
+        boolean mobile = NoteUtil.isMobile(userAgent);
+        Chapter result = chapterService.createChapter(userId, inputDTO, language, mobile);
 
-        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERCREATE, NoteUtil.isMobile(userAgent));
+        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERCREATE, mobile);
         notifier.publishMQTT(result.getId(), null, result.getName());
 
         return success(result);
@@ -80,10 +81,10 @@ public class ChapterController {
     @DeleteMapping(path = "/app/{channelId}/chapter/{chapterId}")
     public ResponseEntity<?> deleteChapter(@PathVariable String channelId,
         @PathVariable String chapterId, @RequestHeader("user-agent") String userAgent) {
-        chapterService.deleteChapter(channelId, chapterId);
+        boolean mobile = NoteUtil.isMobile(userAgent);
+        chapterService.deleteChapter(userId, channelId, chapterId, mobile);
 
-        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERDELETE,
-            NoteUtil.isMobile(userAgent));
+        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERDELETE, mobile);
         notifier.publishMQTT(chapterId, null, null);
 
         return noContent();
@@ -94,10 +95,10 @@ public class ChapterController {
     public ResponseEntity<ResponseDTO<Chapter>> updateChapter(@PathVariable String channelId,
         @RequestBody Chapter inputDTO,
         @RequestHeader("user-agent") String userAgent) {
-        Chapter result = chapterService.updateChapter(inputDTO);
+        boolean mobile = NoteUtil.isMobile(userAgent);
+        Chapter result = chapterService.updateChapter(userId, inputDTO,mobile);
 
-        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERRENAME,
-            NoteUtil.isMobile(userAgent));
+        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERRENAME, mobile);
         notifier.publishMQTT(inputDTO.getId(), null, null);
 
         return success(result);
@@ -108,17 +109,15 @@ public class ChapterController {
     public ResponseEntity<ResponseDTO<Chapter>> shareChapter(@PathVariable String channelId,
         @RequestBody Chapter inputDTO,
         @RequestHeader("user-agent") String userAgent) {
-        Chapter chapter = chapterService.shareChapter(userId, inputDTO.getId());
+        boolean mobile = NoteUtil.isMobile(userAgent);
+        Chapter chapter = chapterService.shareChapter(userId, inputDTO.getId(), mobile);
 
         ServiceCaller caller = new ServiceCaller();
         caller.createTalkMeta("", userId, chapter.getId(), chapter.getName(),
-//            chapter.getType().name(),
-            "",
-            NoteUtil.dateToString(chapter.getModifiedDate()
+            chapter.getType().name(), NoteUtil.dateToString(chapter.getModifiedDate()
             ));
 
-        Notifier notifier = new Notifier(userId, channelId, Method.SHARECHAPTER,
-            NoteUtil.isMobile(userAgent));
+        Notifier notifier = new Notifier(userId, channelId, Method.SHARECHAPTER, mobile);
         notifier.publishMQTT(inputDTO.getId(), null, chapter.getName());
 
         return ResponseUtil.success(chapter);

@@ -1,36 +1,41 @@
 package ai.wapl.noteapi.service;
 
+import static ai.wapl.noteapi.domain.Chapter.Type;
+import static ai.wapl.noteapi.domain.Chapter.Type.DEFAULT;
+import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
+import static ai.wapl.noteapi.util.Constants.EMPTY_CONTENT;
+import static ai.wapl.noteapi.util.Constants.KOREAN;
+import static ai.wapl.noteapi.util.Constants.NEW_CHAPTER_ENGLISH;
+import static ai.wapl.noteapi.util.Constants.NEW_CHAPTER_KOREAN;
+import static ai.wapl.noteapi.util.Constants.NEW_PAGE_ENGLISH;
+import static ai.wapl.noteapi.util.Constants.NEW_PAGE_KOREAN;
+import static ai.wapl.noteapi.util.NoteUtil.now;
+
+import ai.wapl.noteapi.domain.Chapter;
+import ai.wapl.noteapi.domain.NoteLog;
+import ai.wapl.noteapi.domain.NoteLog.LogAction;
+import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.ChapterDTO;
-import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.repository.LogRepository;
 import ai.wapl.noteapi.util.Color;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-
-import ai.wapl.noteapi.domain.Chapter;
-import ai.wapl.noteapi.domain.Page;
-import ai.wapl.noteapi.repository.ChapterRepository;
 import org.springframework.transaction.annotation.Transactional;
-
-import static ai.wapl.noteapi.domain.Chapter.*;
-import static ai.wapl.noteapi.domain.Chapter.Type.DEFAULT;
-import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
-import static ai.wapl.noteapi.util.Constants.*;
-import static ai.wapl.noteapi.util.NoteUtil.*;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ChapterService {
+
+    public static final String RESOURCE_TYPE = "chapter";
 
     private final ChapterRepository chapterRepository;
     private final LogRepository logRepository;
@@ -43,9 +48,9 @@ public class ChapterService {
 
         Chapter chapter = createChapter(null,
             Chapter.builder().channelId(channelId)
-            .name(language.equals(KOREAN) ? NEW_CHAPTER_KOREAN : NEW_CHAPTER_ENGLISH)
-            .color(Color.getRandomColor()).build(),
-            language);
+                .name(language.equals(KOREAN) ? NEW_CHAPTER_KOREAN : NEW_CHAPTER_ENGLISH)
+                .color(Color.getRandomColor()).build(),
+            language, false);
 
         chapterRepository.save(Chapter.createRecycleBin(channelId));
 
@@ -90,30 +95,29 @@ public class ChapterService {
     }
 
     /**
-     * 챕터 추가 서비스
-     * createdDate, modifiedDate
+     * 챕터 추가 서비스 createdDate, modifiedDate
      */
-    public Chapter createChapter(String userId, Chapter inputChapter, String language) {
+    public Chapter createChapter(String userId, Chapter inputChapter, String language,
+        boolean mobile) {
         Chapter chapter = chapterRepository.save(Chapter.createChapter(userId, inputChapter));
 
         Page page = Page.builder().chapter(chapter)
-                .userId(inputChapter.getUserId())
-                .userName(inputChapter.getUserName())
-                .content(EMPTY_CONTENT)
-                .name(language.equals(KOREAN) ? NEW_PAGE_KOREAN : NEW_PAGE_ENGLISH)
-                .build();
+            .userId(userId)
+            .userName(inputChapter.getUserName())
+            .content(EMPTY_CONTENT)
+            .name(language.equals(KOREAN) ? NEW_PAGE_KOREAN : NEW_PAGE_ENGLISH)
+            .build();
 
-        chapter.addPage(pageService.createPage(page));
-
+        chapter.addPage(pageService.createPage(page, mobile));
         return chapter;
     }
 
     /**
-     * 챕터 삭제 서비스
-     * 하위 페이지는 휴지통으로 이동 되고 챕터는 삭제 된다.
+     * 챕터 삭제 서비스 하위 페이지는 휴지통으로 이동 되고 챕터는 삭제 된다.
      */
-    public void deleteChapter(String channelId, String chapterId) {
-        Chapter chapter = chapterRepository.findById(chapterId).orElseThrow(ResourceNotFoundException::new);
+    public void deleteChapter(String userId, String channelId, String chapterId, boolean mobile) {
+        Chapter chapter = chapterRepository.findById(chapterId)
+            .orElseThrow(ResourceNotFoundException::new);
 
         if (chapter.getType().equals(DEFAULT) || chapter.getType().equals(Type.NOTEBOOK)) {
             chapterRepository.updateRecycleBin(chapterId, channelId, now());
@@ -121,15 +125,15 @@ public class ChapterService {
             fileService.deleteFileByChapterId(channelId, chapterId);
 
         chapterRepository.deleteById(chapterId);
+        createChapterLog(userId, chapter.getId(), LogAction.delete, mobile);
     }
 
     /**
-     * 챕터 수정 서비스
-     * 챕터 이름, 챕터 색상(기획엔 없음)
+     * 챕터 수정 서비스 챕터 이름, 챕터 색상(기획엔 없음)
      */
-    public Chapter updateChapter(Chapter inputDTO) {
+    public Chapter updateChapter(String userId, Chapter inputDTO, boolean mobile) {
         Chapter chapter = chapterRepository.findById(inputDTO.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter."));
+            .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter."));
 
         if (inputDTO.getName() != null) {
             chapter.setName(inputDTO.getName());
@@ -138,6 +142,7 @@ public class ChapterService {
             chapter.setColor(inputDTO.getColor());
             chapter.setModifiedDate(now());
         }
+        createChapterLog(userId, chapter.getId(), LogAction.rename, mobile);
         return chapter;
     }
 
@@ -147,17 +152,23 @@ public class ChapterService {
             .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public Chapter shareChapter(String userId, String chapterId) {
+    public Chapter shareChapter(String userId, String chapterId, boolean mobile) {
         // create share type of chapter
         Chapter originChapter = chapterRepository.findByIdFetchJoin(chapterId)
-                .orElseThrow(ResourceNotFoundException::new);
+            .orElseThrow(ResourceNotFoundException::new);
         Chapter newChapter = Chapter.createChapterForShare(userId, originChapter);
         chapterRepository.save(newChapter);
 
         // get page list of chapter
-        originChapter.getPageList().forEach(page -> pageService.sharePageToChapter(newChapter, page));
-
+        originChapter.getPageList()
+            .forEach(page -> pageService.sharePageToChapter(userId, newChapter, page, mobile));
         return newChapter;
+    }
+
+    private void createChapterLog(String userId, String chapterId, LogAction action,
+        boolean mobile) {
+        NoteLog log = new NoteLog("", userId, chapterId, RESOURCE_TYPE, action, mobile);
+        logRepository.save(log);
     }
 
 }

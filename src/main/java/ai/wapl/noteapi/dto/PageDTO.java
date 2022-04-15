@@ -67,6 +67,6 @@ public class PageDTO {
     }
 
     public enum Action {
-        NON_EDIT, EDIT_START, MOVE, RENAME, EDIT_DONE, THROW, RESTORE,
+        NON_EDIT, EDIT_START, MOVE, RENAME, EDIT_DONE, THROW, RESTORE, EDITING,
     }
 }

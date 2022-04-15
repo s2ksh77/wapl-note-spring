@@ -4,6 +4,8 @@ import ai.wapl.noteapi.util.NoteUtil;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,20 +42,26 @@ public class NoteLog {
   private LocalDateTime timestamp;
 
   @Column(name = "ACTION")
-  private String action;
+  @Enumerated(EnumType.STRING)
+  private LogAction action;
 
   @Column(name = "DEVICE_TYPE")
   private String deviceType;
 
   @Builder
   public NoteLog(String roomId, String userId, String resourceId, String resourceType,
-      String action, String deviceType) {
+      LogAction action, boolean mobile) {
     this.roomId = roomId;
     this.userId = userId;
     this.resourceId = resourceId;
     this.resourceType = resourceType;
     this.action = action;
-    this.deviceType = deviceType;
+    this.deviceType = mobile ? "mobile" : "pc";
     this.timestamp = NoteUtil.now();
   }
+
+  public enum LogAction {
+    create, delete, move, rename, edit_start, edit_done, restore, throw_to_recycle_bin
+  }
+
 }

@@ -64,7 +64,7 @@ public class PageController {
     public ResponseEntity<ResponseDTO<Page>> createPage(@PathVariable String channelId,
         @PathVariable String chapterId,
         @RequestBody PageDTO inputDTO, @RequestHeader("user-agent") String userAgent) {
-        Page result = pageService.createPage(inputDTO);
+        Page result = pageService.createPage(userId, inputDTO, NoteUtil.isMobile(userAgent));
 
         Notifier notifier = new Notifier(userId, channelId, Method.CREATE,
             NoteUtil.isMobile(userAgent));
@@ -78,7 +78,8 @@ public class PageController {
     public ResponseEntity<ResponseDTO<Page>> deletePage(@PathVariable String channelId,
         @PathVariable String chapterId,
         @PathVariable String pageId, @RequestHeader("user-agent") String userAgent) {
-        Page result = pageService.deletePage(channelId, pageId);
+        Page result = pageService
+            .deletePage(userId, channelId, pageId, NoteUtil.isMobile(userAgent));
 
         Notifier notifier = new Notifier(userId, channelId, Method.DELETE,
             NoteUtil.isMobile(userAgent));
@@ -94,10 +95,11 @@ public class PageController {
         @RequestBody PageDTO inputDTO,
         @RequestParam("action") Action action, @RequestParam("isNewPage") boolean isNewPage,
         @RequestHeader("user-agent") String userAgent) {
-        Page result = pageService.updatePage(userId, inputDTO, action);
+        boolean mobile = NoteUtil.isMobile(userAgent);
+        Page result = pageService.updatePage(userId, inputDTO, action, mobile);
 
-        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action),
-            NoteUtil.isMobile(userAgent));
+        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action), mobile);
+
         if (action.equals(Action.EDIT_DONE) && isNewPage)
             notifier.setAlarmCenter(result.getId(), result.getName());
         notifier.publishMQTT(chapterId, result.getId(), result.getName());
@@ -110,9 +112,9 @@ public class PageController {
     public ResponseEntity<ResponseDTO<Page>> updateRecyclePage(@PathVariable String channelId,
         @RequestBody PageDTO inputDTO,
         @RequestParam("action") Action action, @RequestHeader("user-agent") String userAgent) {
-        Page result = pageService.updateRecyclePage(inputDTO, action);
-        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action),
-            NoteUtil.isMobile(userAgent));
+        boolean mobile = NoteUtil.isMobile(userAgent);
+        Page result = pageService.updateRecyclePage(userId, inputDTO, action, mobile);
+        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action), mobile);
         notifier.publishMQTT(result.getChapter().getId(), result.getId(), result.getName());
         return ResponseUtil.success(result);
     }
@@ -127,17 +129,19 @@ public class PageController {
 
     @ApiOperation(value = "페이지 전달 서비스 noteshareCreate", notes = "페이지 전달 서비스")
     @PostMapping("/page/copy")
-    public ResponseEntity<ResponseDTO<Page>> sharePage(@RequestBody PageDTO dto, @RequestHeader("user-agent") String userAgent) {
+    public ResponseEntity<ResponseDTO<Page>> sharePage(@RequestBody PageDTO dto,
+        @RequestHeader("user-agent") String userAgent) {
+        boolean mobile = NoteUtil.isMobile(userAgent);
         Page page = pageService
-            .sharePageToChannel(userId, dto.getChannelId(), dto.getId(), dto.getSharedRoomId());
+            .sharePageToChannel(userId, dto.getChannelId(), dto.getId(), dto.getSharedRoomId(),
+                mobile);
 
         ServiceCaller caller = new ServiceCaller();
         caller.createTalkMeta("", userId, page.getId(), page.getName(), page.getShared(),
             NoteUtil.dateToString(page.getModifiedDate()
             ));
 
-        Notifier notifier = new Notifier(userId, dto.getChannelId(), Method.SHAREPAGE,
-            NoteUtil.isMobile(userAgent));
+        Notifier notifier = new Notifier(userId, dto.getChannelId(), Method.SHAREPAGE, mobile);
         notifier.publishMQTT(page.getChapter().getId(), page.getId(), page.getName());
         return ResponseUtil.success(page);
     }

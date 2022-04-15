@@ -64,7 +64,7 @@ public class PageServiceMockTest {
                 .build();
 
         // when
-        Page result = pageService.createPage(input);
+        Page result = pageService.createPage(input, false);
 
         // then
         verify(pageRepository).save(input);
@@ -83,7 +83,7 @@ public class PageServiceMockTest {
                 .build();
 
         // when
-        pageService.createPage(input);
+        pageService.createPage(input, false);
 
         // then
         verify(pageRepository).save(input);
@@ -142,7 +142,7 @@ public class PageServiceMockTest {
         when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
 
         // when
-        Page updatePage = pageService.updatePage(userId, page, NON_EDIT);
+        Page updatePage = pageService.updatePage(userId, page, NON_EDIT, false);
 
         // then
         assertThat(updatePage.isEditing()).isFalse();
@@ -160,7 +160,7 @@ public class PageServiceMockTest {
         when(pageRepository.findById(pageId)).thenReturn(Optional.of(page.toEntity()));
 
         // when
-        Page updatePage = pageService.updatePage(userId, page, Action.EDIT_START);
+        Page updatePage = pageService.updatePage(userId, page, Action.EDIT_START, false);
 
         // then
         assertThat(updatePage.isEditing()).isTrue();
@@ -185,7 +185,7 @@ public class PageServiceMockTest {
         page.setChapterId(chapterId);
 
         // when
-        Page output = pageService.updatePage(userId, page, Action.MOVE);
+        Page output = pageService.updatePage(userId, page, Action.MOVE, false);
 
         // then
         assertThat(output.getChapter().getId()).isEqualTo(chapterId);
@@ -205,7 +205,7 @@ public class PageServiceMockTest {
         page.setName("rename");
 
         // when
-        Page output = pageService.updatePage(userId, page, Action.RENAME);
+        Page output = pageService.updatePage(userId, page, Action.RENAME, false);
 
         // then
         assertThat(output.getName()).isEqualTo("rename");
@@ -225,7 +225,7 @@ public class PageServiceMockTest {
         page.setContent("updated content");
 
         // when
-        Page output = pageService.updatePage(userId, page, Action.EDIT_DONE);
+        Page output = pageService.updatePage(userId, page, Action.EDIT_DONE, false);
 
         // then
         assertThat(output.isEditing()).isFalse();
@@ -257,7 +257,7 @@ public class PageServiceMockTest {
             Optional.of(chapter));
 
         // when
-        pageService.updateRecyclePage(dto, THROW);
+        pageService.updateRecyclePage(userId, dto, THROW, false);
 
         // then
         assertThat(page.isShared()).isFalse();
@@ -289,7 +289,7 @@ public class PageServiceMockTest {
             Optional.of(chapter));
 
         // when
-        pageService.updateRecyclePage(dto, RESTORE);
+        pageService.updateRecyclePage(userId, dto, RESTORE, false);
 
         // then
         assertThat(page.isShared()).isFalse();
