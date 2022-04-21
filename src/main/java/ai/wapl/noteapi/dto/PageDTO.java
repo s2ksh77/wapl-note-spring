@@ -30,7 +30,7 @@ public class PageDTO {
     private String userName;
     private String editingUserId;
     private boolean favorite;
-    @JsonProperty("NOTE_CONTENT")
+    @JsonProperty("noteContent")
     @Lob
     private String content;
     private String updatedUserId;
@@ -39,7 +39,7 @@ public class PageDTO {
     private String sharedRoomId;
     private String createdUserId;
     private String deletedDate;
-    @JsonProperty("TEXT_CONTENT")
+    @JsonProperty("textContent")
     @Lob
     private String textContent;
     private boolean read;
