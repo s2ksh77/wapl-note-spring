@@ -3,6 +3,8 @@ package ai.wapl.noteapi.dto;
 import java.time.LocalDateTime;
 
 import ai.wapl.noteapi.domain.Chapter;
+import ai.wapl.noteapi.domain.Chapter.Type;
+
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -22,7 +24,7 @@ public class ChapterDTO {
     private String channelId;
     private String name;
     private LocalDateTime modifiedDate;
-    private String type;
+    private Type type;
     private String color;
     private String createdUserId;
     private LocalDateTime sharedDate;

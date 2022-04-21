@@ -47,10 +47,10 @@ public class ChapterService {
         String channelId = UUID.randomUUID().toString();
 
         Chapter chapter = createChapter(null,
-            Chapter.builder().channelId(channelId)
-                .name(language.equals(KOREAN) ? NEW_CHAPTER_KOREAN : NEW_CHAPTER_ENGLISH)
-                .color(Color.getRandomColor()).build(),
-            language, false);
+                Chapter.builder().channelId(channelId)
+                        .name(language.equals(KOREAN) ? NEW_CHAPTER_KOREAN : NEW_CHAPTER_ENGLISH)
+                        .color(Color.getRandomColor()).build(),
+                language, false);
 
         chapterRepository.save(Chapter.createRecycleBin(channelId));
 
@@ -84,7 +84,7 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public ChapterDTO getChapterInfoList(String userId, String chapterId) {
         Chapter chapter = chapterRepository.findByIdFetchJoin(chapterId)
-            .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
         Set<String> readSet = logRepository.getReadListByChapterId(userId, chapterId);
 
         ChapterDTO dto = new ChapterDTO(chapter);
@@ -98,15 +98,15 @@ public class ChapterService {
      * 챕터 추가 서비스 createdDate, modifiedDate
      */
     public Chapter createChapter(String userId, Chapter inputChapter, String language,
-        boolean mobile) {
+            boolean mobile) {
         Chapter chapter = chapterRepository.save(Chapter.createChapter(userId, inputChapter));
 
         Page page = Page.builder().chapter(chapter)
-            .userId(userId)
-            .userName(inputChapter.getUserName())
-            .content(EMPTY_CONTENT)
-            .name(language.equals(KOREAN) ? NEW_PAGE_KOREAN : NEW_PAGE_ENGLISH)
-            .build();
+                .userId(userId)
+                .userName(inputChapter.getUserName())
+                .content(EMPTY_CONTENT)
+                .name(language.equals(KOREAN) ? NEW_PAGE_KOREAN : NEW_PAGE_ENGLISH)
+                .build();
 
         chapter.addPage(pageService.createPage(page, mobile));
         return chapter;
@@ -117,7 +117,7 @@ public class ChapterService {
      */
     public void deleteChapter(String userId, String channelId, String chapterId, boolean mobile) {
         Chapter chapter = chapterRepository.findById(chapterId)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
 
         if (chapter.getType().equals(DEFAULT) || chapter.getType().equals(Type.NOTEBOOK)) {
             chapterRepository.updateRecycleBin(chapterId, channelId, now());
@@ -133,7 +133,7 @@ public class ChapterService {
      */
     public Chapter updateChapter(String userId, Chapter inputDTO, boolean mobile) {
         Chapter chapter = chapterRepository.findById(inputDTO.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter."));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter."));
 
         if (inputDTO.getName() != null) {
             chapter.setName(inputDTO.getName());
@@ -149,24 +149,24 @@ public class ChapterService {
     @Transactional(readOnly = true)
     public Chapter getRecycleBin(String channelId) {
         return chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     public Chapter shareChapter(String userId, String chapterId, boolean mobile) {
         // create share type of chapter
         Chapter originChapter = chapterRepository.findByIdFetchJoin(chapterId)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         Chapter newChapter = Chapter.createChapterForShare(userId, originChapter);
         chapterRepository.save(newChapter);
 
         // get page list of chapter
         originChapter.getPageList()
-            .forEach(page -> pageService.sharePageToChapter(userId, newChapter, page, mobile));
+                .forEach(page -> pageService.sharePageToChapter(userId, newChapter, page, mobile));
         return newChapter;
     }
 
     private void createChapterLog(String userId, String chapterId, LogAction action,
-        boolean mobile) {
+            boolean mobile) {
         NoteLog log = new NoteLog("", userId, chapterId, RESOURCE_TYPE, action, mobile);
         logRepository.save(log);
     }

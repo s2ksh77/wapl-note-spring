@@ -4,6 +4,8 @@ import javax.persistence.Lob;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
+import ai.wapl.noteapi.domain.Chapter.Type;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
@@ -32,7 +34,7 @@ public class PageDTO {
     @Lob
     private String content;
     private String updatedUserId;
-    private String type;
+    private boolean shared;
     private String sharedUserId;
     private String sharedRoomId;
     private String createdUserId;
@@ -46,7 +48,8 @@ public class PageDTO {
 
     public PageDTO(Page source) {
         BeanUtils.copyProperties(source, this);
-        if (source.getChapter() != null) this.chapterId = source.getChapter().getId();
+        if (source.getChapter() != null)
+            this.chapterId = source.getChapter().getId();
     }
 
     public PageDTO(Page source, Set<Tag> tagSet) {

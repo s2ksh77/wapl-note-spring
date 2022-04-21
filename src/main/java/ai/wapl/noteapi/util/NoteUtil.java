@@ -37,7 +37,7 @@ public class NoteUtil {
         return colorArray[idx];
     }
 
-    public static boolean isMobile(String userAgent){
+    public static boolean isMobile(String userAgent) {
         String[] mobile = {
                 "okhttp",
                 "iPhone",
@@ -57,7 +57,7 @@ public class NoteUtil {
     }
 
     public static boolean isImage(String FileExtension) {
-        String[] ImageExt = {"jpg", "gif", "jpeg", "jfif", "tiff", "bmp", "bpg", "png"};
+        String[] ImageExt = { "jpg", "gif", "jpeg", "jfif", "tiff", "bmp", "bpg", "png" };
         return Arrays.asList(ImageExt).contains(FileExtension.toLowerCase());
     }
 

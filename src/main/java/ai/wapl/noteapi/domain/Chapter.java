@@ -86,7 +86,7 @@ public class Chapter {
 
     @Builder
     public Chapter(String id, String channelId, String name, Type type, String color,
-        String createdUserId) {
+            String createdUserId) {
         this.id = id;
         this.channelId = channelId;
         this.name = name;
@@ -97,17 +97,17 @@ public class Chapter {
 
     public static Chapter createChapter(String userId, Chapter input) {
         Chapter chapter = Chapter.builder().channelId(input.getChannelId())
-            .color(input.getColor()).name(input.getName())
-            .createdUserId(userId)
-            .type(NOTEBOOK).build();
+                .color(input.getColor()).name(input.getName())
+                .createdUserId(userId)
+                .type(NOTEBOOK).build();
         chapter.modifiedDate = NoteUtil.now();
         return chapter;
     }
 
     public static Chapter createRecycleBin(String channelId) {
         Chapter chapter = Chapter.builder().channelId(channelId)
-            .name(Constants.RECYCLE_BIN_NAME)
-            .type(RECYCLE_BIN).build();
+                .name(Constants.RECYCLE_BIN_NAME)
+                .type(RECYCLE_BIN).build();
         chapter.modifiedDate = NoteUtil.now();
         chapter.modifiedDate = NoteUtil.now();
         return chapter;
@@ -115,8 +115,8 @@ public class Chapter {
 
     public static Chapter createChapterForShare(String userId, Chapter input) {
         Chapter chapter = Chapter.builder().channelId(input.getChannelId())
-            .color(input.getColor()).name(input.getName())
-            .type(SHARED).build();
+                .color(input.getColor()).name(input.getName())
+                .type(SHARED).build();
 
         chapter.modifiedDate = NoteUtil.now();
         chapter.sharedDate = NoteUtil.now();
@@ -126,7 +126,7 @@ public class Chapter {
 
     public static Chapter createShareChapter(String userId, String channelId) {
         Chapter chapter = Chapter.builder().channelId(channelId).name("전달받은 페이지")
-            .type(SHARED_PAGE).build();
+                .type(SHARED_PAGE).build();
         chapter.modifiedDate = NoteUtil.now();
         chapter.sharedDate = NoteUtil.now();
         chapter.sharedUserId = userId;
@@ -139,8 +139,10 @@ public class Chapter {
 
     public enum Type {
         NOTEBOOK("notebook"), RECYCLE_BIN("recycle_bin"), SHARED("shared"), SHARED_PAGE(
-            "shared_page"), ALL_NOTE("allNote"), DEFAULT(
-            "default");
+                "shared_page"),
+        ALL_NOTE("allNote"), DEFAULT(
+                "default");
+
         String value;
 
         Type(String value) {
@@ -149,7 +151,7 @@ public class Chapter {
 
         public static Type find(String value) {
             return Arrays.stream(Type.values()).filter(type -> type.value.equals(value)).findFirst()
-                .orElse(null);
+                    .orElse(null);
         }
 
         public String getValue() {
@@ -171,5 +173,4 @@ public class Chapter {
         }
 
     }
-
 }
