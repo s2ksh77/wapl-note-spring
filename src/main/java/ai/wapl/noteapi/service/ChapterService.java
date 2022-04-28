@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ai.wapl.noteapi.util.exception.GlobalExceptionHandler;
 
 @Service
 @Transactional
@@ -66,13 +67,19 @@ public class ChapterService {
      * 챕터 전체 조회 서비스
      */
     @Transactional(readOnly = true)
-    public List<ChapterDTO> getChapterList(String userId, String channelId) {
+    public List<ChapterDTO> getChapterList(String userId, String channelId, boolean mobile) {
         List<ChapterDTO> chapterDTOS = new ArrayList<>();
         List<Chapter> chapters = chapterRepository.findByChannelId(channelId);
+        if (chapters.size() == 0)
+            return (List<ChapterDTO>) new GlobalExceptionHandler().handleNotFound(null);
         Set<String> readSet = logRepository.getReadListByChannelId(userId, channelId);
+
         chapters.forEach(chapter -> {
             ChapterDTO dto = new ChapterDTO(chapter);
-            dto.setRead(readSet.contains(dto.getId()));
+            // 웹에서만 즐찾 필요
+            if (mobile)
+                dto.setPageList(chapterRepository.findByChapterIdWithBookmark(dto.getId(), userId));
+            dto.setRead(readSet.contains(chapter.getId()));
             chapterDTOS.add(dto);
         });
         return chapterDTOS;
@@ -82,16 +89,19 @@ public class ChapterService {
      * 챕터 하위 페이지 조회 서비스
      */
     @Transactional(readOnly = true)
-    public ChapterDTO getChapterInfoList(String userId, String chapterId) {
-        Chapter chapter = chapterRepository.findByIdFetchJoin(chapterId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
+    public ChapterDTO getChapterInfoList(String userId, String chapterId, String channelId) {
+        ChapterDTO chapter = chapterRepository.findByIdFetchJoin(chapterId, userId, channelId);
+        // .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
         Set<String> readSet = logRepository.getReadListByChapterId(userId, chapterId);
 
-        ChapterDTO dto = new ChapterDTO(chapter);
-        dto.setRead(readSet.contains(dto.getId()));
-        dto.getPageList().forEach(pageDTO -> pageDTO.setRead(readSet.contains(pageDTO.getId())));
+        // ChapterDTO dto = new ChapterDTO(chapter);
+        chapter.setRead(readSet.contains(chapter.getId()));
+        chapter.getPageList().forEach(pageDTO -> {
+            pageDTO.setFavorite(pageService.isBookMark(pageDTO.getId(), userId));
+            pageDTO.setRead(readSet.contains(pageDTO.getId()));
+        });
 
-        return dto;
+        return chapter;
     }
 
     /**
@@ -154,14 +164,14 @@ public class ChapterService {
 
     public Chapter shareChapter(String userId, String chapterId, boolean mobile) {
         // create share type of chapter
-        Chapter originChapter = chapterRepository.findByIdFetchJoin(chapterId)
-                .orElseThrow(ResourceNotFoundException::new);
+        Chapter originChapter = chapterRepository.findByIdJoin(chapterId).orElseThrow(ResourceNotFoundException::new);
         Chapter newChapter = Chapter.createChapterForShare(userId, originChapter);
         chapterRepository.save(newChapter);
 
-        // get page list of chapter
+        // // get page list of chapter
         originChapter.getPageList()
                 .forEach(page -> pageService.sharePageToChapter(userId, newChapter, page, mobile));
+
         return newChapter;
     }
 

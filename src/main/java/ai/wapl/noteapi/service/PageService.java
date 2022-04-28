@@ -56,7 +56,7 @@ public class PageService {
      */
     public Page createPage(String userId, PageDTO inputPage, boolean mobile) {
         Chapter chapter = chapterRepository.findById(inputPage.getChapterId())
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         Page page = pageRepository.save(Page.createPage(chapter, inputPage.toEntity()));
 
         createPageLog(userId, page.getId(), LogAction.create, mobile);
@@ -80,9 +80,9 @@ public class PageService {
 
     public Page updatePage(String userId, PageDTO input, Action action, boolean mobile) {
         Page page = pageRepository.findById(input.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
         if (!action.equals(Action.EDIT_DONE) && (page.isEditing() && !userId
-            .equals(page.getEditingUserId()))) {
+                .equals(page.getEditingUserId()))) {
             throw new IllegalStateException("Can not access this page!");
         }
 
@@ -97,7 +97,7 @@ public class PageService {
                 return page;
             case MOVE:
                 page.setChapter(chapterRepository.findById(input.getChapterId())
-                    .orElseThrow(ResourceNotFoundException::new));
+                        .orElseThrow(ResourceNotFoundException::new));
                 page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
                 page.setModifiedDate(NoteUtil.now());
                 page.setUpdatedUserId(userId);
@@ -135,7 +135,7 @@ public class PageService {
     public Page updateRecyclePage(String userId, PageDTO page, Action action, boolean mobile) {
         String channelId = page.getChannelId();
         Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)
-            .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         Page pageInfo = pageRepository.getById(page.getId());
         switch (action) {
             case THROW:
@@ -147,9 +147,8 @@ public class PageService {
                 return pageInfo;
             case RESTORE:
                 pageInfo.setChapter(
-                    chapterRepository.findById(page.getChapterId())
-                        .orElseThrow(ResourceNotFoundException::new)
-                );
+                        chapterRepository.findById(page.getChapterId())
+                                .orElseThrow(ResourceNotFoundException::new));
                 pageInfo.setShared(false);
                 pageInfo.setRestoreChapterId(null);
                 pageInfo.setDeletedDate(null);
@@ -175,8 +174,10 @@ public class PageService {
     public SearchDTO search(String channelId, String text) {
         SearchDTO output = new SearchDTO();
 
-        if(text.equals("%")) text = "@%%";
-        else if(text.equals("_")) text = "@__";
+        if (text.equals("%"))
+            text = "@%%";
+        else if (text.equals("_"))
+            text = "@__";
         output.setChapterList(pageRepository.searchChapter(channelId, text));
         output.setPageList(pageRepository.searchPage(channelId, text));
         output.setTagList(pageRepository.searchTag(channelId, text));
@@ -216,9 +217,13 @@ public class PageService {
         return bookmarkRepository.save(new Bookmark(userId, pageId));
     }
 
-    public List<Page> getBookmark(String userId, String channelId) {
+    public List<PageDTO> getBookmark(String userId, String channelId) {
         return channelId == null ? pageRepository.findBookmarkedPageByUser(userId)
-            : pageRepository.findBookmarkedPageByChannel(userId, channelId);
+                : pageRepository.findBookmarkedPageByChannel(userId, channelId);
+    }
+
+    public boolean isBookMark(String pageId, String userId) {
+        return pageRepository.isBookMark(pageId, userId);
     }
 
     public Bookmark deleteBookmark(String userId, String pageId) {
@@ -227,14 +232,14 @@ public class PageService {
         return bookmark;
     }
 
-    public Page sharePageToChannel(String userId, String channelId, String pageId, String sharedRoomId, boolean mobile) {
+    public Page sharePageToChannel(String userId, String channelId, String pageId, String sharedRoomId,
+            boolean mobile) {
         Chapter sharedChapter = chapterRepository.findByChannelIdAndType(channelId, SHARED_PAGE)
-            .orElseGet(() -> chapterRepository.save(Chapter.createShareChapter(userId, channelId)));
+                .orElseGet(() -> chapterRepository.save(Chapter.createShareChapter(userId, channelId)));
 
         Page sharedPage = pageRepository.save(
-            Page.createSharedPage(userId, sharedChapter,
-                pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new),sharedRoomId)
-        );
+                Page.createSharedPage(userId, sharedChapter,
+                        pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new), sharedRoomId));
 
         fileService.copyFileListByPageId(channelId, pageId, sharedPage.getId());
 

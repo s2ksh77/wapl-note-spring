@@ -20,7 +20,7 @@ import org.springframework.beans.BeanUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChapterDTO {
-    private String id;
+    public String id;
     private String channelId;
     private String name;
     private LocalDateTime modifiedDate;

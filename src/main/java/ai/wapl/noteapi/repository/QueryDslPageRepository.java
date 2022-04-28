@@ -13,6 +13,8 @@ public interface QueryDslPageRepository {
 
     PageDTO findById(String userId, String pageId);
 
+    boolean isBookMark(String pageId, String userId);
+
     List<PageDTO> findByChannelIdOrderByModifiedDate(String userId, String channelId, int count);
 
     List<PageDTO> findAllPageByChannelId(String userId, String channelId);
@@ -31,9 +33,10 @@ public interface QueryDslPageRepository {
 
     long updatePageToNonEdit(LocalDateTime targetDateTime);
 
-    List<Page> findBookmarkedPageByChannel(String userId, String channelId);
+    List<PageDTO> findBookmarkedPageByChannel(String userId, String channelId);
 
-    List<Page> findBookmarkedPageByUser(String userId);
+    List<PageDTO> findBookmarkedPageByUser(String userId);
 
     long deleteAllByChannelId(String channelId);
+
 }

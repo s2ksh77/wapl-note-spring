@@ -9,7 +9,6 @@ import static ai.wapl.noteapi.domain.QPage.page;
 import static ai.wapl.noteapi.domain.QTag.tag;
 
 import ai.wapl.noteapi.domain.File;
-import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.QChapter;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
@@ -21,6 +20,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.EntityManager;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -38,18 +38,25 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
   public PageDTO findById(String userId, String pageId) {
     JPQLQuery<String> bookmarkJPQLQuery = JPAExpressions.select(bookmark.pageId).from(bookmark)
         .where(bookmark.pageId.eq(pageId).and(bookmark.userId.eq(userId)));
+    System.out.println(bookmarkJPQLQuery);
 
     return queryFactory.select(Projections.constructor(PageDTO.class, page, bookmarkJPQLQuery))
         .from(page).where(page.id.eq(pageId)).fetchOne();
   }
 
   @Override
+  public boolean isBookMark(String pageId, String userId) {
+    String result = queryFactory.select(bookmark.pageId).from(bookmark)
+        .where(bookmark.pageId.eq(pageId).and(bookmark.userId.eq(userId))).fetchOne();
+    return result == null ? false : true;
+  }
+
+  @Override
   public List<PageDTO> findByChannelIdOrderByModifiedDate(String userId, String channelId,
       int count) {
-    return queryFactory.select(Projections.constructor(PageDTO.class, page
-        , JPAExpressions.select(bookmark.pageId).from(bookmark)
-            .where(bookmark.pageId.eq(page.id).and(bookmark.userId.eq(userId)))
-    ))
+    return queryFactory
+        .select(Projections.constructor(PageDTO.class, page, JPAExpressions.select(bookmark.pageId).from(bookmark)
+            .where(bookmark.pageId.eq(page.id).and(bookmark.userId.eq(userId)))))
         .from(page).join(chapter).on(chapter.eq(page.chapter))
         .where(chapter.channelId.eq(channelId))
         .orderBy(page.modifiedDate.desc())
@@ -73,8 +80,8 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     return queryFactory.update(page.chapter).where(page.chapter.id.eq(chapterId))
         .set(page.chapter,
             queryFactory.selectFrom(r)
-                .where(r.channelId.eq(channelId).and(r.type.eq(Type.RECYCLE_BIN)))
-        ).execute();
+                .where(r.channelId.eq(channelId).and(r.type.eq(Type.RECYCLE_BIN))))
+        .execute();
   }
 
   @Override
@@ -83,8 +90,8 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     return queryFactory.select(Projections.constructor(ChapterDTO.class, chapter)).from(chapter)
         .where(chapter.channelId.eq(channelId)
             .and(chapter.name.lower().like(lowerText, '@'))
-            .and(chapter.type.ne(ALL_NOTE))
-        ).fetch();
+            .and(chapter.type.ne(ALL_NOTE)))
+        .fetch();
   }
 
   @Override
@@ -94,9 +101,8 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
         .join(chapter).on(page.chapter.id.eq(chapter.id))
         .where(chapter.channelId.eq(channelId).and(
             page.name.lower().like(lowerText, '@')
-                .or(page.textContent.lower().like(lowerText, '@'))
-            )
-        ).fetch();
+                .or(page.textContent.lower().like(lowerText, '@'))))
+        .fetch();
   }
 
   @Override
@@ -108,22 +114,19 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
         Projections.fields(TagDTO.class,
             tag.id.as("id"),
             tag.name.as("name"),
-            page.id.as("pageId")
-        )
-    )
+            page.id.as("pageId")))
         .from(page)
         .join(tag).on(page.tagSet.any().id.eq(tag.id))
         .where(page.id.in(subQuery)
-            .and(tag.name.lower().like(lowerText, '@'))
-        )
+            .and(tag.name.lower().like(lowerText, '@')))
         .fetch();
   }
 
   @Override
   public List<File> getFileInRecycleBin(LocalDateTime targetDate) {
     return queryFactory.select(Projections.fields(File.class,
-        page.id.as("pageId"), file.fileId.as("fileId"), chapter.channelId.as("channelId")
-    )).from(page).join(chapter).on(chapter.id.eq(page.chapter.id))
+        page.id.as("pageId"), file.fileId.as("fileId"), chapter.channelId.as("channelId"))).from(page).join(chapter)
+        .on(chapter.id.eq(page.chapter.id))
         .join(file).on(file.pageId.eq(page.id))
         .where(page.deletedDate.before(targetDate))
         .fetch();
@@ -143,17 +146,17 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
   }
 
   @Override
-  public List<Page> findBookmarkedPageByChannel(String userId, String channelId) {
-   return queryFactory.selectFrom(page)
+  public List<PageDTO> findBookmarkedPageByChannel(String userId, String channelId) {
+    return queryFactory.select(Projections.constructor(PageDTO.class, page)).from(page)
         .join(bookmark).on(bookmark.pageId.eq(page.id))
         .join(chapter).on(chapter.id.eq(page.chapter.id))
         .where(chapter.channelId.eq(channelId).and(bookmark.userId.eq(userId)))
-       .fetch();
+        .fetch();
   }
 
   @Override
-  public List<Page> findBookmarkedPageByUser(String userId) {
-    return queryFactory.selectFrom(page)
+  public List<PageDTO> findBookmarkedPageByUser(String userId) {
+    return queryFactory.select(Projections.constructor(PageDTO.class, page)).from(page)
         .join(bookmark).on(bookmark.pageId.eq(page.id))
         .where(bookmark.userId.eq(userId)).fetch();
   }
@@ -171,6 +174,18 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
         .join(tag).on(page.tagSet.any().id.eq(tag.id))
         .join(chapter).on(chapter.id.eq(page.chapter.id))
         .where(chapter.channelId.eq(channelId));
+  }
+
+  @Override
+  public List<PageDTO> findByChapterIdWithBookmark(String chapterId, String userId) {
+    JPQLQuery<String> bookmarkJPQLQuery = JPAExpressions.select(bookmark.pageId).from(bookmark)
+        .where(bookmark.pageId.eq(page.id).and(bookmark.userId.eq(userId)));
+
+    return queryFactory.select(Projections.constructor(PageDTO.class, page, bookmarkJPQLQuery))
+        .from(page)
+        .join(chapter).on(chapter.id.eq(page.chapter.id))
+        .where(chapter.id.eq(chapterId))
+        .fetch();
   }
 
 }

@@ -4,6 +4,7 @@ import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 
 import ai.wapl.noteapi.domain.Bookmark;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.service.PageService;
 import ai.wapl.noteapi.util.ResponseUtil;
 import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
@@ -34,13 +35,17 @@ public class BookmarkController {
 
   @ApiOperation(value = "룸 별 즐겨찾기 조회 서비스 bookmarkList", notes = "룸 별 즐겨찾기 조회 서비스")
   @GetMapping(path = "/app/{channelId}/bookmark")
-  public ResponseEntity<ResponseDTO<List<Page>>> getBookmarkInChannel(@PathVariable String channelId) {
-    return ResponseUtil.success(pageService.getBookmark(userId, channelId));
+  public ResponseEntity<ResponseDTO<List<PageDTO>>> getBookmarkInChannel(@PathVariable String channelId) {
+    List<PageDTO> pages = pageService.getBookmark(userId, channelId);
+
+    pages.forEach(page -> page.setFavorite(true));
+
+    return ResponseUtil.success(pages);
   }
 
   @ApiOperation(value = "유저 별 즐겨찾기 조회 서비스 bookmarkList", notes = "유저 별 즐겨찾기 조회 서비스")
   @GetMapping(path = "/bookmark")
-  public ResponseEntity<ResponseDTO<List<Page>>> getBookmark() {
+  public ResponseEntity<ResponseDTO<List<PageDTO>>> getBookmark() {
     return ResponseUtil.success(pageService.getBookmark(userId, null));
   }
 

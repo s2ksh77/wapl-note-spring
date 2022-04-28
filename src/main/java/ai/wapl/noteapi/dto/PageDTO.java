@@ -30,7 +30,6 @@ public class PageDTO {
     private String userName;
     private String editingUserId;
     private boolean favorite;
-    @JsonProperty("noteContent")
     @Lob
     private String content;
     private String updatedUserId;
