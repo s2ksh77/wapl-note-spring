@@ -20,28 +20,32 @@ import ai.wapl.noteapi.domain.Chapter;
 @Repository
 public interface ChapterRepository extends JpaRepository<Chapter, String>, QueryDslChapterRepository {
 
-    List<Chapter> findByChannelId(String channelId);
+        List<Chapter> findByChannelId(String channelId);
 
-    Optional<Chapter> findByChannelIdAndType(String channelId, Type type);
+        Optional<Chapter> findByChannelIdAndType(String channelId, Type type);
 
-    @Query("select c from Chapter c join fetch c.pageList where c.id = :id")
-    Optional<Chapter> findByIdJoin(@Param("id") String id);
+        @Query("select c from Chapter c join fetch c.pageList where c.id = :id")
+        Optional<Chapter> findByIdJoin(@Param("id") String id);
 
-    ChapterDTO findByIdFetchJoin(@Param("id") String id, String userId, String pageId);
+        ChapterDTO findByIdFetchJoin(@Param("id") String id, String userId);
 
-    @Modifying
-    @Query("update Page p\n"
-            + "set p.chapter = (select c from Chapter c \n"
-            + "        where c.type = RECYCLE_BIN"
-            + " and c.channelId = :channelId),\n"
-            + "p.deletedDate = :deletedAt \n"
-            + "where p.chapter.id = :chapterId")
-    int updateRecycleBin(@Param("chapterId") String chapterId,
-            @Param("channelId") String channelId,
-            @Param("deletedAt") LocalDateTime deletedAt);
+        @Modifying
+        @Query("update Page p\n"
+                        + "set p.chapter = (select c from Chapter c \n"
+                        + "        where c.type = RECYCLE_BIN"
+                        + " and c.channelId = :channelId),\n"
+                        + "p.deletedDate = :deletedAt \n"
+                        + "where p.chapter.id = :chapterId")
+        int updateRecycleBin(@Param("chapterId") String chapterId,
+                        @Param("channelId") String channelId,
+                        @Param("deletedAt") LocalDateTime deletedAt);
 
-    @Modifying
-    @Query("delete from Chapter c where c.channelId = :channelId")
-    int deleteAllByChannelId(@Param("channelId") String channelId);
+        @Modifying
+        @Query("delete from Chapter c where c.channelId = :channelId")
+        int deleteAllByChannelId(@Param("channelId") String channelId);
+
+        @Query(value = "select ws_id from tb_map_ws_ch \n"
+                        + "where CH_ID = :channelId", nativeQuery = true)
+        String findByRoomIdFromChannelId(@Param("channelId") String channelId);
 
 }

@@ -7,7 +7,7 @@ import ai.wapl.noteapi.dto.PageDTO;
 
 public interface QueryDslChapterRepository {
 
-    ChapterDTO findByIdFetchJoin(String id, String userId, String pageId);
+    ChapterDTO findByIdFetchJoin(String id, String userId);
 
     List<PageDTO> findByChapterIdWithBookmark(String chapterId, String userId);
 

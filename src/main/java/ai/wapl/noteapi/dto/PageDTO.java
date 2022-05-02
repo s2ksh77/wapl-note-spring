@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.beans.BeanUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,8 +26,8 @@ public class PageDTO {
     private String channelId;
     private String restoreChapterId;
     private String name;
-    private String createdDate;
-    private String modifiedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
     private String userName;
     private String editingUserId;
     private boolean favorite;
@@ -37,7 +38,7 @@ public class PageDTO {
     private String sharedUserId;
     private String sharedRoomId;
     private String createdUserId;
-    private String deletedDate;
+    private LocalDateTime deletedDate;
     @JsonProperty("textContent")
     @Lob
     private String textContent;

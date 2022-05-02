@@ -1,30 +1,20 @@
 package ai.wapl.noteapi.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import static ai.wapl.noteapi.domain.Chapter.Type;
-import static ai.wapl.noteapi.domain.Chapter.Type.ALL_NOTE;
 import static ai.wapl.noteapi.domain.QBookmark.bookmark;
 import static ai.wapl.noteapi.domain.QChapter.chapter;
-import static ai.wapl.noteapi.domain.QFile.file;
 import static ai.wapl.noteapi.domain.QPage.page;
-import static ai.wapl.noteapi.domain.QTag.tag;
 
 import java.util.List;
 
-import ai.wapl.noteapi.domain.Chapter;
-import ai.wapl.noteapi.domain.File;
-import ai.wapl.noteapi.domain.QChapter;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
-import ai.wapl.noteapi.dto.TagDTO;
 
 import javax.persistence.EntityManager;
 
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.JPQLQueryFactory;
 
 import org.springframework.stereotype.Repository;
 
@@ -39,7 +29,7 @@ public class QueryDslChapterRepositoryImpl implements QueryDslChapterRepository 
     }
 
     @Override
-    public ChapterDTO findByIdFetchJoin(String id, String userId, String pageId) {
+    public ChapterDTO findByIdFetchJoin(String id, String userId) {
         ChapterDTO result = queryFactory.select(Projections.constructor(ChapterDTO.class, chapter))
                 .from(chapter)
                 .where(chapter.id.eq(id))
@@ -60,4 +50,5 @@ public class QueryDslChapterRepositoryImpl implements QueryDslChapterRepository 
                 .where(chapter.id.eq(chapterId))
                 .fetch();
     }
+
 }

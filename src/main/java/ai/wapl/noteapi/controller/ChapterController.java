@@ -75,6 +75,7 @@ public class ChapterController {
             @RequestBody Chapter inputDTO, @RequestParam String language,
             @RequestHeader("user-agent") String userAgent) {
 
+        inputDTO.setChannelId(channelId);
         boolean mobile = NoteUtil.isMobile(userAgent);
         Chapter result = chapterService.createChapter(userId, inputDTO, language, mobile);
 

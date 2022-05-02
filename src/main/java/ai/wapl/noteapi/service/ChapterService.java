@@ -90,7 +90,7 @@ public class ChapterService {
      */
     @Transactional(readOnly = true)
     public ChapterDTO getChapterInfoList(String userId, String chapterId, String channelId) {
-        ChapterDTO chapter = chapterRepository.findByIdFetchJoin(chapterId, userId, channelId);
+        ChapterDTO chapter = chapterRepository.findByIdFetchJoin(chapterId, userId);
         // .orElseThrow(() -> new ResourceNotFoundException("Not found Chapter"));
         Set<String> readSet = logRepository.getReadListByChapterId(userId, chapterId);
 
