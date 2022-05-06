@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
 import ai.wapl.noteapi.dto.TagDTO;
+import ai.wapl.noteapi.dto.TagDTOInterface;
 import ai.wapl.noteapi.repository.TagRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +21,9 @@ public class TagService {
     private final PageRepository pageRepository;
 
     @Transactional(readOnly = true)
-    public Map<String, Map<String, List<Tag>>> getAllTagList(String channelId) {
-        Set<Tag> tagList = tagRepository.findByChannelId(channelId);
-        Map<String, Map<String, List<Tag>>> tagMap = new LinkedHashMap<>() {
+    public Map<String, Map<String, List<TagDTOInterface>>> getAllTagList(String channelId) {
+        List<TagDTOInterface> tagList = tagRepository.findByChannelIdForCount(channelId);
+        Map<String, Map<String, List<TagDTOInterface>>> tagMap = new LinkedHashMap<>() {
             {
                 put("KOR", null);
                 put("ENG", null);
@@ -34,9 +35,9 @@ public class TagService {
         tagList.forEach(tag -> {
             String key = getInitialSound(tag.getName());
             String localize = getLocalization(key);
-            Map<String, List<Tag>> sortMap = tagMap.computeIfAbsent(localize, k -> new HashMap<>());
+            Map<String, List<TagDTOInterface>> sortMap = tagMap.computeIfAbsent(localize, k -> new HashMap<>());
 
-            List<Tag> sortList = sortMap.computeIfAbsent(key, k -> new ArrayList<>());
+            List<TagDTOInterface> sortList = sortMap.computeIfAbsent(key, k -> new ArrayList<>());
             sortList.add(tag);
 
             Object[] mapkey = sortMap.keySet().toArray();

@@ -253,7 +253,7 @@ public class PageService {
 
     private void createPageLog(String userId, String pageId, LogAction action, boolean mobile) {
         NoteLog log = new NoteLog("", userId, pageId, RESOURCE_TYPE, action, mobile);
-        logRepository.save(log);
+        // logRepository.save(log);
     }
 
     private String getNotNull(String name, String name2) {

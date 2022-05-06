@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import ai.wapl.noteapi.domain.Tag;
 import ai.wapl.noteapi.dto.TagDTO;
+import ai.wapl.noteapi.dto.TagDTOInterface;
 import ai.wapl.noteapi.service.TagService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,9 @@ public class TagController {
      */
     @ApiOperation(value = "태그 전체 조회 정렬 서비스. tagSortList ", notes = "[KOR : [tagList], ENG : [tagList], NUM : [tagList], ETC : [tagList] 데이터 반환")
     @GetMapping(path = "/app/{channelId}/tag")
-    public ResponseEntity<ResponseDTO<Map<String, Map<String, List<Tag>>>>> getAllTagList(
+    public ResponseEntity<ResponseDTO<Map<String, Map<String, List<TagDTOInterface>>>>> getAllTagList(
             @PathVariable("channelId") String channelId) {
-        Map<String, Map<String, List<Tag>>> result = tagService.getAllTagList(channelId);
+        Map<String, Map<String, List<TagDTOInterface>>> result = tagService.getAllTagList(channelId);
 
         return ResponseUtil.success(result);
     }
