@@ -14,7 +14,7 @@ import ai.wapl.noteapi.dto.SearchDTOinterface;
 @Repository
 public interface PageRepository extends JpaRepository<Page, String>, QueryDslPageRepository {
 
-        @Query(value = "SELECT DISTINCT N.note_id as id, B.id as chapterId, B.text as chapterName, B.TYPE as Type, B.color \n"
+        @Query(value = "SELECT DISTINCT N.note_id as id, N.note_title as name, B.id as chapterId, B.text as chapterName, B.TYPE as Type, B.color \n"
                         + "from TB_NOTEAPP_TAG as T \n"
                         + "LEFT JOIN TB_NOTEAPP_TAG_MST as M \n"
                         + "on t.tag_id = m.tag_id \n"

@@ -6,9 +6,11 @@ public interface SearchDTOinterface {
 
     String getName();
 
+    String getContent();
+
     String getChapterId();
 
-    String getChpaterName();
+    String getChapterName();
 
     String getType();
 
