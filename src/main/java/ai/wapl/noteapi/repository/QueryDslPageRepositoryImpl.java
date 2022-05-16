@@ -106,18 +106,16 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
   }
 
   @Override
-  public List<TagDTO> searchTag(String channelId, String text) {
+  public List<TagDTO> searchTag(String channelId, String text, String pageId) {
     String lowerText = "%" + text.toLowerCase() + "%";
-    JPQLQuery<String> subQuery = getPageIdWithTag(channelId);
 
     return queryFactory.select(
         Projections.fields(TagDTO.class,
             tag.id.as("id"),
-            tag.name.as("name"),
-            page.id.as("pageId")))
+            tag.name.as("name")))
         .from(page)
         .join(tag).on(page.tagSet.any().id.eq(tag.id))
-        .where(page.id.in(subQuery)
+        .where(page.id.eq(pageId)
             .and(tag.name.lower().like(lowerText, '@')))
         .fetch();
   }

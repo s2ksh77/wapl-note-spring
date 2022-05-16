@@ -4,7 +4,6 @@ import javax.persistence.Lob;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
-import ai.wapl.noteapi.domain.Chapter.Type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -45,6 +44,9 @@ public class PageDTO {
     private boolean read;
     private List<FileDTO> fileList;
     private List<Tag> tagList;
+
+    private String chapterColor;
+    private String chapterType;
 
     public PageDTO(Page source) {
         BeanUtils.copyProperties(source, this);

@@ -1,7 +1,6 @@
 package ai.wapl.noteapi.repository;
 
 import ai.wapl.noteapi.domain.File;
-import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.dto.ChapterDTO;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.dto.TagDTO;
@@ -25,7 +24,7 @@ public interface QueryDslPageRepository {
 
     List<PageDTO> searchPage(String channelId, String text);
 
-    List<TagDTO> searchTag(String channelId, String text);
+    List<TagDTO> searchTag(String channelId, String text, String pageId);
 
     List<File> getFileInRecycleBin(LocalDateTime targetDateTime);
 

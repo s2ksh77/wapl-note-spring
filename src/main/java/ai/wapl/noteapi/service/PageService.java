@@ -5,6 +5,8 @@ import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.domain.NoteLog;
 import ai.wapl.noteapi.domain.NoteLog.LogAction;
 import ai.wapl.noteapi.dto.SearchDTO;
+import ai.wapl.noteapi.dto.SearchDTOinterface;
+import ai.wapl.noteapi.dto.TagDTO;
 import ai.wapl.noteapi.repository.BookmarkRepository;
 import ai.wapl.noteapi.repository.LogRepository;
 import java.util.Set;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Chapter;
 import ai.wapl.noteapi.domain.Page;
+import ai.wapl.noteapi.domain.Tag;
 import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.repository.ChapterRepository;
 import ai.wapl.noteapi.repository.PageRepository;
@@ -21,6 +24,7 @@ import ai.wapl.noteapi.util.NoteUtil;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static ai.wapl.noteapi.domain.Chapter.Type.RECYCLE_BIN;
@@ -36,6 +40,7 @@ public class PageService {
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
     private final FileService fileService;
+    private final TagService tagService;
     private final BookmarkRepository bookmarkRepository;
     private final LogRepository logRepository;
 
@@ -46,6 +51,7 @@ public class PageService {
     @Transactional(readOnly = true)
     public PageDTO getPageInfo(String userId, String pageId) {
         PageDTO result = pageRepository.findById(userId, pageId);
+        result.setTagList(new ArrayList<>(tagService.getTagList(pageId)));
         result.setFileList(fileService.getFileListByPageId(pageId));
 
         return result;
@@ -81,6 +87,7 @@ public class PageService {
     public Page updatePage(String userId, PageDTO input, Action action, boolean mobile) {
         Page page = pageRepository.findById(input.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Not found Page."));
+
         if (!action.equals(Action.EDIT_DONE) && (page.isEditing() && !userId
                 .equals(page.getEditingUserId()))) {
             throw new IllegalStateException("Can not access this page!");
@@ -141,13 +148,13 @@ public class PageService {
             case THROW:
                 pageInfo.setChapter(recycleBin);
                 pageInfo.setShared(false);
-                pageInfo.setRestoreChapterId(page.getRestoreChapterId());
+                pageInfo.setRestoreChapterId(page.getChapterId());
                 pageInfo.setDeletedDate(NoteUtil.now());
                 createPageLog(userId, page.getId(), LogAction.throw_to_recycle_bin, mobile);
                 return pageInfo;
             case RESTORE:
                 pageInfo.setChapter(
-                        chapterRepository.findById(page.getChapterId())
+                        chapterRepository.findById(page.getRestoreChapterId())
                                 .orElseThrow(ResourceNotFoundException::new));
                 pageInfo.setShared(false);
                 pageInfo.setRestoreChapterId(null);
@@ -178,11 +185,41 @@ public class PageService {
             text = "@%%";
         else if (text.equals("_"))
             text = "@__";
+
         output.setChapterList(pageRepository.searchChapter(channelId, text));
         output.setPageList(pageRepository.searchPage(channelId, text));
-        output.setTagList(pageRepository.searchTag(channelId, text));
+        output.setTagList(searchTagList(channelId, text));
 
         return output;
+    }
+
+    public List<PageDTO> searchTagList(String channelId, String text) {
+        String lowerText = "%" + text.toLowerCase() + "%";
+
+        List<SearchDTOinterface> tagList = pageRepository.searchTagInPage(channelId, lowerText);
+        List<PageDTO> pageDTOs = new ArrayList<>();
+        tagList.forEach(item -> {
+            PageDTO dto = new PageDTO();
+
+            dto.setId(item.getId());
+            dto.setChapterId(item.getChapterId());
+            dto.setChapterColor(item.getColor());
+            dto.setChapterType(item.getType());
+
+            List<TagDTO> tags = pageRepository.searchTag(channelId, lowerText, item.getId());
+            List<Tag> result = new ArrayList<>();
+
+            tags.forEach(tag -> {
+                Tag convertTag = new Tag();
+                convertTag.setId(tag.getId());
+                convertTag.setName(tag.getName());
+                result.add(convertTag);
+            });
+            dto.setTagList(result);
+            pageDTOs.add(dto);
+        });
+
+        return pageDTOs;
     }
 
     public List<PageDTO> getRecentPageList(String userId, String channelId, int count) {

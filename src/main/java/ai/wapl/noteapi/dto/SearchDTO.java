@@ -8,5 +8,5 @@ import java.util.List;
 public class SearchDTO {
     private List<ChapterDTO> chapterList;
     private List<PageDTO> pageList;
-    private List<TagDTO> tagList;
+    private List<PageDTO> tagList;
 }
