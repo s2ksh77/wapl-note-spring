@@ -1,5 +1,7 @@
 package ai.wapl.noteapi;
 
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +19,13 @@ public class NoteApiApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("*");
+				registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
 			}
 		};
+	}
+
+	@Bean
+	Hibernate5Module hibernate5Module() {
+		return new Hibernate5Module();
 	}
 }

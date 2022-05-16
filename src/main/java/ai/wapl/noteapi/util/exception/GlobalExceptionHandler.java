@@ -3,7 +3,6 @@ package ai.wapl.noteapi.util.exception;
 import ai.wapl.noteapi.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,8 +26,8 @@ public class GlobalExceptionHandler {
         return error(headers, status, e.getMessage());
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class
-            , MissingRequestValueException.class, MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class, MissingRequestValueException.class,
+            MethodArgumentTypeMismatchException.class })
     public ResponseEntity<?> handleInvalidInput(Exception e) {
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
@@ -49,8 +48,7 @@ public class GlobalExceptionHandler {
         return getResponseEntity(e, HttpStatus.EXPECTATION_FAILED);
     }
 
-
-    @ExceptionHandler({Exception.class, RuntimeException.class})
+    @ExceptionHandler({ Exception.class, RuntimeException.class })
     public ResponseEntity<?> handleUnknown(Exception e) {
         logger.error("Unexpected exception occurred: {}", e.getMessage(), e);
         return getResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);

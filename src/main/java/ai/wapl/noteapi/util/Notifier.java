@@ -82,7 +82,8 @@ public class Notifier {
         .retrieve().toEntity(JsonObject.class);
 
     logger.info("Publish Wwms Event: " + userNoti);
-//    logger.info("Publish Result: " + jsonObjectMono.block().getBody().toString());
+    // logger.info("Publish Result: " +
+    // jsonObjectMono.block().getBody().toString());
   }
 
   public enum Method {
@@ -135,7 +136,8 @@ public class Notifier {
       public String getMessage(String name) {
         return "휴지통으로 이동/복원 되었습니다.";
       }
-    }, SHARECHAPTER(null) {
+    },
+    SHARECHAPTER(null) {
       public String getMessage(String name) {
         return "챕터 : " + name;
       }
@@ -144,11 +146,13 @@ public class Notifier {
       public String getMessage(String name) {
         return "노트 : " + name;
       }
-    }, THROW(null) {
+    },
+    THROW(null) {
       public String getMessage(String name) {
         return "휴지통으로 이동/복원 되었습니다.";
       }
-    }, UPDATE(null) {
+    },
+    UPDATE(null) {
       public String getMessage(String name) {
         return name + " 페이지가 변경 되었습니다.";
       }
