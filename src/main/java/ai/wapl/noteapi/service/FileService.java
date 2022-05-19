@@ -2,6 +2,7 @@ package ai.wapl.noteapi.service;
 
 import ai.wapl.noteapi.domain.File;
 import ai.wapl.noteapi.dto.FileDTO;
+import ai.wapl.noteapi.dto.FileDTOinterface;
 import ai.wapl.noteapi.repository.FileRepository;
 import ai.wapl.noteapi.repository.StorageRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +20,11 @@ public class FileService {
     private final StorageRepository storageRepository;
 
     @Transactional(readOnly = true)
-    public List<FileDTO> getFileListByPageId(String pageId) {
+    public List<FileDTOinterface> getFileListByPageId(String pageId) {
         List<File> files = fileRepository.findByPageId(pageId);
 
-        List<FileDTO> result = new ArrayList<>();
-        files.forEach(file -> result.add(storageRepository.findFileInfo(file.getFileId())));
+        List<FileDTOinterface> result = new ArrayList<>();
+        files.forEach(file -> result.add(fileRepository.findFileInfo(file.getFileId())));
 
         return result;
     }

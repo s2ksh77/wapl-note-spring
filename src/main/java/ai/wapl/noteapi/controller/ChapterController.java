@@ -86,14 +86,16 @@ public class ChapterController {
     }
 
     @ApiOperation(value = "챕터 삭제 서비스 notebookDelete ", notes = "챕터 삭제 서비스")
-    @DeleteMapping(path = "/app/{channelId}/chapter/{chapterId}")
-    public ResponseEntity<?> deleteChapter(@PathVariable String channelId,
-            @PathVariable String chapterId, @RequestHeader("user-agent") String userAgent) {
+    @PostMapping(path = "/app/{channelId}/chapter/delete")
+    public ResponseEntity<ResponseDTO<List<ChapterDTO>>> deleteChapter(@PathVariable String channelId,
+            @RequestBody List<ChapterDTO> inputList, @RequestHeader("user-agent") String userAgent) {
         boolean mobile = NoteUtil.isMobile(userAgent);
-        chapterService.deleteChapter(userId, channelId, chapterId, mobile);
+        chapterService.deleteChapter(userId, channelId, inputList, mobile);
 
-        Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERDELETE, mobile);
-        notifier.publishMQTT(chapterId, null, null);
+        // TODO: // 삭제 noti
+        // Notifier notifier = new Notifier(userId, channelId, Method.CHAPTERDELETE,
+        // mobile);
+        // notifier.publishMQTT(chapterId, null, null);
 
         return noContent();
     }

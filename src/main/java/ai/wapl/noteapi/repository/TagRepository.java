@@ -3,15 +3,15 @@ package ai.wapl.noteapi.repository;
 import java.util.List;
 import java.util.Set;
 
-import javax.transaction.Transactional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
+import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.dto.PageDTOinterface;
 import ai.wapl.noteapi.dto.TagDTOInterface;
 
 @Repository
@@ -37,6 +37,15 @@ public interface TagRepository extends JpaRepository<Tag, String> {
 
         @Query("select p.tagSet from Page p where p.id = :NOTE_ID")
         Set<Tag> findByPageId(@Param("NOTE_ID") String pageId);
+
+        @Query(value = "select P.NOTE_ID as id \n"
+                        + "from TB_NOTEAPP_TAG_MST as TM \n"
+                        + "LEFT JOIN TB_NOTEAPP_NOTE_MST as P \n"
+                        + "ON TM.NOTE_ID = P.NOTE_ID \n"
+                        + "LEFT JOIN TB_NOTEAPP_NOTEBOOK_MST as B \n"
+                        + "ON P.PARENT_NOTEBOOK = B.ID \n"
+                        + "WHERE NOTE_CHANNEL_ID = :NOTE_CHANNEL_ID and TAG_ID = :TAG_ID", nativeQuery = true)
+        List<PageDTOinterface> findByTagId(@Param("NOTE_CHANNEL_ID") String channelId, @Param("TAG_ID") String tagId);
 
         // @Modifying
         // @Query(value = "INSERT INTO TB_NOTEAPP_TAG_MST (TAG_ID, NOTE_ID) VALUES

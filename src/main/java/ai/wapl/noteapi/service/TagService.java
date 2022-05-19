@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
+import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.dto.PageDTOinterface;
 import ai.wapl.noteapi.dto.TagDTO;
 import ai.wapl.noteapi.dto.TagDTOInterface;
 import ai.wapl.noteapi.repository.TagRepository;
@@ -50,6 +52,14 @@ public class TagService {
     @Transactional(readOnly = true)
     public Set<Tag> getTagList(String pageId) {
         return tagRepository.findByPageId(pageId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PageDTO> getTagPageList(String channelId, String tagId, String userId) {
+        List<PageDTOinterface> pageList = tagRepository.findByTagId(channelId, tagId);
+        List<PageDTO> result = new ArrayList<>();
+        pageList.forEach(page -> result.add(pageRepository.findById(userId, page.getId())));
+        return result;
     }
 
     @Transactional(readOnly = true)

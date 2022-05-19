@@ -9,7 +9,10 @@ import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
+import ai.wapl.noteapi.dto.PageDTO;
+import ai.wapl.noteapi.dto.PageDTOinterface;
 import ai.wapl.noteapi.dto.TagDTO;
 import ai.wapl.noteapi.dto.TagDTOInterface;
 import ai.wapl.noteapi.service.TagService;
@@ -23,14 +26,18 @@ import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 @RequestMapping(path = DEFAULT_API_URI)
 public class TagController {
     private final TagService tagService;
+    private String userId = "caf1a998-c39e-49d4-81c7-719f6cc624d9"; // for test daeun
 
     /**
      * tagSortList
      *
      * @param channelId 태그 조회할 채널 id
-     * @return "KOR" / "ENG" / "NUM" / "ETC"</p>
-     * <p>태그 이름 첫 번째 문자 (모음/자음) </p>
-     * 태그 ID, 태그 이름
+     * @return "KOR" / "ENG" / "NUM" / "ETC"
+     *         </p>
+     *         <p>
+     *         태그 이름 첫 번째 문자 (모음/자음)
+     *         </p>
+     *         태그 ID, 태그 이름
      */
     @ApiOperation(value = "태그 전체 조회 정렬 서비스. tagSortList ", notes = "[KOR : [tagList], ENG : [tagList], NUM : [tagList], ETC : [tagList] 데이터 반환")
     @GetMapping(path = "/app/{channelId}/tag")
@@ -71,6 +78,16 @@ public class TagController {
         tagService.updateTag(inputDTO);
 
         return ResponseUtil.noContent();
+    }
+
+    @ApiOperation(value = "태그 하위 페이지 리스트 조회 서비스", notes = "태그 하위 페이지 리스트 조회 서비스")
+    @GetMapping(path = "/app/{channelId}/tag/{tagId}/page")
+    public ResponseEntity<ResponseDTO<List<PageDTO>>> getTagPageList(
+            @PathVariable("channelId") String channelId,
+            @PathVariable("tagId") String tagId) {
+        List<PageDTO> result = tagService.getTagPageList(channelId, tagId, userId);
+
+        return ResponseUtil.success(result);
     }
 
 }

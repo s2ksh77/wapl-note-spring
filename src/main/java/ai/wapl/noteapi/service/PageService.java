@@ -75,13 +75,16 @@ public class PageService {
         return page;
     }
 
-    public Page deletePage(String userId, String channelId, String pageId, boolean mobile) {
-        Page page = pageRepository.findById(pageId).orElseThrow(ResourceNotFoundException::new);
-        fileService.deleteFileByPageId(channelId, pageId);
+    public void deletePage(String userId, String channelId, List<PageDTO> inputList, boolean mobile) {
+        inputList.forEach(page -> deletePage(userId, channelId, page, mobile));
+    }
+
+    public void deletePage(String userId, String channelId, PageDTO inputDTO, boolean mobile) {
+        Page page = pageRepository.findById(inputDTO.getId()).orElseThrow(ResourceNotFoundException::new);
+        fileService.deleteFileByPageId(channelId, inputDTO.getId());
         pageRepository.delete(page);
 
         createPageLog(userId, page.getId(), LogAction.delete, mobile);
-        return page;
     }
 
     public Page updatePage(String userId, PageDTO input, Action action, boolean mobile) {

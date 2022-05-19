@@ -25,6 +25,24 @@ public class File implements Serializable {
     @Transient
     private String channelId;
 
+    @Transient
+    private String fileName;
+
+    @Transient
+    private String fileExtension;
+
+    @Transient
+    private String fileSize;
+
+    @Transient
+    private String createdAt;
+
+    @Transient
+    private String updatedAt;
+
+    @Transient
+    private String uploadUserId;
+
     public File(String pageId, String fileId) {
         this.pageId = pageId;
         this.fileId = fileId;

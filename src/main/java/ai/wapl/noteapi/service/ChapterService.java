@@ -125,16 +125,20 @@ public class ChapterService {
     /**
      * 챕터 삭제 서비스 하위 페이지는 휴지통으로 이동 되고 챕터는 삭제 된다.
      */
-    public void deleteChapter(String userId, String channelId, String chapterId, boolean mobile) {
-        Chapter chapter = chapterRepository.findById(chapterId)
+    public void deleteChapter(String userId, String channelId, List<ChapterDTO> inputList, boolean mobile) {
+        inputList.forEach(chapter -> deleteChapter(userId, channelId, chapter, mobile));
+    }
+
+    public void deleteChapter(String userId, String channelId, ChapterDTO inputDTO, boolean mobile) {
+        Chapter chapter = chapterRepository.findById(inputDTO.getId())
                 .orElseThrow(ResourceNotFoundException::new);
 
         if (chapter.getType().equals(DEFAULT) || chapter.getType().equals(Type.NOTEBOOK)) {
-            chapterRepository.updateRecycleBin(chapterId, channelId, now());
+            chapterRepository.updateRecycleBin(inputDTO.getId(), channelId, Type.RECYCLE_BIN, now());
         } else
-            fileService.deleteFileByChapterId(channelId, chapterId);
+            fileService.deleteFileByChapterId(channelId, inputDTO.getId());
 
-        chapterRepository.deleteById(chapterId);
+        chapterRepository.deleteById(inputDTO.getId());
         createChapterLog(userId, chapter.getId(), LogAction.delete, mobile);
     }
 

@@ -8,6 +8,8 @@ import ai.wapl.noteapi.domain.Tag;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
+
+import org.hibernate.annotations.Nationalized;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
@@ -30,7 +32,9 @@ public class PageDTO {
     private String userName;
     private String editingUserId;
     private boolean favorite;
+
     @Lob
+    @JsonProperty("content")
     private String content;
     private String updatedUserId;
     private boolean shared;
@@ -38,11 +42,12 @@ public class PageDTO {
     private String sharedRoomId;
     private String createdUserId;
     private LocalDateTime deletedDate;
-    @JsonProperty("textContent")
+
     @Lob
+    @JsonProperty("textContent")
     private String textContent;
     private boolean read;
-    private List<FileDTO> fileList;
+    private List<FileDTOinterface> fileList;
     private List<Tag> tagList;
 
     private String chapterColor;

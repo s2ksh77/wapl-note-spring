@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import static ai.wapl.noteapi.dto.PageDTO.*;
 import static ai.wapl.noteapi.util.Constants.DEFAULT_API_URI;
 
@@ -74,18 +76,17 @@ public class PageController {
     }
 
     @ApiOperation(value = "페이지 삭제 서비스 noteDelete ", notes = "페이지 삭제 서비스")
-    @DeleteMapping(path = "/chapter/{chapterId}/page/{pageId}")
-    public ResponseEntity<ResponseDTO<Page>> deletePage(@PathVariable String channelId,
-            @PathVariable String chapterId,
-            @PathVariable String pageId, @RequestHeader("user-agent") String userAgent) {
-        Page result = pageService
-                .deletePage(userId, channelId, pageId, NoteUtil.isMobile(userAgent));
+    @PostMapping(path = "/page")
+    public ResponseEntity<ResponseDTO<List<PageDTO>>> deletePage(@PathVariable String channelId,
+            @RequestBody List<PageDTO> inputList, @RequestHeader("user-agent") String userAgent) {
+        pageService.deletePage(userId, channelId, inputList, NoteUtil.isMobile(userAgent));
 
-        Notifier notifier = new Notifier(userId, channelId, Method.DELETE,
-                NoteUtil.isMobile(userAgent));
-        notifier.publishMQTT(chapterId, result.getId(), result.getName());
+        // TODO:// 삭제 noti
+        // Notifier notifier = new Notifier(userId, channelId, Method.DELETE,
+        // NoteUtil.isMobile(userAgent));
+        // notifier.publishMQTT(chapterId, result.getId(), result.getName());
 
-        return ResponseUtil.success(result);
+        return ResponseUtil.noContent();
     }
 
     @ApiOperation(value = "페이지 업데이트 서비스 noteUpdate ", notes = "페이지 업데이트 서비스")
