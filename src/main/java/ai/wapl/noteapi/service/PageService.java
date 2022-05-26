@@ -142,32 +142,36 @@ public class PageService {
     /**
      * 휴지통 관련 THROW 또는 RESTORE 관련 서비스
      */
-    public Page updateRecyclePage(String userId, PageDTO page, Action action, boolean mobile) {
-        String channelId = page.getChannelId();
+    public void updateRecyclePage(String userId, String channelId, List<PageDTO> pageList, Action action,
+            boolean mobile) {
         Chapter recycleBin = chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)
                 .orElseThrow(ResourceNotFoundException::new);
-        Page pageInfo = pageRepository.getById(page.getId());
-        switch (action) {
-            case THROW:
-                pageInfo.setChapter(recycleBin);
-                pageInfo.setShared(false);
-                pageInfo.setRestoreChapterId(page.getChapterId());
-                pageInfo.setDeletedDate(NoteUtil.now());
-                createPageLog(userId, page.getId(), LogAction.throw_to_recycle_bin, mobile);
-                return pageInfo;
-            case RESTORE:
-                pageInfo.setChapter(
-                        chapterRepository.findById(page.getRestoreChapterId())
-                                .orElseThrow(ResourceNotFoundException::new));
-                pageInfo.setShared(false);
-                pageInfo.setRestoreChapterId(null);
-                pageInfo.setDeletedDate(null);
-                pageInfo.setModifiedDate(NoteUtil.now());
-                createPageLog(userId, page.getId(), LogAction.restore, mobile);
-                return pageInfo;
-            default:
-                throw new IllegalArgumentException("Wrong Action");
-        }
+        pageList.forEach(page -> {
+            Page pageInfo = pageRepository.getById(page.getId());
+            switch (action) {
+                case THROW:
+                    System.out.println("here? 1");
+                    pageInfo.setChapter(recycleBin);
+                    pageInfo.setShared(false);
+                    pageInfo.setRestoreChapterId(page.getChapterId());
+                    pageInfo.setDeletedDate(NoteUtil.now());
+                    System.out.println("here? 2");
+                    createPageLog(userId, page.getId(), LogAction.throw_to_recycle_bin, mobile);
+                    return;
+                case RESTORE:
+                    pageInfo.setChapter(
+                            chapterRepository.findById(page.getRestoreChapterId())
+                                    .orElseThrow(ResourceNotFoundException::new));
+                    pageInfo.setShared(false);
+                    pageInfo.setRestoreChapterId(null);
+                    pageInfo.setDeletedDate(null);
+                    pageInfo.setModifiedDate(NoteUtil.now());
+                    createPageLog(userId, page.getId(), LogAction.restore, mobile);
+                    return;
+                default:
+                    throw new IllegalArgumentException("Wrong Action");
+            }
+        });
     }
 
     public Page sharePageToChapter(String userId, Chapter chapter, Page input, boolean mobile) {

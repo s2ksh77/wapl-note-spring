@@ -110,15 +110,19 @@ public class PageController {
 
     @ApiOperation(value = "휴지통 서비스 noteRecycleBinUpdate", notes = "휴지통 서비스")
     @PutMapping(path = "/page/recycle")
-    public ResponseEntity<ResponseDTO<Page>> updateRecyclePage(@PathVariable String channelId,
-            @RequestBody PageDTO inputDTO,
+    public ResponseEntity<ResponseDTO<?>> updateRecyclePage(@PathVariable String channelId,
+            @RequestBody List<PageDTO> inputDTO,
             @RequestParam("action") Action action, @RequestHeader("user-agent") String userAgent) {
         boolean mobile = NoteUtil.isMobile(userAgent);
-        inputDTO.setChannelId(channelId);
-        Page result = pageService.updateRecyclePage(userId, inputDTO, action, mobile);
-        Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action), mobile);
-        notifier.publishMQTT(result.getChapter().getId(), result.getId(), result.getName());
-        return ResponseUtil.success(result);
+        pageService.updateRecyclePage(userId, channelId, inputDTO, action, mobile);
+
+        // TODO: 리스트로 휴지통 보낸 데이터 notifier 연결
+
+        // Notifier notifier = new Notifier(userId, channelId, Method.valueOf(action),
+        // mobile);
+        // notifier.publishMQTT(result.getChapter().getId(), result.getId(),
+        // result.getName());
+        return ResponseUtil.success();
     }
 
     @ApiOperation(value = "노트 통합검색 서비스 noteSearchList", notes = "노트 통합검색 서비스")
