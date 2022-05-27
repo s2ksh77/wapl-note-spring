@@ -150,12 +150,10 @@ public class PageService {
             Page pageInfo = pageRepository.getById(page.getId());
             switch (action) {
                 case THROW:
-                    System.out.println("here? 1");
                     pageInfo.setChapter(recycleBin);
                     pageInfo.setShared(false);
                     pageInfo.setRestoreChapterId(page.getChapterId());
                     pageInfo.setDeletedDate(NoteUtil.now());
-                    System.out.println("here? 2");
                     createPageLog(userId, page.getId(), LogAction.throw_to_recycle_bin, mobile);
                     return;
                 case RESTORE:
