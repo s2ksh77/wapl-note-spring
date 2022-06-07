@@ -55,6 +55,14 @@ dependencies {
 
     //hibernate 5
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
+
+	//security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// jwt 관련 의존성
+    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 }
 
 test {

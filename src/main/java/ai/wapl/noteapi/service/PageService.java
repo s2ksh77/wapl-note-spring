@@ -108,7 +108,7 @@ public class PageService {
             case MOVE:
                 page.setChapter(chapterRepository.findById(input.getChapterId())
                         .orElseThrow(ResourceNotFoundException::new));
-                page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
+                // page.setUserName(getNotNull(input.getUserName(), page.getUserName()));
                 page.setModifiedDate(NoteUtil.now());
                 page.setUpdatedUserId(userId);
                 createPageLog(userId, page.getId(), LogAction.move, mobile);
