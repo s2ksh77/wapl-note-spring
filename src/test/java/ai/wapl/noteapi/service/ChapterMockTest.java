@@ -41,19 +41,19 @@ public class ChapterMockTest {
   @DisplayName("delete Chapter type default")
   public void deleteChapterTypeDefault() {
     // given
-    String channelId = "channelId";
-    String chapterId = "chapterId";
-    String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-    Chapter chapter = Chapter.builder().id(chapterId).channelId(channelId)
-        .type(Type.DEFAULT).build();
-
-    when(chapterRepository.findById(chapterId)).thenReturn(Optional.ofNullable(chapter));
-
-    // when
-    chapterService.deleteChapter(userId, channelId, chapterId, false);
-
-    // then
-    verify(chapterRepository).updateRecycleBin(chapterId, channelId, now());
+//    String channelId = "channelId";
+//    String chapterId = "chapterId";
+//    String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
+//    Chapter chapter = Chapter.builder().id(chapterId).channelId(channelId)
+//        .type(Type.DEFAULT).build();
+//
+//    when(chapterRepository.findById(chapterId)).thenReturn(Optional.ofNullable(chapter));
+//
+//    // when
+//    chapterService.deleteChapter(userId, channelId, chapterId, false);
+//
+//    // then
+//    verify(chapterRepository).updateRecycleBin(chapterId, channelId, now());
   }
 
 

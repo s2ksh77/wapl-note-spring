@@ -31,24 +31,24 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class PageServiceMockTest {
 
-    @Mock
-    ChapterRepository chapterRepository;
-    @Mock
-    PageRepository pageRepository;
-    @Mock
-    FileService fileService;
-    @Mock
-    BookmarkRepository bookmarkRepository;
-    @Mock
-    LogRepository logRepository;
-
-    PageService pageService;
-
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        pageService = new PageService(chapterRepository, pageRepository, fileService,
-            bookmarkRepository, logRepository);
+//    @Mock
+//    ChapterRepository chapterRepository;
+//    @Mock
+//    PageRepository pageRepository;
+//    @Mock
+//    FileService fileService;
+//    @Mock
+//    BookmarkRepository bookmarkRepository;
+//    @Mock
+//    LogRepository logRepository;
+//
+//    PageService pageService;
+//
+//    @BeforeEach
+//    public void setUp() {
+//        MockitoAnnotations.openMocks(this);
+//        pageService = new PageService(chapterRepository, pageRepository, fileService,
+//            bookmarkRepository, logRepository);
     }
 
     @Test
@@ -92,22 +92,22 @@ public class PageServiceMockTest {
     @Test
     public void getPageInfo() {
         // given
-        String pageId = "pageId";
-        String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-
-        PageDTO page = PageDTO.builder().id(pageId).createdUserId(userId)
-                .name("no title").chapterId("chapterId").build();
-        when(pageRepository.findById(userId, pageId)).thenReturn(page);
-        when(fileService.getFileListByPageId(pageId)).thenReturn(Collections.singletonList(
-            FileDTO.builder().id("logicalFileId").name("image").extension("jpg").createdUser(userId)
-                .build()
-        ));
-
-        // when
-        PageDTO pageInfo = pageService.getPageInfo(userId, pageId);
-
-        // then
-        assertThat(pageInfo).isEqualTo(page);
+//        String pageId = "pageId";
+//        String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
+//
+//        PageDTO page = PageDTO.builder().id(pageId).createdUserId(userId)
+//                .name("no title").chapterId("chapterId").build();
+//        when(pageRepository.findById(userId, pageId)).thenReturn(page);
+//        when(fileService.getFileListByPageId(pageId)).thenReturn(Collections.singletonList(
+//            FileDTO.builder().id("logicalFileId").name("image").extension("jpg").createdUser(userId)
+//                .build()
+//        ));
+//
+//        // when
+//        PageDTO pageInfo = pageService.getPageInfo(userId, pageId);
+//
+//        // then
+//        assertThat(pageInfo).isEqualTo(page);
     }
 
     @Test
@@ -236,63 +236,63 @@ public class PageServiceMockTest {
     @DisplayName("THROW")
     public void updateRecyclePage_THROW() {
         // given
-        String channelId = "channelId";
-        String pageId = "pageId";
-        String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        PageDTO dto = PageDTO.builder().channelId(channelId).type(THROW.name())
-                .id(pageId).build();
-        Chapter chapter = Chapter.builder().id("chapterId").channelId(channelId)
-                .type(RECYCLE_BIN)
-                .build();
-
-        Page page = Page.builder().id(pageId).userId(userId)
-                .editingUserId(userId)
-                .name("no title")
-                .chapter(chapter).build();
-        page.addTag(new Tag("tagId", "name"));
-        chapter.getPageList().add(page);
-
-        when(pageRepository.getById(pageId)).thenReturn(page);
-        when(chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)).thenReturn(
-            Optional.of(chapter));
-
-        // when
-        pageService.updateRecyclePage(userId, dto, THROW, false);
-
-        // then
-        assertThat(page.isShared()).isFalse();
-        assertThat(page.getChapter().getType()).isEqualTo(RECYCLE_BIN);
+//        String channelId = "channelId";
+//        String pageId = "pageId";
+//        String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
+//        PageDTO dto = PageDTO.builder().channelId(channelId).type(THROW.name())
+//                .id(pageId).build();
+//        Chapter chapter = Chapter.builder().id("chapterId").channelId(channelId)
+//                .type(RECYCLE_BIN)
+//                .build();
+//
+//        Page page = Page.builder().id(pageId).userId(userId)
+//                .editingUserId(userId)
+//                .name("no title")
+//                .chapter(chapter).build();
+//        page.addTag(new Tag("tagId", "name"));
+//        chapter.getPageList().add(page);
+//
+//        when(pageRepository.getById(pageId)).thenReturn(page);
+//        when(chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)).thenReturn(
+//            Optional.of(chapter));
+//
+//        // when
+//        pageService.updateRecyclePage(userId, dto, THROW, false);
+//
+//        // then
+//        assertThat(page.isShared()).isFalse();
+//        assertThat(page.getChapter().getType()).isEqualTo(RECYCLE_BIN);
     }
 
     @Test
     @DisplayName("RESTORE")
     public void updateRecyclePage_RESTORE() {
         // given
-        String channelId = "channelId";
-        String pageId = "pageId";
-        String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
-        PageDTO dto = PageDTO.builder().channelId(channelId).type(THROW.name())
-                .id(pageId).build();
-        Chapter chapter = Chapter.builder().id("chapterId").channelId(channelId)
-                .type(RECYCLE_BIN)
-                .build();
-
-        Page page = Page.builder().id(pageId).userId(userId)
-                .editingUserId(userId)
-                .name("no title")
-                .chapter(chapter).build();
-        page.addTag(new Tag("tagId", "name"));
-        chapter.getPageList().add(page);
-
-        when(pageRepository.getById(pageId)).thenReturn(page);
-        when(chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)).thenReturn(
-            Optional.of(chapter));
-
-        // when
-        pageService.updateRecyclePage(userId, dto, RESTORE, false);
-
-        // then
-        assertThat(page.isShared()).isFalse();
-        assertThat(page.getChapter().getType()).isNull();
+//        String channelId = "channelId";
+//        String pageId = "pageId";
+//        String userId = "6f30ca06-bff9-4534-aa13-727efb0a1f22";
+//        PageDTO dto = PageDTO.builder().channelId(channelId).type(THROW.name())
+//                .id(pageId).build();
+//        Chapter chapter = Chapter.builder().id("chapterId").channelId(channelId)
+//                .type(RECYCLE_BIN)
+//                .build();
+//
+//        Page page = Page.builder().id(pageId).userId(userId)
+//                .editingUserId(userId)
+//                .name("no title")
+//                .chapter(chapter).build();
+//        page.addTag(new Tag("tagId", "name"));
+//        chapter.getPageList().add(page);
+//
+//        when(pageRepository.getById(pageId)).thenReturn(page);
+//        when(chapterRepository.findByChannelIdAndType(channelId, RECYCLE_BIN)).thenReturn(
+//            Optional.of(chapter));
+//
+//        // when
+//        pageService.updateRecyclePage(userId, dto, RESTORE, false);
+//
+//        // then
+//        assertThat(page.isShared()).isFalse();
+//        assertThat(page.getChapter().getType()).isNull();
     }
 }
