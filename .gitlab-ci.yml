@@ -93,3 +93,129 @@ visualize-coverage:
   image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
   dependencies:
     - test-gradle
+  needs: [ "test-gradle" ]
+  rules:
+    # 마스터 브랜치나 develop* 브랜치에 머지 리퀘스트가 올라올 때
+    - if: $CI_PIPELINE_SOURCE ==  "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE ==  "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^develop.*$/
+    #- if: $CI_PIPELINE_SOURCE ==  "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "samsung-etech"
+    # 마스터 브랜치에 커밋이 올라올 때
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/src/main/java/ > build/cobertura.xml
+  artifacts:
+    reports:
+      cobertura: build/cobertura.xml
+  tags:
+    - pl2-2
+
+# 마스터 브랜치에 커밋이 올라올 때, 정적 코드 검사
+analyze-code:
+  stage: analysis
+  script:
+    # 코드 분석 실행 스크립트
+    - echo "After commits merged, run static/dynamic analysis."
+
+  only: # MR 시 항상 테스트 실행
+    - master
+  tags:
+    - pl2-2
+
+# 도커 이미지 빌드 job
+build-docker:
+  stage: package
+  image: docker:19.03.12
+  # 아래 서비스는 Docker-in-Docker (dind)를 위한 설정
+  # - docker-build 라는 Job이 현재 docker:19.03.12 이미지로 생성된 컨테이너에서 실행되고 있는 상태
+  # - 도커 컨테이너 안에서 다시 docker 명령어를 수행하기 위해 나온 개념이 docker-in-docker
+  # - docker build 또는 docker push 등과 같은 명령어를 수행하려면 아래 services 를 복사해서 사용하기 바람
+  services:
+    - name: docker:19.03.12-dind
+      alias: docker
+      command: ["--tls=false"]
+
+  # DinD 이미지는 alpine 위에 docker 와 dind 서비스만 올라간 이미지이기 때문에 별도로 gradle-7.4, openjdk-11 을 설치 하는 스크립트 추가
+  before_script:
+    - apk update
+    - apk add openjdk11
+    - apk add bash curl zip && curl -s "https://get.sdkman.io" | bash
+    - bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && sdk version && sdk install gradle 7.4"
+
+    # harbor.wapl.ai 에 이미지 푸시하기 위해 로그인 진행
+    - echo "---- Docker login"
+    - echo "$HARBOR_PASSWORD" | docker login -u "$HARBOR_USER" "$HARBOR_URL" --password-stdin
+  script:
+    - echo "build docker image with tag ${CI_COMMIT_TAG}"
+    - |-
+      ./gradlew --build-cache \
+                --gradle-user-home cache/ \
+                bootBuildImage \
+                --imageName=${HARBOR_URL}/${DOCKER_PROJECT}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} \
+                -Pprofile=prod
+    - docker tag ${HARBOR_URL}/${DOCKER_PROJECT}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG} ${HARBOR_URL}/${DOCKER_PROJECT}/${CI_PROJECT_NAME}:latest
+
+    - echo "Deploy docker image ${DOCKER_PROJECT}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}"
+    - echo "docker push ${HARBOR_URL}/${DOCKER_PROJECT}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}"
+    # harbor.wapl.ai/wapl-ci/{project_name} 밑에 이미지 푸시
+    - docker push ${HARBOR_URL}/${DOCKER_PROJECT}/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}
+    - docker push ${HARBOR_URL}/${DOCKER_PROJECT}/${CI_PROJECT_NAME}:latest
+  only:  # 태그 작성 시 도커 이미지 빌드
+    - master
+    #- samsung-etech
+    - tags
+  except:
+    - branches
+  cache:
+    key: gradle-cache-${CI_PROJECT_NAME} # gradle 캐시를 저장하기 위한 key
+    paths:
+      - cache/wrapper/
+      - cache/caches/
+  tags:
+    - pl2-2
+
+# GitOps 저장소에 빌드한 도커 이미지 버전을 수정하는 job
+deploy-gitops:
+  stage: deploy
+  needs: ["build-docker"]
+  # 가장 가벼운 alpine 이미지에 깃만 설치해서 사용
+  image: alpine:3.15
+  only:
+    - master
+    #- samsung-etech
+    - tags
+  except:
+    - branches
+  variables:
+    # GitOps 정보들을 환경변수 파일이나 프로젝트 환경변수로 분리 해야 함
+    GITOPS_HOST: 'demogit.tmaxcloud.com'
+    GITOPS_PROJECT_PATH: 'wapl-cicd/gitops'
+    GITOPS_BRANCH: 'wapl-dev'
+
+  # alpine 이미지에 깃 설치 후 gitops 저장소 clone
+  before_script:
+    - apk update && apk add git
+    - pwd
+    - git clone "https://${GITOPS_USERNAME}:${GITOPS_TOKEN}@${GITOPS_HOST}/${GITOPS_PROJECT_PATH}.git" "${CI_COMMIT_SHA}"
+    - cd ${CI_COMMIT_SHA}
+    - git config user.email "${GITOPS_USER_EMAIL:-$GITLAB_USER_EMAIL}"
+    - git config user.name "${GITOPS_USER_NAME:-$GITLAB_USER_NAME}"
+  script:
+    - git checkout ${GITOPS_BRANCH}
+    - cd ${CI_PROJECT_NAME}
+    - pwd
+
+    # update gitops
+    - sed -i "s;image:\ $HARBOR_URL/$DOCKER_PROJECT/$CI_PROJECT_NAME:.*\+;image:\ $HARBOR_URL/$DOCKER_PROJECT/$CI_PROJECT_NAME:$CI_COMMIT_TAG;g" calendar-spring-deployment.yaml
+    # commit to Git
+    - git add .
+    - |-
+      CHANGES=$(git status -- porcelain | wc -l)
+
+      if [ "$CHANGES" -gt "0" ]; then
+        git status
+        git commit -m "${CI_PROJECT_NAME}_${CI_COMMIT_TAG}"
+        git push
+      fi
+
+  tags:
+    - pl2-2
