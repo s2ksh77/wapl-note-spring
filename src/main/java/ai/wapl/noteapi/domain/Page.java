@@ -2,6 +2,7 @@ package ai.wapl.noteapi.domain;
 
 import static ai.wapl.noteapi.util.Constants.EMPTY_CONTENT;
 
+import ai.wapl.noteapi.dto.PageDTO;
 import ai.wapl.noteapi.util.DateTimeConverter;
 import ai.wapl.noteapi.util.NoteUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -101,12 +102,16 @@ public class Page {
   @Transient
   private int tagCount;
 
+  @Transient
+  private String chapterId;
+
   @Builder
   public static Page createPage(String id, String name, String content, String textContent,
-      String editingUserId, Chapter chapter, String userId, String userName, boolean shared) {
+      String editingUserId, Chapter chapter, String userId, String userName, boolean shared, String chapterId) {
     Page page = new Page();
     page.setId(id);
     page.setChapter(chapter);
+    page.setChapterId(chapterId);
     page.setName(name);
     page.setContent(content);
     page.setTextContent(textContent);
@@ -123,7 +128,9 @@ public class Page {
 
   public static Page createPage(Chapter chapter, Page input) {
     Page page = Page.builder().chapter(chapter)
+        .chapterId(chapter.getId())
         .name(input.getName()).content(input.getContent())
+        .editingUserId(input.getCreatedUserId())
         .userId(input.getCreatedUserId()).userName(input.getUserName())
         .textContent(input.getTextContent()).build();
 
@@ -145,6 +152,23 @@ public class Page {
     page.setCreatedDate(NoteUtil.now());
     page.setModifiedDate(NoteUtil.now());
 
+    return page;
+  }
+
+  public static PageDTO convertDTO(Page input) {
+    PageDTO page = new PageDTO();
+    page.setId(input.getId());
+    page.setChapterId(input.chapter.getId());
+    page.setName(input.getName());
+    page.setContent(EMPTY_CONTENT);
+    page.setTextContent(input.getTextContent());
+    page.setEditingUserId(input.getEditingUserId());
+    page.setUpdatedUserId(input.getUpdatedUserId());
+    page.setCreatedUserId(input.getCreatedUserId());
+    page.setUserName(input.getUserName());
+    page.setCreatedDate(input.getCreatedDate());
+    page.setModifiedDate(input.getModifiedDate());
+    page.setShared(input.isShared());
     return page;
   }
 

@@ -63,10 +63,11 @@ public class PageController {
 
     @ApiOperation(value = "페이지 생성 서비스 noteCreate ", notes = "페이지 생성 서비스")
     @PostMapping("/chapter/{chapterId}/page")
-    public ResponseEntity<ResponseDTO<Page>> createPage(@PathVariable String channelId,
+    public ResponseEntity<ResponseDTO<PageDTO>> createPage(@PathVariable String channelId,
             @PathVariable String chapterId,
             @RequestBody PageDTO inputDTO, @RequestHeader("user-agent") String userAgent) {
-        Page result = pageService.createPage(userId, inputDTO, NoteUtil.isMobile(userAgent));
+
+        PageDTO result = pageService.createPage(userId, inputDTO, NoteUtil.isMobile(userAgent));
 
         Notifier notifier = new Notifier(userId, channelId, Method.CREATE,
                 NoteUtil.isMobile(userAgent));

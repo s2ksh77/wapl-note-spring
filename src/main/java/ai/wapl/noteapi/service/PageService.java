@@ -60,13 +60,13 @@ public class PageService {
     /**
      * 페이지 추가 서비스 createdDate, modifiedDate
      */
-    public Page createPage(String userId, PageDTO inputPage, boolean mobile) {
+    public PageDTO createPage(String userId, PageDTO inputPage, boolean mobile) {
         Chapter chapter = chapterRepository.findById(inputPage.getChapterId())
                 .orElseThrow(ResourceNotFoundException::new);
         Page page = pageRepository.save(Page.createPage(chapter, inputPage.toEntity()));
 
         createPageLog(userId, page.getId(), LogAction.create, mobile);
-        return page;
+        return Page.convertDTO(page);
     }
 
     Page createPage(Page inputPage, boolean mobile) {

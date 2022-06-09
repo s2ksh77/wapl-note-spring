@@ -5,6 +5,7 @@ import javax.persistence.Lob;
 import ai.wapl.noteapi.domain.Page;
 import ai.wapl.noteapi.domain.Tag;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PageDTO {
     private String id;
     private String chapterId;
