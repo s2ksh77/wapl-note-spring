@@ -31,21 +31,21 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class PageServiceMockTest {
 
-//    @Mock
-//    ChapterRepository chapterRepository;
-//    @Mock
-//    PageRepository pageRepository;
-//    @Mock
-//    FileService fileService;
-//    @Mock
-//    BookmarkRepository bookmarkRepository;
-//    @Mock
-//    LogRepository logRepository;
-//
-//    PageService pageService;
-//
-//    @BeforeEach
-//    public void setUp() {
+    @Mock
+    ChapterRepository chapterRepository;
+    @Mock
+    PageRepository pageRepository;
+    @Mock
+    FileService fileService;
+    @Mock
+    BookmarkRepository bookmarkRepository;
+    @Mock
+    LogRepository logRepository;
+
+    PageService pageService;
+
+    @BeforeEach
+    public void setUp() {
 //        MockitoAnnotations.openMocks(this);
 //        pageService = new PageService(chapterRepository, pageRepository, fileService,
 //            bookmarkRepository, logRepository);
