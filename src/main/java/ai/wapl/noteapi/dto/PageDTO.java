@@ -33,6 +33,7 @@ public class PageDTO {
     private LocalDateTime modifiedDate;
     private String userName;
     private String editingUserId;
+    private boolean editing;
     private boolean favorite;
 
     @Lob
@@ -70,6 +71,7 @@ public class PageDTO {
     public PageDTO(Page source, String bookmark) {
         this(source);
         this.favorite = bookmark != null;
+        this.editing = editingUserId != null && !editingUserId.isEmpty();
     }
 
     public Page toEntity() {
