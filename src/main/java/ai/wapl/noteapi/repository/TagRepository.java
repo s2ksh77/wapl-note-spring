@@ -31,6 +31,19 @@ public interface TagRepository extends JpaRepository<Tag, String> {
                         + "GROUP BY T.TAG_ID, T.TEXT", nativeQuery = true)
         List<TagDTOInterface> findByChannelIdForCount(@Param("NOTE_CHANNEL_ID") String channelId);
 
+        @Query(value = "SELECT T.TAG_ID as id, T.TEXT as name, count(*) as tagCount \n"
+                        + "FROM TB_NOTEAPP_TAG as T \n"
+                        + "LEFT JOIN TB_NOTEAPP_TAG_MST as TM \n"
+                        + "ON T.TAG_ID = TM.TAG_ID \n"
+                        + "LEFT JOIN TB_NOTEAPP_NOTE_MST as P \n"
+                        + "ON P.NOTE_ID = TM.NOTE_ID \n"
+                        + "LEFT JOIN TB_NOTEAPP_NOTEBOOK_MST as B \n"
+                        + "ON P.PARENT_NOTEBOOK = B.ID \n"
+                        + "WHERE NOTE_CHANNEL_ID = :NOTE_CHANNEL_ID AND T.TEXT LIKE %:SEARCHKEY% ESCAPE '@' \n"
+                        + "GROUP BY T.TAG_ID, T.TEXT", nativeQuery = true)
+        List<TagDTOInterface> findByChannelIdSearchTag(@Param("NOTE_CHANNEL_ID") String channelId,
+                        @Param("SEARCHKEY") String searchKey);
+
         @Query(value = "select p.tagSet from Page p " +
                         "inner join p.chapter c where c.channelId = :NOTE_CHANNEL_ID")
         Set<Tag> findByChannelId(@Param("NOTE_CHANNEL_ID") String channelId);

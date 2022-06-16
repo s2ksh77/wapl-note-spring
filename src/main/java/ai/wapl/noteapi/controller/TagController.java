@@ -48,6 +48,15 @@ public class TagController {
         return ResponseUtil.success(result);
     }
 
+    @ApiOperation(value = "태그 메뉴 검색 조회 정렬 서비스. tagSearchList ", notes = "[KOR : [tagList], ENG : [tagList], NUM : [tagList], ETC : [tagList] 데이터 반환")
+    @GetMapping(path = "/app/{channelId}/tag/{searchKey}")
+    public ResponseEntity<ResponseDTO<Map<String, Map<String, List<TagDTOInterface>>>>> getAllSearchTagList(
+            @PathVariable("channelId") String channelId, @PathVariable("searchKey") String searchKey) {
+        Map<String, Map<String, List<TagDTOInterface>>> result = tagService.getAllSearchTagList(channelId, searchKey);
+
+        return ResponseUtil.success(result);
+    }
+
     @ApiOperation(value = "페이지 하위 태그 리스트 조회 서비스", notes = "페이지 하위 태그 리스트 조회 서비스. tagList")
     @GetMapping(path = "/page/{pageId}/tag")
     public ResponseEntity<ResponseDTO<Set<Tag>>> getTagList(@PathVariable("pageId") String pageId) {
@@ -65,7 +74,7 @@ public class TagController {
     }
 
     @ApiOperation(value = "태그 삭제 서비스", notes = "태그 삭제 서비스. tagDelete ")
-    @DeleteMapping(path = "/page/{pageId}/tag")
+    @PostMapping(path = "/page/{pageId}/tag/delete")
     public ResponseEntity<ResponseDTO<Tag>> deleteTag(@RequestBody List<TagDTO> inputDTO) {
         tagService.deleteTag(inputDTO);
 

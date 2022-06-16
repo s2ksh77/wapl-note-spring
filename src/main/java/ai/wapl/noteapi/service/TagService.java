@@ -22,9 +22,18 @@ public class TagService {
     private final TagRepository tagRepository;
     private final PageRepository pageRepository;
 
-    @Transactional(readOnly = true)
     public Map<String, Map<String, List<TagDTOInterface>>> getAllTagList(String channelId) {
         List<TagDTOInterface> tagList = tagRepository.findByChannelIdForCount(channelId);
+        return getSortedList(tagList);
+    }
+
+    public Map<String, Map<String, List<TagDTOInterface>>> getAllSearchTagList(String channelId, String searchKey) {
+        List<TagDTOInterface> tagList = tagRepository.findByChannelIdSearchTag(channelId, searchKey);
+        return getSortedList(tagList);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Map<String, List<TagDTOInterface>>> getSortedList(List<TagDTOInterface> tagList) {
         Map<String, Map<String, List<TagDTOInterface>>> tagMap = new LinkedHashMap<>() {
             {
                 put("KOR", null);
