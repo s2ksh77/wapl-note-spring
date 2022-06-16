@@ -160,6 +160,7 @@ public class Page {
     PageDTO page = new PageDTO();
     page.setId(input.getId());
     page.setChapterId(input.chapter.getId());
+    page.setColor(input.chapter.getColor());
     page.setName(input.getName());
     page.setContent(EMPTY_CONTENT);
     page.setTextContent(input.getTextContent());

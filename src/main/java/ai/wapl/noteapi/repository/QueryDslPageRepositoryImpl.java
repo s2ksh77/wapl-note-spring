@@ -41,7 +41,7 @@ public class QueryDslPageRepositoryImpl implements QueryDslPageRepository {
     System.out.println(bookmarkJPQLQuery);
 
     return queryFactory.select(Projections.constructor(PageDTO.class, page, bookmarkJPQLQuery))
-        .from(page).where(page.id.eq(pageId)).fetchOne();
+        .from(page).join(chapter).on(chapter.eq(page.chapter)).where(page.id.eq(pageId)).fetchOne();
   }
 
   @Override

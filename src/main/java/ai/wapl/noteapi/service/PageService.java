@@ -210,7 +210,7 @@ public class PageService {
             dto.setName(item.getChapterName()); // pageList에서 name 부분에 chapter name
             dto.setChapterId(item.getChapterId());
             dto.setTextContent(item.getName()); // pageList에서 textContent 부분에 page name
-            dto.setChapterColor(item.getColor());
+            dto.setColor(item.getColor());
             dto.setChapterType(item.getType());
 
             List<TagDTO> tags = pageRepository.searchTag(channelId, lowerText, item.getId());

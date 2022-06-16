@@ -53,13 +53,14 @@ public class PageDTO {
     private List<FileDTOinterface> fileList;
     private List<Tag> tagList;
 
-    private String chapterColor;
+    private String color;
     private String chapterType;
 
     public PageDTO(Page source) {
         BeanUtils.copyProperties(source, this);
         if (source.getChapter() != null)
             this.chapterId = source.getChapter().getId();
+        this.color = source.getChapter().getColor();
     }
 
     public PageDTO(Page source, Set<Tag> tagSet) {
