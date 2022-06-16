@@ -1,0 +1,48 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.Oracle10gDialect
+        use_sql_comments: 'true'
+        format_sql: 'true'
+        show_sql: 'true'
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.Oracle9iDialect
+
+  datasource:
+    password: ${DATABASE_USER:DOM_B2B_4}
+    driver-class-name: com.tmax.tibero.jdbc.TbDriver
+    username: ${DATABASE_PASSWD:DOM_B2B_4}
+    url: jdbc:tibero:thin:@${DATABASE_IP:220.90.208.123}:${DATABASE_PORT:8629}:tibero
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  aop:
+    proxy-target-class: 'true'
+
+wapl:
+  default:
+    schema: CMS
+  com:
+    server:
+      url: COM
+  localhost:
+    schema: DOM_B2B_4
+
+jwt:
+  secret: MIIClzCCAX8CBgF7UyTVUzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDAR0bWF4MB4XDTIxMDgxNzA4MDM0OFoXDTMxMDgxNzA4MDUyOFowDzENMAsGA1UEAwwEdG1heDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKvwhP6gZpsfye7tDE+0M8CM3F9Z0cCxMVo4lUQQylmjyURs+gNnLxy+/R7pbLVMjQc7r1e4wh3BrZlGgUGcENAYfPg5A4BhE57zvsJKm+Q4EVmenXKilhqgZ28eTCq3UMft7CalhXwvKtZZ6Um/peGQGlmyCJ3inTedM7umDLZo66iXLIaNQsHZ9JPRkWSMXacj/34PmgUA+TsEycxfF7rPLw7vbunCLX4ewLdkD68YoNw4RrW7rTetCnY27KVzDZDPY3FIDApyb2Rrv7f1zI7UKyT/m543ikwVJfDFULesX3kOd0BUOJZ82ejRS3GtFsJJ+adgCvRzJ+J1RQ/6760CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAeT5vmZpxJXkM4SYMrgjQvba6UiIpbZwMSG4ev21gEB+O/qoNGhkhG/yE7IqogKuLFnhcVxr14nDwHFQRGC8Fn7wU4cjOun/j+LPjwZ33vKhNyjn0GWL/k4/rdlN/w//NEBYq8fsfJweUWtewZjDyhcyL1eOIhtCCvNNuZFVLEiZjN+LVO3l1Qbt1U6fKmv9SrJf8d9AaPZvmDAcB0SbUaQ0k7zBm6i/ElahnAzjnoyzZztNZ0SBHduXdHX0K47oA0ym5q2L2ameHYJPT8nfJChBPxDQgebJZg5vpj7I2dU4mLc0Tde6o5Hw/XBSc0n/D4n2255Ug0OtK3MV0U0iKXw==
+
+auth:
+  domain: https://auth.teespace.net/auth
+  client-id: wapl_dev
+  realm-name: tmax
+
+server:
+  port: '8282'
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: TRACE
