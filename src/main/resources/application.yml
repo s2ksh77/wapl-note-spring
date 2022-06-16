@@ -38,9 +38,6 @@ auth:
   client-id: wapl_dev
   realm-name: tmax
 
-server:
-  port: '8282'
-
 logging:
   level:
     org:
