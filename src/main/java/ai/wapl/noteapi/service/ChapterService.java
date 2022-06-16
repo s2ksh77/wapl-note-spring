@@ -98,6 +98,7 @@ public class ChapterService {
         chapter.setRead(readSet.contains(chapter.getId()));
         chapter.getPageList().forEach(pageDTO -> {
             pageDTO.setFavorite(pageService.isBookMark(pageDTO.getId(), userId));
+            pageDTO.setEditingUserId(pageDTO.getEditingUserId());
             pageDTO.setRead(readSet.contains(pageDTO.getId()));
         });
 
@@ -118,7 +119,7 @@ public class ChapterService {
                 .name(language.equals(KOREAN) ? NEW_PAGE_KOREAN : NEW_PAGE_ENGLISH)
                 .build();
 
-        chapter.addPage(pageService.createPage(page, mobile));
+        chapter.addPage(pageService.createPage(page, mobile, true));
         return chapter;
     }
 
@@ -174,7 +175,7 @@ public class ChapterService {
 
         // // get page list of chapter
         originChapter.getPageList()
-                .forEach(page -> pageService.sharePageToChapter(userId, newChapter, page, mobile));
+                .forEach(page -> pageService.sharePageToChapter(userId, newChapter, page, mobile, true));
 
         return newChapter;
     }

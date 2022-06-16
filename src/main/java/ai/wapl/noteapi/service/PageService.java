@@ -63,14 +63,14 @@ public class PageService {
     public PageDTO createPage(String userId, PageDTO inputPage, boolean mobile) {
         Chapter chapter = chapterRepository.findById(inputPage.getChapterId())
                 .orElseThrow(ResourceNotFoundException::new);
-        Page page = pageRepository.save(Page.createPage(chapter, inputPage.toEntity()));
+        Page page = pageRepository.save(Page.createPage(chapter, inputPage.toEntity(), false));
 
         createPageLog(userId, page.getId(), LogAction.create, mobile);
         return Page.convertDTO(page);
     }
 
-    Page createPage(Page inputPage, boolean mobile) {
-        Page page = pageRepository.save(Page.createPage(inputPage.getChapter(), inputPage));
+    Page createPage(Page inputPage, boolean mobile, boolean isChapter) {
+        Page page = pageRepository.save(Page.createPage(inputPage.getChapter(), inputPage, isChapter));
         createPageLog(inputPage.getCreatedUserId(), page.getId(), LogAction.create, mobile);
         return page;
     }
@@ -172,9 +172,9 @@ public class PageService {
         });
     }
 
-    public Page sharePageToChapter(String userId, Chapter chapter, Page input, boolean mobile) {
+    public Page sharePageToChapter(String userId, Chapter chapter, Page input, boolean mobile, boolean isChapter) {
         // create page with same content
-        Page page = Page.createPage(chapter, input);
+        Page page = Page.createPage(chapter, input, isChapter);
         pageRepository.save(page);
 
         // deep copy files of page

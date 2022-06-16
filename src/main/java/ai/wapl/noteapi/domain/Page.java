@@ -126,12 +126,13 @@ public class Page {
     return page;
   }
 
-  public static Page createPage(Chapter chapter, Page input) {
+  public static Page createPage(Chapter chapter, Page input, boolean isChapter) {
     Page page = Page.builder().chapter(chapter)
         .chapterId(chapter.getId())
         .name(input.getName()).content(input.getContent())
-        .editingUserId(input.getCreatedUserId())
-        .userId(input.getCreatedUserId()).userName(input.getUserName())
+        .editingUserId(isChapter ? null : input.getCreatedUserId())
+        .userId(input.getCreatedUserId())
+        .userName(input.getUserName())
         .textContent(input.getTextContent()).build();
 
     page.setCreatedDate(NoteUtil.now());
