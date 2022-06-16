@@ -43,3 +43,6 @@ logging:
     org:
       hibernate:
         SQL: TRACE
+
+server:
+  port: 8282
