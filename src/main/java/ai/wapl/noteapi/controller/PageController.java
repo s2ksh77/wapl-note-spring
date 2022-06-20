@@ -6,6 +6,7 @@ import ai.wapl.noteapi.util.Notifier;
 import ai.wapl.noteapi.util.Notifier.Method;
 import ai.wapl.noteapi.util.ResponseUtil;
 import ai.wapl.noteapi.util.ResponseUtil.ResponseDTO;
+import ai.wapl.noteapi.util.security.SecurityUtil;
 import ai.wapl.noteapi.util.ServiceCaller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -49,6 +51,9 @@ public class PageController {
             @PathVariable("channelId") String channelId,
             @RequestParam(value = "count", defaultValue = "5") Integer count) {
         List<PageDTO> pageDTOS = pageService.getRecentPageList(userId, channelId, count);
+
+        UUID userId = SecurityUtil.getUserId().get();
+        System.out.println(userId);
 
         return ResponseUtil.success(pageDTOS);
     }
