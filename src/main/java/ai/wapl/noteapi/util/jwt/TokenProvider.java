@@ -54,7 +54,6 @@ public class TokenProvider {
         // 호출 캐릭터 uuid
         String uuid = request.getHeader(HEADER_USER_ID);
 
-        System.out.println("getAuthentication 에서 uuid" + uuid);
         // get WAPL data from JWT
         Long accountId = claims.get(TOKEN_ACCOUNT_ID, Long.class);
         Map<String, Object> userMap = claims.get(TOKEN_USER_MAP, Map.class);
@@ -64,7 +63,6 @@ public class TokenProvider {
 
         // 호출 캐릭터 정보가 유효하다면 custom principal 및 authorities 세팅
         if (StringUtils.hasText(uuid) && userMap != null && userMap.get(uuid) != null) {
-            System.out.println("이 조건문에는 들어오나요" + uuid);
 
             ObjectMapper mapper = new ObjectMapper();
             MapperObject user = mapper.convertValue(userMap.get(uuid), MapperObject.class);
@@ -78,7 +76,6 @@ public class TokenProvider {
         // 유효하지 않다면 계정 정보만 세팅
         else {
             principal.setAccountId(accountId);
-            System.out.println("account 조건문입니당" + accountId);
         }
         // 인증된 Authentication 객체 생성하여 리턴
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
