@@ -34,11 +34,14 @@ public class SecurityUtil {
 
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
 
+        System.out.println("util 안에서 principal" + principal);
+
         String userId = principal.getUserId();
 
         // if (userId == null) {
         // throw new RuntimeException("Security Context 에 User ID가 없습니다.");
         // }
+        System.out.println("util 안에서 userId" + userId);
 
         UUID userUUID = null;
         if (userId != null) {
