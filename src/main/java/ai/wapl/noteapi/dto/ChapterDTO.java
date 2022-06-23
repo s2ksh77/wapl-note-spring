@@ -38,4 +38,12 @@ public class ChapterDTO {
         if (source.getPageList() != null && !source.getPageList().isEmpty())
             source.getPageList().forEach(page -> pageList.add(new PageDTO(page)));
     }
+
+    public ChapterDTO(Chapter source, boolean mobile) {
+        BeanUtils.copyProperties(source, this);
+        if (!mobile) {
+            if (source.getPageList() != null && !source.getPageList().isEmpty())
+                source.getPageList().forEach(page -> pageList.add(new PageDTO(page)));
+        }
+    }
 }

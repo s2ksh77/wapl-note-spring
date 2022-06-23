@@ -75,9 +75,9 @@ public class ChapterService {
         Set<String> readSet = logRepository.getReadListByChannelId(userId, channelId);
 
         chapters.forEach(chapter -> {
-            ChapterDTO dto = new ChapterDTO(chapter);
+            ChapterDTO dto = new ChapterDTO(chapter, mobile);
             // 웹에서만 즐찾 필요
-            if (mobile)
+            if (!mobile)
                 dto.setPageList(chapterRepository.findByChapterIdWithBookmark(dto.getId(), userId));
             dto.setRead(readSet.contains(chapter.getId()));
             chapterDTOS.add(dto);

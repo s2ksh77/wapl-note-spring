@@ -53,10 +53,12 @@ public class ChapterController {
         boolean mobile = true;
         List<ChapterDTO> chapterList = chapterService.getChapterList(userId, channelId, mobile);
 
-        chapterList.forEach(chapter -> chapter.getPageList().forEach(page -> {
-            page.setContent(null);
-            page.setTextContent(null);
-        }));
+        if (!mobile) { // mobile일 경우 pageList 없게끔
+            chapterList.forEach(chapter -> chapter.getPageList().forEach(page -> {
+                page.setContent(null);
+                page.setTextContent(null);
+            }));
+        }
 
         return success(chapterList);
     }
